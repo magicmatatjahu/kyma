@@ -6,6 +6,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kyma-project/kyma/components/ui-api-layer/internal/gqlschema"
+	"github.com/kyma-project/kyma/components/ui-api-layer/internal/domain/servicecatalog/pretty"
 )
 
 // TODO: Move to subpackage
@@ -49,7 +50,12 @@ func (il *instanceListener) notify(eventType gqlschema.ServiceInstanceEventType,
 		return
 	}
 
-	gqlInstance := il.instanceConverter.ToGQL(instance)
+	gqlInstance, err := il.instanceConverter.ToGQL(instance)
+	if err != nil {
+		glog.Error(fmt.Errorf("Failed converting %s: %s to QGL", pretty.ServiceInstance, instance.Name))
+		return
+	}
+
 	event := gqlschema.ServiceInstanceEvent{
 		Type:     eventType,
 		Instance: *gqlInstance,
