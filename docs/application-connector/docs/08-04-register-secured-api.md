@@ -20,7 +20,7 @@ To register an API secured with Basic Authentication, add a `credentials.basic` 
 
 This is an example of the `api` section of the request body for an API secured with Basic Authentication:
 
-```
+``` json
     "api": {
         "targetUrl": "https://sampleapi.targeturl/v1",
         "credentials": {
@@ -42,7 +42,7 @@ To register an API secured with OAuth, add a `credentials.oauth` object to the `
 
 This is an example of the `api` section of the request body for an API secured with OAuth:
 
-```
+``` json
     "api": {
         "targetUrl": "https://sampleapi.targeturl/v1",
         "credentials": {
@@ -66,7 +66,7 @@ Include this field in the service registration request body:
 
 This is an example of the `api` section of the request body for an API secured with generated client certificates:
 
-```
+``` json
     "api": {
         "targetUrl": "https://sampleapi.targeturl/v1",
         "credentials": {
@@ -84,13 +84,13 @@ When you register an API with the `credentials.certificateGen` object, the Appli
 
 The certificate and key pair is stored in a Secret in the `kyma-integration` Namespace. List all Secrets and find the one created for your API:
 
-```
+``` console
 kubectl -n kyma-integration get secrets
 ```
 
 To fetch the certificate and key encoded with base64, run this command:
 
-```
+``` console
 kubectl -n kyma-integration get secrets app-{APP_NAME}-{SERVICE_ID} -o yaml
 ```
 
@@ -99,7 +99,7 @@ kubectl -n kyma-integration get secrets app-{APP_NAME}-{SERVICE_ID} -o yaml
 
 If the API you registered provides a certificate-key pair or the generated certificate doesn't meet your security standards or specific needs, you can use a custom certificate-key pair for authentication. To replace the Kyma-generated pair with your certificate and key, run this command:
 
-```
+``` console
 kubectl -n kyma-integration patch secrets app-{APP_NAME}-{SERVICE_ID} --patch 'data:
   crt: {BASE64_ENCODED_CRT}
   key: {BASE64_ENCODED_KEY}'

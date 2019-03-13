@@ -5,7 +5,7 @@ type: Custom Resource
 
 The `applicationmappings.application.kyma-project.io` CustomResourceDefinition (CRD) is a detailed description of the kind of data and the format used to enable APIs and Events from an Application (App) as a ServiceClass in a given Namespace. To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-```
+``` console
 kubectl get crd applicationmappings.applicationconnector.kyma-project.io -o yaml
 ```
 
@@ -13,7 +13,7 @@ kubectl get crd applicationmappings.applicationconnector.kyma-project.io -o yaml
 
 This is a sample ApplicationMapping resource which enables the `test` Application in the `production` Namespace:
 
-```
+``` yaml
 apiVersion: applicationconnector.kyma-project.io/v1alpha1
 kind: ApplicationMapping
 metadata:

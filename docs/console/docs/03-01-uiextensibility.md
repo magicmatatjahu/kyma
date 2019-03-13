@@ -18,13 +18,13 @@ A micro front-end is a standalone web application which is developed, tested and
 The Luigi Client enables communication between the micro front-end and the Console application.
 Include [Luigi Client](https://www.npmjs.com/package/@kyma-project/luigi-client) in the micro front-end's codebase as an npm dependency.
 
-```
+``` console
 npm i @kyma-project/luigi-client
 ```
 It helps to read the context data that is sent by the Console when the user activates the micro front-end in the UI.
 Use the following example to read the context data:
 
-```
+``` js
 LuigiClient.addInitListener((data)=>{
     // do stuff with the context data
 });
@@ -32,7 +32,7 @@ LuigiClient.addInitListener((data)=>{
 
 The Luigi Client facilitates communication between the micro front-end and the Console. Use the Luigi Client API to request the Console to navigate from the micro front-end to any other route available in the application:
 
-```
+``` js
 LuigiClient.linkManager().navigate('/targetRoute', null, true)
 ```
 

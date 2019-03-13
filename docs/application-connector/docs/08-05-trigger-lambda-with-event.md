@@ -17,7 +17,7 @@ This guide shows how to create a simple lambda function and trigger it with an e
 1. Register a service with the following specification to the desired App.
 
 >**NOTE:** See [this](#tutorials-get-the-client-certificate) tutorial to learn how to register a service.
-```json
+``` json
 {
   "name": "my-service",
   "provider": "myCompany",
@@ -66,12 +66,13 @@ This guide shows how to create a simple lambda function and trigger it with an e
 ```
 
 2. Get the `externalName` of the Service Class of the registered service.
-```
+``` console
 kubectl -n production get serviceclass {SERVICE_ID}  -o jsonpath='{.spec.externalName}'
 ```
 
 3. Create a Service Instance for the registered service.
-```
+
+``` yaml
 cat <<EOF | kubectl apply -f -
 apiVersion: servicecatalog.k8s.io/v1beta1
 kind: ServiceInstance
@@ -84,7 +85,8 @@ EOF
 ```
 
 4. Create a sample lambda function which sends a request to `http://httpbin.org/uuid`. A successful response logs a `Response acquired successfully! Uuid: {RECEIVED_UUID}` message. To create and register the lambda function in the `production` Namespace, run:
-```
+
+``` yaml
 cat <<EOF | kubectl apply -f -
 apiVersion: kubeless.io/v1beta1
 kind: Function
@@ -151,7 +153,8 @@ EOF
 ```
 
 5. Create a Subscription to allow events to trigger the lambda function.
-```
+
+``` yaml
 cat <<EOF | kubectl apply -f -
 apiVersion: eventing.kyma.cx/v1alpha1
 kind: Subscription
@@ -173,7 +176,7 @@ EOF
 
 6. Send an event to trigger the created lambda.
   - On a cluster:
-    ```
+    ``` console
     curl -X POST https://gateway.{CLUSTER_DOMAIN}/{APP_NAME}/v1/events -k --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -d \
     '{
         "event-type": "exampleEvent",
@@ -184,7 +187,7 @@ EOF
     }'
     ```
   - On a local deployment:
-    ```
+    ``` console
     curl -X POST https://gateway.kyma.local:{NODE_PORT}/{APP_NAME}/v1/events -k --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -d \
     '{
         "event-type": "exampleEvent",
@@ -196,6 +199,6 @@ EOF
     ```
 
 7. Check the logs of the lambda function to see if it was triggered. Every time an event successfully triggers the function, this message appears in the logs: `Response acquired successfully! Uuid: {RECEIVED_UUID}`. Run this command:
-```
+``` console
 kubectl -n production logs "$(kubectl -n production get po -l function=my-lambda -o jsonpath='{.items[0].metadata.name}')" -c my-lambda | grep "Response acquired successfully! Uuid: "
 ```

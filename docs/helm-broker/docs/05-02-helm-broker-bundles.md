@@ -10,7 +10,7 @@ type: Configuration
 
 To create your own bundle, you must create a directory with the following structure:
 
-```
+``` text
 sample-bundle/
   ├── meta.yaml                             # A file which contains the metadata information about this bundle
   ├── chart/                                # A directory which contains a Helm chart that installs your Kubernetes resources
@@ -118,7 +118,8 @@ Use the dry-run mode to check the generated manifests of the chart without insta
 The **--debug** option prints the generated manifests.
 As a prerequisite, you must install [Helm](https://github.com/kubernetes/helm) on your machine to run this command:
 
+``` console
+helm install --dry-run {path-to-chart} --debug
 ```
- helm install --dry-run {path-to-chart} --debug
-```
+
 For more details, read the Helm [official documentation](https://docs.helm.sh/chart_template_guide/#debugging-templates).

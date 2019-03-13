@@ -17,7 +17,7 @@ The UI API Layer consists of the Kubernetes resource logic and cache for differe
 
 To enable this functionality, run this command:
 
-```bash
+``` console
 kubectl set env deployment/core-ui-api MODULE_PLUGGABILITY=true -n kyma-system
 ```
 

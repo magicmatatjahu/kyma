@@ -20,7 +20,7 @@ If you want to use sample backup configurations, you must use Backup custom reso
 
 A sample backup configuration looks like this:
 
-```yaml
+``` yaml
 ---
 apiVersion: ark.heptio.com/v1
 kind: Backup
@@ -41,7 +41,9 @@ spec:
 
 To create the backup, run the following command:
 
-```$ kubectl apply -f <filename>```
+``` console
+$ kubectl apply -f <filename>
+```
 
 ## Schedule periodic backups
 
@@ -49,7 +51,7 @@ If you want to use sample backup configurations, ou must use Schedule custom res
 
 A sample scheduled backup configuration looks like this:
 
-```yaml
+``` yaml
 ---
 apiVersion: ark.heptio.com/v1
 kind: Schedule
@@ -74,12 +76,15 @@ spec:
 
 To schedule a backup, run the following command:
 
-```$ kubectl apply -f <filename>```
+``` console
+$ kubectl apply -f <filename>
+```
 
 ## Backup retention period
 
 To set the retention period of a backup, define the **ttl** parameter in the Backup specification [definition](https://github.com/heptio/velero/blob/master/docs/api-types/backup.md#definition):
 
-```  The amount of time before this backup is eligible for garbage collection.
-  ttl: 24h0m0s 
-  ```
+``` console
+The amount of time before this backup is eligible for garbage collection.
+ttl: 24h0m0s 
+```

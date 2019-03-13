@@ -47,7 +47,7 @@ The Event Payload is delivered as the body of the HTTP Request in JSON format. T
 
 In this example, you write a service for an `order.created` Event published by the external solution service. The published Event schema looks as follows:
 
-```json
+``` json
 {
   "example": {
     "orderCode": "4caad296-e0c5-491e-98ac-0ed118f9474e"
@@ -65,7 +65,7 @@ In this example, you write a service for an `order.created` Event published by t
 
 The HTTP POST request payload is a JSON object:
 
-```json
+``` json
 {"orderCode": "4caad296-e0c5-491e-98ac-0ed118f9474e"}
 ```
 

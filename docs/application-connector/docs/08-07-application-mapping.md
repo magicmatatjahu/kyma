@@ -12,13 +12,13 @@ To complete this guide, your cluster must have at least one App created.
 ## Steps
 
 1. List all Apps bound to the `production` Namespace:
-  ```
+  ``` console
   kubectl get em -n production
   ```
 
 2. Bind an App to a Namespace. Run this command to create an ApplicationMapping custom resource and apply it to the cluster:
 
-  ```
+  ``` yaml
   cat <<EOF | kubectl apply -f -
   apiVersion: applicationconnector.kyma-project.io/v1alpha1
   kind: ApplicationMapping
@@ -29,6 +29,6 @@ To complete this guide, your cluster must have at least one App created.
   ```
 
 3. Check if the operation is successful. List all Namespaces to which your App is bound:
-  ```
+  ``` console
   kubectl get em --all-namespaces -o jsonpath='{range .items[?(@.metadata.name=="{NAME_OF_YOUR_APP}")]}{@.metadata.namespace}{""}{end}'
   ```

@@ -7,11 +7,13 @@ Restoring a Kyma cluster requires a fresh Kyma installation. As soon as the clus
 
 Use this command to list available backups:
 
-```$ kubectl get backups -n heptio-ark```
+``` console
+$ kubectl get backups -n heptio-ark
+```
 
 Sample restore configuration:
 
-```yaml
+``` yaml
 ---
 apiVersion: ark.heptio.com/v1
 kind: Restore
@@ -38,11 +40,15 @@ spec:
 
 To trigger the restore process, run this command:
 
-```$ kubectl apply -f <filename>```
+``` console
+$ kubectl apply -f <filename>
+```
 
 To check the restore progress, run this command:
 
-```$ kubectl describe restore -n heptio-ark  <restore name>```
+``` console
+$ kubectl describe restore -n heptio-ark  <restore name>
+```
 
 To validate the result of the restore use the `kubectl get` command.
 

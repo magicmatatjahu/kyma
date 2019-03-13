@@ -5,7 +5,7 @@ type: Custom Resource
 
 The `clusterassets.assetstore.kyma-project.io` CustomResourceDefinition (CRD) is a detailed description of the kind of data and the format used to define an asset to store in a cloud storage bucket. To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-```
+``` console
 kubectl get crd clusterassets.assetstore.kyma-project.io -o yaml
 ```
 
@@ -13,7 +13,7 @@ kubectl get crd clusterassets.assetstore.kyma-project.io -o yaml
 
 This is a sample resource (CR) that provides details of the bucket for storing assets.
 
-```
+``` yaml
 apiVersion: assetstore.kyma-project.io/v1alpha2
 kind: ClusterAsset
 metadata:
@@ -34,7 +34,7 @@ You can also define validation and mutation services:
 - **Validation webhook** performs the validation of fetched assets before the ClusterAsset Controller uploads them into the bucket. It can be a list of several different validation webhooks and all of them should be processed even if one fails. It can refer either to the validation of a specific file against a specification or to the security validation. The validation webhook returns the validation status when the validation completes.
 - **Mutation webhook** acts similarly to the validation service. The difference is that it mutates the asset instead of just validating it. For example, this can mean asset rewriting through the `regex` operation or `keyvalue`, or the modification in the JSON specification. The mutation webhook returns modified files instead of information on the status.
 
-```
+``` yaml
 apiVersion: assetstore.kyma-project.io/v1alpha2
 kind: ClusterAsset
 metadata:

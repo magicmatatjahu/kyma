@@ -7,7 +7,7 @@ The `subscriptions.eventing.kyma-project.io` CustomResourceDefinition (CRD) is a
 
 To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-```
+``` console
 kubectl get crd subscriptions.eventing.kyma-project.io -o yaml
 ```
 
@@ -15,7 +15,7 @@ kubectl get crd subscriptions.eventing.kyma-project.io -o yaml
 
 This is a sample resource that creates an `order.created` Event trigger for a lambda.
 
-```yaml
+``` yaml
 apiVersion: eventing.kyma-project.io/v1alpha1
 kind: Subscription
 metadata:

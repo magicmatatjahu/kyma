@@ -10,7 +10,8 @@ The Ark configuration consists of two custom resources:
 
 A sample BackupStorageLocation CR looks like this:
 
-```apiVersion: ark.heptio.com/v1
+``` yaml
+apiVersion: ark.heptio.com/v1
 kind: BackupStorageLocation
 metadata:
   name: default
@@ -26,7 +27,8 @@ spec:
 
 A sample VolumeSnapshotLocation CR looks like this:
 
-```apiVersion: ark.heptio.com/v1
+``` yaml
+apiVersion: ark.heptio.com/v1
 kind: VolumeSnapshotLocation
 metadata:
   name: azure-default

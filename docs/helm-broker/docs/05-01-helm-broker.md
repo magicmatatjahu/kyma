@@ -12,7 +12,7 @@ Follow these steps to change the configuration and make the Helm Broker fetch bu
 1. Create a remote repository with the definition of your bundles. Your remote bundle repository must include the following resources:
     - A `yaml` file which defines available bundles, for example `index.yaml`.
       This file must have the following structure:
-      ```text
+      ``` yaml
       apiVersion: v1
       entries:
         {bundle_name}:
@@ -21,7 +21,7 @@ Follow these steps to change the configuration and make the Helm Broker fetch bu
             version: {bundle_version}
       ```
       This is an example of a `yaml` file for the Redis bundle:
-      ```text
+      ``` yaml
       apiVersion: v1
       entries:
         redis:
@@ -34,20 +34,21 @@ Follow these steps to change the configuration and make the Helm Broker fetch bu
 2. Install Kyma on Minikube. See [this](/root/kyma#installation-install-kyma-locally-from-the-release) document to learn how.
 
 3. Create a ConfigMap which contains an URL to the repository:
- ```bash
+``` console
 kubectl create configmap my-helm-repos-urls -n kyma-system --from-literal=URLs=https://github.com/kyma-project/bundles/releases/download/latest/index-testing.yaml
- ```
+```
 >**NOTE:** If you want to fetch bundles from many HTTP servers, use `\n` to separate the URLs.
 
 4. Label the newly created ConfigMap:
- ```bash
+``` console
 kubectl label configmap my-helm-repos-urls -n kyma-system helm-broker-repo=true
- ```
+```
  
 Helm Broker triggers the Service Catalog synchronization automatically. New ClusterServiceClasses appear after a few seconds.
 
 Use the following example to create a valid ConfigMap with many URLs from the `yaml` file:
-```yaml
+
+``` yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:

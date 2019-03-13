@@ -5,7 +5,7 @@ type: Custom Resource
 
 The `buckets.assetstore.kyma-project.io` CustomResourceDefinition (CRD) is a detailed description of the kind of data and the format used to define the name of the cloud storage bucket for storing assets. To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-```
+``` console
 kubectl get crd buckets.assetstore.kyma-project.io -o yaml
 ```
 
@@ -13,7 +13,7 @@ kubectl get crd buckets.assetstore.kyma-project.io -o yaml
 
 This is a sample resource that defines the storage bucket configuration.
 
-```
+``` yaml
 apiVersion: assetstore.kyma-project.io/v1alpha2
 kind: Bucket
 metadata:

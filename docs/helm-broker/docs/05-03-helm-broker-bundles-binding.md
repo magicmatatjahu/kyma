@@ -19,7 +19,7 @@ This section provides an example of the `bind.yaml` file. It further describes t
 
 ### Example usage
 
-```yaml
+``` yaml
 # bind.yaml
 credential:
   - name: HOST
@@ -53,7 +53,7 @@ In this example of the [binding action][bind], the Helm Broker returns the follo
 
 In the `bind.yaml` file, you can use the Helm Chart templates directives.
 
-```yaml
+``` yaml
 # bind.yaml
 credential:
   - name: HOST
@@ -66,6 +66,7 @@ credential:
         key: redis-password
 {{- end }}
 ```
+
 In this example, the system renders the `bind.yaml` file. The system resolves all the directives enclosed in the double curly braces in the same way as in the files located in the `templates` directory in your Helm chart.
 
 ### Credential name conflicts policy

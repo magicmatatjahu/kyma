@@ -14,7 +14,7 @@ Valid certificate signed by the Kyma Certificate Authority.
 1. To register a service with a Basic Authentication-secured API, follow this template to prepare the request body:
   >**NOTE:** Follow [this](#tutorials-register-a-secured-api) tutorial to learn how to register APIs secured with different security schemes.
 
-  ```
+  ``` json
   {
     "provider": "example-provider",
     "name": "example-name",
@@ -103,28 +103,28 @@ Valid certificate signed by the Kyma Certificate Authority.
 2. Include the request body you prepared in the following call to register a service:
 
   - For a cluster deployment:
-    ```
+    ``` console
     curl -X POST -d '{YOUR_REQUEST_BODY}' https://gateway.{CLUSTER_DOMAIN}/{RE_NAME}/v1/metadata/services --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
     ```
 
   - For a local deployment:
-    ```
+    ``` console
     curl -X POST -d '{YOUR_REQUEST_BODY}' https://gateway.kyma.local:$NODE_PORT/{RE_NAME}/v1/metadata/services --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
     ```
 
 A successful response returns the ID of the registered service:
-```
+``` json
 {"id":"{YOUR_SERVICE_ID}"}
 ```
 
 ### Check the details of a registered service
 
   - For a cluster deployment:
-    ```
+    ``` console
     curl https://gateway.{CLUSTER_DOMAIN}/{RE_NAME}/v1/metadata/services/{YOUR_SERVICE_ID} --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
     ```
 
   - For a local deployment:
-    ```
+    ``` console
     curl https://gateway.kyma.local:{NODE_PORT}/{RE_NAME}/v1/metadata/services/{YOUR_SERVICE_ID} --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
     ```

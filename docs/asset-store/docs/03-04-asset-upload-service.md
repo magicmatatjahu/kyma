@@ -20,7 +20,7 @@ Once you upload the files, system buckets store them permanently. There is no po
 
 You can expose the service for development purposes. To use the Asset Upload Service on a local machine, run the following command:
 
-```bash
+``` console
 kubectl port-forward deployment/assetstore-asset-upload-service 3000:3000 -n kyma-system
 ```
 
@@ -37,13 +37,13 @@ To upload files, send the multipart form **POST** request to the `/v1/upload` en
 
 To do the multipart request using `curl`, run the following command in this repository:
 
-```bash
+``` console
 curl -v -F directory='example' -F private=@sample.md -F private=@text-file.md -F public=@archive.zip http://localhost:3000/v1/upload
 ```
 
 The result is as follows:
 
-```json
+``` json
 {
    "uploadedFiles": [
       {

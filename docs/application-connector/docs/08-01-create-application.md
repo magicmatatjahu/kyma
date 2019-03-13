@@ -9,7 +9,7 @@ The Application Operator listens for the creation of Application custom resource
 
 To create a new App, run this command:
 
-```
+``` yaml
 cat <<EOF | kubectl apply -f -
 apiVersion: applicationconnector.kyma-project.io/v1alpha1
 kind: Application
@@ -26,14 +26,14 @@ EOF
 ## Check the App status
 
 To check the status of the created App and show the output in the `yaml` format, run this command:
-```
+``` console
 kubectl get app {APP_NAME} -o yaml
 ```
 
 A successful response returns the Application custom resource with the specified name. The custom resource has the **status** section added.
 This is an example response:
 
-```
+``` yaml
 apiVersion: applicationconnector.kyma-project.io/v1alpha1
 kind: Application
 metadata:
