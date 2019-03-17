@@ -7,7 +7,7 @@ The `subscriptions.eventing.kyma-project.io` CustomResourceDefinition (CRD) is a
 
 To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-``` console
+``` bash
 kubectl get crd subscriptions.eventing.kyma-project.io -o yaml
 ```
 

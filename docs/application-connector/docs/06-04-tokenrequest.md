@@ -5,7 +5,7 @@ type: Custom Resource
 
 The `tokenrequests.applicationconnector.kyma-project.io` CustomResourceDefinition (CRD) is a detailed description of the kind of data and the format used to request token for Application (App) configuration URL from the Connector Service. To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-``` console
+``` bash
 kubectl get crd tokenrequests.applicationconnector.kyma-project.io -o yaml
 ```
 

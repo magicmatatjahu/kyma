@@ -44,12 +44,12 @@ Overrides for top-level charts are straightforward. Just use the template value 
 Example:
 
 The Installer uses a `core` top-level chart that contains a template with the following value reference:
-```
+``` yaml
 memory: {{ .Values.test.acceptance.ui.requests.memory }}
 ```
 The chart's default value `test.acceptance.ui.requests.memory` in the `values.yaml` file resolves the template.
 The following fragment of `values.yaml` shows this definition:
-```
+``` yaml
 test:
   acceptance:
     ui:
@@ -82,7 +82,7 @@ There's a `core` top-level chart, that the Installer installs.
 There's an `application-connector` sub-chart in `core` with another nested sub-chart: `connector-service`.
 In one of its templates there's a following fragment (shortened):
 
-```
+``` yaml
 spec:
   containers:
   - name: {{ .Chart.Name }}
@@ -95,7 +95,7 @@ spec:
 
 The following fragment of the `values.yaml` file in `connector-service` chart defines the default value for `tokenExpirationMinutes`:
 
-```
+``` yaml
 deployment:
   args:
     tokenExpirationMinutes: 60
@@ -144,14 +144,14 @@ It is important to avoid overrides having the same keys for final values.
 
 Two overrides with a common key prefix ("a.b"):
 
-```
+``` yaml
 "a.b.c": "first"
 "a.b.d": "second"
 ```
 
 The Installer yields correct output:
 
-```
+``` yaml
 a:
   b:
     c: first
@@ -162,21 +162,21 @@ a:
 
 Two overrides with the same key ("a.b"):
 
-```
+``` yaml
 "a.b": "first"
 "a.b": "second"
 ```
 
 The Installer yields either:
 
-```
+``` yaml
 a:
   b: "first"
 ```
 
 Or (due to non-deterministic merge order):
 
-```
+``` yaml
 a:
   b: "second"
 ```

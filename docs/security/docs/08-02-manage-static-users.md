@@ -7,7 +7,7 @@ type: Tutorials
 
 To create a static user in Dex, create a Secret with the **dex-user-config** label set to `true`. Run:
 
-```
+``` yaml
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Secret
@@ -49,11 +49,11 @@ By default, Kyma comes with the following ClusterRoles:
 - **kyma-essentials**: set of  minimal view access right to use the kyma console
 
 To bind a newly created user to the **kyma-view** ClusterRole, run this command:
-```
+``` bash
 kubectl create clusterrolebinding {BINDING_NAME} --clusterrole=kyma-view --user={USER_EMAIL}
 ```
 
 To check if the binding is created, run:
-```
+``` bash
 kubectl get clusterrolebinding {BINDING_NAME}
 ```

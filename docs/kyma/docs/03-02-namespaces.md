@@ -28,7 +28,7 @@ Kyma comes with three Namespaces ready for you to use.
 
 Create a Namespace and mark it with the `env: "true"` label to make it available for Kyma users. Use this command to do that in a single step:
 
-```
+``` yaml
 $ cat <<EOF | kubectl create -f -
 apiVersion: v1
 kind: Namespace

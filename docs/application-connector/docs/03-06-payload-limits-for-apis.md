@@ -9,6 +9,6 @@ The `nginx.ingress.kubernetes.io/proxy-body-size` annotation defines the maximum
 
 To change the maximum payload size for an API definition, edit the configuration of the Ingress of the Application for which you want to tune the limit. Run this command to edit the Ingress configuration:
 
-``` console
+``` bash
 kubectl -n kyma-integration edit ingress {APPLICATION_NAME}-application
 ```

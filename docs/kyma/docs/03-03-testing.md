@@ -11,7 +11,7 @@ The system bases tests on the Helm broker concept with one modification: adding 
 
 See the following example of a test prepared for Dex:
 
-```
+``` text
 # Chart tree
 dex
 ├── Chart.yaml
@@ -32,7 +32,7 @@ dex
 The test adds a new **test-dex-connection.yaml** under the `templates/tests` directory.
 This simple test calls the `Dex` endpoint with cURL, defined as follows:
 
-```yaml
+``` yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -73,7 +73,7 @@ If any of the tests fail, the system prints the Pod logs in the terminal, then d
 
 Another option is to run a Helm test directly on your release.
 
-```bash
+``` bash
 $ helm test {your_release_name}
 ```
 

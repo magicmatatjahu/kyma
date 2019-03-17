@@ -29,7 +29,7 @@ To get the configuration URL which allows you to fetch the required configuratio
   ```
 
 - Fetch the TokenRequest CR you created to get the configuration details from the **status** section. Run:
-  ``` console
+  ``` bash
   kubectl get tokenrequest.applicationconnector.kyma-project.io {APP_NAME} -o yaml
   ```
   >**NOTE:** If the response doesn't contain the **status** section, wait for a few moments and fetch the CR again.
@@ -52,7 +52,7 @@ A successful call returns the following response:
 
 Use the link you got in the previous step to fetch the CSR information and configuration details required to connect your external solution. Run:
 
-``` console
+``` bash
 curl {CONFIGURATION_URL_WITH_TOKEN}
 ```
 >**NOTE:** The URL you call in this step contains a token that is valid for 5 minutes or for a single call. You get a code `403` error if you call the same configuration URL more than once, or if you call an URL with an expired token.
@@ -79,14 +79,14 @@ A successful call returns the following response:
 ## Generate a CSR and send it to Kyma
 
 Generate a CSR using the certificate subject data obtained in the previous step:
-``` console
+``` bash
 openssl genrsa -out generated.key 2048
 openssl req -new -sha256 -out generated.csr -key generated.key -subj "/OU=Test/O=TestOrg/L=Waldorf/ST=Waldorf/C=DE/CN={APP_NAME}"
 openssl base64 -in generated.csr
 ```
 
 Send the encoded CSR to Kyma. Run:
-``` console
+``` bash
 curl -H "Content-Type: application/json" -d '{"csr":"BASE64_ENCODED_CSR_HERE"}' {CSR_SIGNING_URL_WITH_TOKEN}
 ```
 
@@ -107,13 +107,13 @@ After you receive the certificate, decode it and use it in your application. Reg
 When you connect an external solution to a local Kyma deployment, you must pass the NodePort of the `application-connector-ingress-nginx-ingress-controller` to successfully call the Metadata Service and the Event Service.
 
 - To get the NodePort, run:
-  ``` console
+  ``` bash
   kubectl -n kyma-system get svc application-connector-ingress-nginx-ingress-controller -o 'jsonpath={.spec.ports[?(@.port==443)].nodePort}'
   ```
 - When you send requests to the Metadata Service and the Event Service, pass the NodePort along with the generated certificate and key. For example:
-  ``` console
+  ``` bash
   curl https://gateway.kyma.local:{NODE_PORT}/{APP_NAME}/v1/metadata/services --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
   ```
-  ``` console
+  ``` bash
   curl https://gateway.kyma.local:{NODE_PORT}/{APP_NAME}/v1/events --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
   ```

@@ -16,14 +16,14 @@ period of time.
 
 1. Export the new TLS certificate and key as environment variables. Run:
 
-    ```bash
+    ``` bash
     export KYMA_TLS_CERT=$(cat {NEW_CERT_PATH})
     export KYMA_TLS_KEY=$(cat {NEW_KEY_PATH})
     ```
 
 2. Update the Ingress Gateway certificate. Run:
 
-    ```bash
+    ``` yaml
     cat <<EOF | kubectl apply -f -
     apiVersion: v1
     kind: Secret
@@ -39,7 +39,7 @@ period of time.
 
 3. Update the `kyma-system` Namespace certificate:
 
-    ```bash
+    ``` yaml
     cat <<EOF | kubectl apply -f -
     apiVersion: v1
     kind: Secret
@@ -54,7 +54,7 @@ period of time.
 
 4. Update the `kyma-integration` Namespace certificate:
 
-    ```bash
+    ``` yaml
     cat <<EOF | kubectl apply -f -
     apiVersion: v1
     kind: Secret
@@ -69,18 +69,18 @@ period of time.
 
 5. Restart the Ingress Gateway Pod to apply the new certificate:
 
-    ```bash
+    ``` bash
     kubectl delete pod -l app=istio-ingressgateway -n istio-system
     ```
 
 6. Restart the Pods in the `kyma-system` Namespace to apply the new certificate:
 
-    ```bash
+    ``` bash
     kubectl delete pod -l tlsSecret=ingress-tls-cert -n kyma-system
     ```
 
 7. Restart the Pods in the `kyma-integration` Namespace to apply the new certificate:
 
-    ```bash
+    ``` bash
     kubectl delete pod -l tlsSecret=ingress-tls-cert -n kyma-integration
     ```

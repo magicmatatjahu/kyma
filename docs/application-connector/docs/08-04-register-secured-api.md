@@ -84,13 +84,13 @@ When you register an API with the `credentials.certificateGen` object, the Appli
 
 The certificate and key pair is stored in a Secret in the `kyma-integration` Namespace. List all Secrets and find the one created for your API:
 
-``` console
+``` bash
 kubectl -n kyma-integration get secrets
 ```
 
 To fetch the certificate and key encoded with base64, run this command:
 
-``` console
+``` bash
 kubectl -n kyma-integration get secrets app-{APP_NAME}-{SERVICE_ID} -o yaml
 ```
 
@@ -99,7 +99,7 @@ kubectl -n kyma-integration get secrets app-{APP_NAME}-{SERVICE_ID} -o yaml
 
 If the API you registered provides a certificate-key pair or the generated certificate doesn't meet your security standards or specific needs, you can use a custom certificate-key pair for authentication. To replace the Kyma-generated pair with your certificate and key, run this command:
 
-``` console
+``` bash
 kubectl -n kyma-integration patch secrets app-{APP_NAME}-{SERVICE_ID} --patch 'data:
   crt: {BASE64_ENCODED_CRT}
   key: {BASE64_ENCODED_KEY}'

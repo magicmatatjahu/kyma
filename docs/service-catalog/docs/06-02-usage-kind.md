@@ -5,7 +5,7 @@ type: Custom Resource
 
 The `usagekinds.servicecatalog.kyma-project.io` CustomResourceDefinition (CRD) is a detailed description of the kind of data and the format used to define which resources can be bound with the ServiceBinding and how to bind them. To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-```
+``` bash
 kubectl get crd usagekinds.servicecatalog.kyma-project.io -o yaml
 ```
 
@@ -13,7 +13,7 @@ kubectl get crd usagekinds.servicecatalog.kyma-project.io -o yaml
 
 This is a sample resource that allows you to bind a given resource with the ServiceBinding. This example has a **resource** section specified as `function`. You can adjust this section to point to any other kind of resource.
 
-```
+``` yaml
 apiVersion: servicecatalog.kyma-project.io/v1alpha1
 kind: UsageKind
 metadata:

@@ -23,8 +23,7 @@ Here are some examples:
 
 1. Generic
 
-
-```yaml
+``` yaml
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -52,7 +51,7 @@ spec:
           timeoutSeconds: 1
 ```
 
-```yaml
+``` yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -70,7 +69,7 @@ spec:
 
 2. Kyma
 
-```yaml
+``` yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -117,7 +116,7 @@ High level Kyma components, such as **core**, come as Helm charts. These charts 
 
 For `Deployments`, set the strategy to `RollingUpdate` and set the `MaxUnavailable` value to a number lower than the number of replicas. This setting is necessary, as readiness in Helm v2.10.0 is fulfilled if the number of replicas in ready state is not lower than the expected number of replicas:
 
-```
+``` text
 ReadyReplicas >= TotalReplicas - MaxUnavailable
 ```
 

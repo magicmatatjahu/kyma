@@ -5,7 +5,7 @@ type: Custom Resource
 
 The `servicebindingusages.servicecatalog.kyma-project.io` CustomResourceDefinition (CRD) is a detailed description of the kind of data and the format used to inject Secrets to the application. To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-```
+``` bash
 kubectl get crd servicebindingusages.servicecatalog.kyma-project.io -o yaml
 ```
 
@@ -13,7 +13,7 @@ kubectl get crd servicebindingusages.servicecatalog.kyma-project.io -o yaml
 
 This is a sample resource in which the ServiceBindingUsage injects a Secret associated with the `redis-instance-binding` ServiceBinding to the `redis-client` Deployment in the `production` Namespace. This example has the **conditions.status** field set to `true`, which means that the ServiceBinding injection is successful. If this field is set to `false`, the **message** and **reason** fields appear.
 
-```
+``` yaml
 apiVersion: servicecatalog.kyma-project.io/v1alpha1
 kind: ServiceBindingUsage
 metadata:

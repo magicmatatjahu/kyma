@@ -118,7 +118,7 @@ Use the dry-run mode to check the generated manifests of the chart without insta
 The **--debug** option prints the generated manifests.
 As a prerequisite, you must install [Helm](https://github.com/kubernetes/helm) on your machine to run this command:
 
-``` console
+``` bash
 helm install --dry-run {path-to-chart} --debug
 ```
 

@@ -14,13 +14,14 @@ You can disable the SSL certificate verification in the communication between Ky
 >**NOTE:** By default, the SSL certificate verification is enabled when sending data and requests to every App.
 
 Follow these steps to disable SSL certificate verification for communication between Kyma and an existing App:
-1. Edit the `{APPLICATION}-application-gateway` Deployment in the `kyma-integration` Namespace. Run:
-  ``` console
-  kubectl -n kyma-integration edit deployment {APPLICATION}-application-gateway
-  ```
-2. Edit the Deployment in Vim. Select `i` to start editing.
-3. Find the **skipVerify** parameter and change its value to `true`.
-4. Select `esc`, type `:wq`, and select `enter` to write and quit.
+
+  1. Edit the `{APPLICATION}-application-gateway` Deployment in the `kyma-integration` Namespace. Run:
+    ``` bash
+    kubectl -n kyma-integration edit deployment {APPLICATION}-application-gateway
+    ```
+  2. Edit the Deployment in Vim. Select `i` to start editing.
+  3. Find the **skipVerify** parameter and change its value to `true`.
+  4. Select `esc`, type `:wq`, and select `enter` to write and quit.
 
 ## Override the API security type
 

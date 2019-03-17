@@ -7,7 +7,7 @@ The `idppresets.authentication.kyma-project.io` CustomResourceDefinition (CRD) i
 
 To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-```bash
+``` bash
 kubectl get crd idppresets.authentication.kyma-project.io -o yaml
 ```
 
@@ -15,7 +15,7 @@ kubectl get crd idppresets.authentication.kyma-project.io -o yaml
 
 This is a sample CR used to create an IDPPreset:
 
-```yaml
+``` yaml
 apiVersion: authentication.kyma-project.io/v1alpha1
 kind: IDPPreset
 metadata:

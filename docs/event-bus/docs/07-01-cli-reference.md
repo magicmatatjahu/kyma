@@ -51,12 +51,12 @@ EOF
 
 * Get the list of all Subscriptions:
 
-``` console
+``` bash
 kubectl get subscription --all-namespaces
 ```
 
 * Get the list of all Subscriptions with detailed information on the Subscription status:
 
-``` console
+``` bash
 kubectl get subscriptions -n stage -o=custom-columns=NAME:.metadata.name,STATUS:.status.conditions[*].status,STATUS\ TYPE:.status.conditions[*].type
 ```

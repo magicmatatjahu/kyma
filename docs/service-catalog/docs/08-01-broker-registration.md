@@ -13,70 +13,70 @@ This tutorial shows you how to register a broker in the Service Catalog. The bro
 ## Steps
 
 1. Clone the [`service-catalog`](https://github.com/kubernetes-incubator/service-catalog) repository:
-    ```
+    ``` bash
     git clone https://github.com/kubernetes-incubator/service-catalog.git
     ```
 
 2. Check out one of the official tags. For example:
 
-    ```
+    ``` bash
     git fetch --all --tags --prune
     git checkout tags/v0.1.39 -b v0.1.39
     ```
 3. Create the `ups-broker` Namespace:
-    ```
+    ``` bash
     kubectl create namespace ups-broker
     ```
 
 4. Run this command to install the chart with the `ups-broker` name in the `ups-broker` Namespace:
-      ```
+     ``` bash
      helm install ./charts/ups-broker --name ups-broker --namespace ups-broker
      ```
 
 5. Register a broker:
   * Run this command to register a ClusterServiceBroker:
-     ```
+    ``` bash
     kubectl create -f ./contrib/examples/walkthrough/ups-clusterservicebroker.yaml
     ```
   * To register the UPS Broker as a ServiceBroker in the `ups-broker` Namespace, run:
-    ```
+    ``` bash
     kubectl create -f ./contrib/examples/walkthrough/ups-servicebroker.yaml -n ups-broker
     ```     
     After you successfully register your ServiceBroker or ClusterServiceBroker, the Service Catalog periodically fetches services from this broker and creates ServiceClasses or ClusterServiceClasses from them.
 
 6. Check the status of your broker:
   * To check the status of your ClusterServiceBroker, run:
-     ```
+    ``` bash
     kubectl get clusterservicebrokers ups-broker -o jsonpath="{.status.conditions}"
     ```
   * To check the status of the ServiceBroker, run:
-    ```
+    ``` bash
     kubectl get servicebrokers ups-broker -n ups-broker -o jsonpath="{.status.conditions}"
     ```
 
     The output looks as follows:
-    ```
+    ``` json
     {
-    "lastTransitionTime": "2018-10-26T12:03:32Z",
-    "message": "Successfully fetched catalog entries from broker.",
-    "reason": "FetchedCatalog",
-    "status": "True",
-    "type": "Ready"
+        "lastTransitionTime": "2018-10-26T12:03:32Z",
+        "message": "Successfully fetched catalog entries from broker.",
+        "reason": "FetchedCatalog",
+        "status": "True",
+        "type": "Ready"
     }
     ```
 
 7. View Service Classes that this broker provides:
   * To check the ClusterServiceClasses, run:
-      ```
+     ``` bash
      kubectl get clusterserviceclasses
-      ```
+     ```
   * To check the ServiceClasses, run:
-      ```
+      ``` bash
       kubectl get serviceclasses -n ups-broker
       ```
 
       These are the UPS Broker Service Classes:
-      ```
+      ``` text
       NAME                                   EXTERNAL NAME
       4f6e6cf6-ffdd-425f-a2c7-3c9258ad2468   user-provided-service
       5f6e6cf6-ffdd-425f-a2c7-3c9258ad2468   user-provided-service-single-plan

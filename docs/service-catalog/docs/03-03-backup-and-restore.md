@@ -23,18 +23,18 @@ To execute the backup process, set the following values in the [`core`][core-cha
 Follow these steps to restore the etcd cluster from the existing backup.
 
 1. Export the **ABS_PATH** environment variable with the path to the last successful backup file.
-```bash
+``` bash
 export ABS_PATH=$(kubectl get cm -n kyma-system sc-recorded-etcd-backup-data -o=jsonpath='{.data.abs-backup-file-path-from-last-success}')
 export BACKUP_FILE_NAME=etcd.backup
 ```
 
 2. Download the backup to the local workstation using the portal or [Azure CLI][az-cli]. Set the downloaded file path:
-```bash
+``` bash
 export BACKUP_FILE_NAME=/path/to/downloaded/file
 ```
 
 3. Copy the backup file to every running Pod of the StatefulSet.
-```bash
+``` bash
 for i in {0..2};
 do
 kubectl cp ./$BACKUP_FILE_NAME kyma-system/service-catalog-etcd-stateful-$i:/$BACKUP_FILE_NAME
@@ -42,7 +42,7 @@ done
 ```
 
 4. Restore the backup on every Pod of the StatefulSet.
-```bash
+``` bash
 for i in {0..2};
 do
   remoteCommand="etcdctl snapshot restore /$BACKUP_FILE_NAME "
@@ -62,7 +62,7 @@ done
 ```
 
 5. Delete old Pods.
-```bash
+``` bash
 kubectl delete pod service-catalog-etcd-stateful-0 service-catalog-etcd-stateful-1 service-catalog-etcd-stateful-2 -n kyma-system
 ```
 

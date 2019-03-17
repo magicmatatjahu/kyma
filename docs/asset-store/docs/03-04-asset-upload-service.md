@@ -37,7 +37,7 @@ To upload files, send the multipart form **POST** request to the `/v1/upload` en
 
 To do the multipart request using `curl`, run the following command in this repository:
 
-``` console
+``` bash
 curl -v -F directory='example' -F private=@sample.md -F private=@text-file.md -F public=@archive.zip http://localhost:3000/v1/upload
 ```
 

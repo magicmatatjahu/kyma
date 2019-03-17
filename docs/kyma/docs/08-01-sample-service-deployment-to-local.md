@@ -22,29 +22,29 @@ Follow these steps:
 
 1. Deploy the sample service to any of your Namespaces. Use the `stage` Namespace for this guide:
 
-   ```bash
+   ``` bash
    kubectl create -n stage -f https://raw.githubusercontent.com/kyma-project/examples/master/http-db-service/deployment/deployment.yaml
    ```
 
 2. Create an unsecured API for your example service:
 
-   ```bash
+   ``` bash
    kubectl apply -n stage -f https://raw.githubusercontent.com/kyma-project/examples/master/gateway/service/api-without-auth.yaml
    ```
 
 3. Add the IP address of Minikube to the `hosts` file on your local machine for your APIs:
 
-   ```bash
+   ``` bash
    $ echo "$(minikube ip) http-db-service.kyma.local" | sudo tee -a /etc/hosts
    ```
 
 4. Access the service using the following call:
-   ```bash
+   ``` bash
    curl -ik https://http-db-service.kyma.local/orders
    ```
 
    The system returns a response similar to the following:
-   ```
+   ``` text
    HTTP/2 200
    content-type: application/json;charset=UTF-8
    vary: Origin
@@ -60,7 +60,7 @@ Follow these steps:
 
 Run the following command:
 
-   ```bash
+   ``` bash
    kubectl apply -n stage -f https://raw.githubusercontent.com/kyma-project/examples/master/gateway/service/api-with-auth.yaml
    ```
 After you apply this update, you must include a valid bearer ID token in the Authorization header to access the service.

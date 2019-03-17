@@ -34,13 +34,13 @@ Follow these steps to change the configuration and make the Helm Broker fetch bu
 2. Install Kyma on Minikube. See [this](/root/kyma#installation-install-kyma-locally-from-the-release) document to learn how.
 
 3. Create a ConfigMap which contains an URL to the repository:
-``` console
+``` bash
 kubectl create configmap my-helm-repos-urls -n kyma-system --from-literal=URLs=https://github.com/kyma-project/bundles/releases/download/latest/index-testing.yaml
 ```
 >**NOTE:** If you want to fetch bundles from many HTTP servers, use `\n` to separate the URLs.
 
 4. Label the newly created ConfigMap:
-``` console
+``` bash
 kubectl label configmap my-helm-repos-urls -n kyma-system helm-broker-repo=true
 ```
  

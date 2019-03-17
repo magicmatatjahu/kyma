@@ -65,30 +65,30 @@ A [plan object](https://github.com/openservicebrokerapi/servicebroker/blob/v2.13
 
 See the sample schema:
 
-```
+``` json
 {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "properties": {
-            "imagePullPolicy": {
-              "default": "IfNotPresent",
-              "enum": [
-                "Always",
-                "IfNotPresent",
-                "Never"
-              ],
-              "title": "Image pull policy",
-              "type": "string"
-            },
-            "redisPassword": {
-              "default": "",
-              "format": "password",
-              "description": "Redis password. Defaults to a random 10-character alphanumeric string.",
-              "title": "Password (Defaults to a random 10-character alphanumeric string)",
-              "type": "string"
-            }
-          },
-          "type": "object"
-        }
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "imagePullPolicy": {
+      "default": "IfNotPresent",
+      "enum": [
+        "Always",
+        "IfNotPresent",
+        "Never"
+      ],
+      "title": "Image pull policy",
+      "type": "string"
+    },
+    "redisPassword": {
+      "default": "",
+      "format": "password",
+      "description": "Redis password. Defaults to a random 10-character alphanumeric string.",
+      "title": "Password (Defaults to a random 10-character alphanumeric string)",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}
 ```
 
 This sample renders in the following way:

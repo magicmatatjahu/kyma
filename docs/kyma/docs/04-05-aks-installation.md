@@ -20,19 +20,19 @@ By default, Kyma is installed on an AKS cluster with a wildcard DNS provided by 
 
 Set the following environment variables:
 1. Select a name for your cluster. Set the cluster name, the resource group and region as environment variables. Run:
-  ```
+  ``` bash
   export RS_GROUP={YOUR_RESOURCE_GROUP_NAME}
   export CLUSTER_NAME={YOUR_CLUSTER_NAME}
   export REGION={YOUR_REGION} #westeurope
   ```
 
 2. Create a resource group that will contain all your resources:
-   ```
+   ``` bash
    az group create --name $RS_GROUP --location $REGION
    ```
 
 3. Create an AKS cluster. Run:
-    ```
+    ``` bash
     az aks create \
       --resource-group $RS_GROUP \
       --name $CLUSTER_NAME \
@@ -42,18 +42,18 @@ Set the following environment variables:
       --generate-ssh-keys
     ```
 4. To configure kubectl to use your new cluster, run:
-    ```
+    ``` bash
     az aks get-credentials --resource-group $RS_GROUP --name $CLUSTER_NAME
     ```
 
 5. Install Tiller and add additional privileges to be able to access readiness probes endpoints on your AKS cluster.
     * Installation from release
-    ```
+    ``` bash
     kubectl apply -f https://raw.githubusercontent.com/kyma-project/kyma/$KYMA_RELEASE_VERSION/installation/resources/tiller.yaml
     kubectl apply -f https://raw.githubusercontent.com/kyma-project/kyma/$KYMA_RELEASE_VERSION/installation/resources/azure-crb-for-healthz.yaml
     ```
     * If you install Kyma from sources, check out [kyma-project](https://github.com/kyma-project/kyma) and enter the root folder. Run:
-    ```
+    ``` bash
     kubectl apply -f installation/resources/tiller.yaml
     kubectl apply -f installation/resources/azure-crb-for-healthz.yaml
     ```
@@ -68,14 +68,14 @@ Follow these steps:
 
 1. Export the domain name, and sub-domain as environment variables. Run the commands listed below:
 
-    ```
+    ``` bash
     export DNS_DOMAIN={YOUR_DOMAIN} # example.com
     export SUB_DOMAIN={YOUR_SUBDOMAIN} # cluster (in this case the full name of your cluster is cluster.example.com)
       ```
 
 1. Create a DNS-managed zone in your Azure subscription. Run:
 
-    ```
+    ``` bash
     az network dns zone create -g $RS_GROUP -n $DNS_DOMAIN
     ```
 
@@ -84,7 +84,7 @@ Follow these steps:
 2. Delegate your domain to Azure name servers.
 
     - Get the list of the name servers from the zone details. This is a sample list:
-      ```
+      ``` text
       ns1-05.azure-dns.com.
       ns2-05.azure-dns.net.
       ns3-05.azure-dns.org.
@@ -94,7 +94,7 @@ Follow these steps:
     - Set up your domain to use these name servers.
 
 3. Check if everything is set up correctly and your domain is managed by Azure name servers. Run:
-    ```
+    ``` bash
     host -t ns $DNS_DOMAIN
     ```
     A successful response returns the list of the name servers you fetched from Azure.
@@ -104,15 +104,15 @@ Follow these steps:
 >**NOTE:** Azure DNS is not yet supported by Certbot so you must perform a manual verification.
 
 1. Create a folder for certificates. Run:
-    ```
+    ``` bash
     mkdir letsencrypt
     ```
 2. Run the Certbot Docker image with the `letsencrypt` folder mounted. Certbot stores the TLS certificates in that folder. Export your email address:
-    ```
+    ``` bash
     export YOUR_EMAIL={YOUR_EMAIL}
     ```
     To obtain a certificate, run:
-    ```
+    ``` bash
     docker run -it --name certbot --rm \
         -v "$(pwd)/letsencrypt:/etc/letsencrypt" \
         certbot/certbot \
@@ -126,7 +126,7 @@ Follow these steps:
     ```
     You will see the following message:
 
-    ```
+    ``` text
     Please deploy a DNS TXT record under the name
     _acme-challenge.rc2-test.kyma.online with the following value:
 
@@ -138,11 +138,11 @@ Follow these steps:
 
 3. Open a new console and set the environment variables from the [Environment variables](#installation-install-kyma-on-an-aks-cluster-environment-variables) section. Export the `TXT_VALUE`.
 
-    ```
+    ``` bash
     export TXT_VALUE={YOUR_TXT_VALUE}
     ```
     To modify TXT record for your domain, run:
-    ```
+    ``` bash
     az network dns record-set txt delete -n "_acme-challenge.$SUB_DOMAIN" -g $RS_GROUP -z $DNS_DOMAIN --yes
     az network dns record-set txt create -n "_acme-challenge.$SUB_DOMAIN" -g $RS_GROUP -z $DNS_DOMAIN --ttl 60 > /dev/null
     az network dns record-set txt add-record -n "_acme-challenge.$SUB_DOMAIN" -g $RS_GROUP -z $DNS_DOMAIN --value $TXT_VALUE
@@ -151,7 +151,7 @@ Follow these steps:
 
 5. Export the certificate and key as environment variables. Run these commands:
 
-    ```
+    ``` bash
     export TLS_CERT=$(cat ./letsencrypt/live/$SUB_DOMAIN.$DNS_DOMAIN/fullchain.pem | base64 | sed 's/ /\\ /g')
     export TLS_KEY=$(cat ./letsencrypt/live/$SUB_DOMAIN.$DNS_DOMAIN/privkey.pem | base64 | sed 's/ /\\ /g')
     ```
@@ -165,12 +165,12 @@ Follow these steps:
 1. Go to [this](https://github.com/kyma-project/kyma/releases/) page and choose the latest release.
 
 2. Export the release version as an environment variable. Run:
-    ```
+    ``` bash
     export LATEST={KYMA_RELEASE_VERSION}
     ```
 
 3. Download the `kyma-config-cluster.yaml` and `kyma-installer-cluster.yaml` files from the latest release. Run:
-   ```
+   ``` bash
    wget https://github.com/kyma-project/kyma/releases/download/$LATEST/kyma-config-cluster.yaml
    wget https://github.com/kyma-project/kyma/releases/download/$LATEST/kyma-installer-cluster.yaml
    ```
@@ -178,12 +178,12 @@ Follow these steps:
 4. Prepare the deployment file.
 
     - Run this command if you use the `xip.io` default domain:
-    ```
+    ``` bash
     cat kyma-installer-cluster.yaml <(echo -e "\n---") kyma-config-cluster.yaml | sed -e "s/__PROXY_EXCLUDE_IP_RANGES__/10.0.0.1/g" | sed -e "s/__.*__//g" > my-kyma.yaml
     ```
 
     - Run this command if you use your own domain:
-    ```
+    ``` bash
     cat kyma-installer-cluster.yaml <(echo -e "\n---") kyma-config-cluster.yaml | sed -e "s/__PROXY_EXCLUDE_IP_RANGES__/10.0.0.1/g" | sed -e "s/__DOMAIN__/$SUB_DOMAIN.$DNS_DOMAIN/g" | sed -e "s/__TLS_CERT__/$TLS_CERT/g" | sed -e "s/__TLS_KEY__/$TLS_KEY/g" | sed -e "s/__.*__//g" > my-kyma.yaml
     ```
 
@@ -196,12 +196,12 @@ Follow these steps:
 
 2. Build an image that is based on the current Installer image and includes the current installation and resources charts. Run:
 
-    ```
+    ``` bash
     docker build -t kyma-installer:latest -f tools/kyma-installer/kyma.Dockerfile .
     ```
 
 3. Push the image to your Docker Hub:
-    ```
+    ``` bash
     docker tag kyma-installer:latest {YOUR_DOCKER_LOGIN}/kyma-installer:latest
     docker push {YOUR_DOCKER_LOGIN}/kyma-installer:latest
     ```
@@ -209,12 +209,12 @@ Follow these steps:
 4. Prepare the deployment file:
 
     - Run this command if you use the `xip.io` default domain:
-    ```
+    ``` bash
     (cat installation/resources/installer.yaml ; echo "\n---" ; cat installation/resources/installer-config-cluster.yaml.tpl ; echo "\n---" ; cat installation/resources/installer-cr-cluster.yaml.tpl) | sed -e "s/__PROXY_EXCLUDE_IP_RANGES__/10.0.0.1/g" | sed -e "s/__.*__//g" > my-kyma.yaml
     ```
 
     - Run this command if you use your own domain:
-    ```
+    ``` bash
     (cat installation/resources/installer.yaml ; echo "\n---" ; cat installation/resources/installer-config-cluster.yaml.tpl ; echo "\n---" ; cat installation/resources/installer-cr-cluster.yaml.tpl) | sed -e "s/__PROXY_EXCLUDE_IP_RANGES__/10.0.0.1/g" | sed -e "s/__DOMAIN__/$SUB_DOMAIN.$DNS_DOMAIN/g" | sed -e "s/__TLS_CERT__/$TLS_CERT/g" | sed -e "s/__TLS_KEY__/$TLS_KEY/g" | sed -e "s/__.*__//g" > my-kyma.yaml
     ```
 
@@ -223,23 +223,23 @@ Follow these steps:
 ## Deploy Kyma
 
 1. Deploy Kyma using the `my-kyma` custom configuration file you created. Run:
-    ```
+    ``` bash
     kubectl apply -f my-kyma.yaml
     ```
     >**NOTE:** In case you receive the `Error from server (MethodNotAllowed)` error, run the command again before going to step 2.
 
 2. Check if the Pods of Tiller and the Kyma Installer are running:
-    ```
+    ``` bash
     kubectl get pods --all-namespaces
     ```
 
 3. Start Kyma installation:
-    ```
+    ``` bash
     kubectl label installation/kyma-installation action=install
     ```
 
 4. To watch the installation progress, run:
-    ```
+    ``` bash
     while true; do \
       kubectl -n default get installation/kyma-installation -o jsonpath="{'Status: '}{.status.state}{', description: '}{.status.description}"; echo; \
       sleep 5; \
@@ -247,7 +247,7 @@ Follow these steps:
     ```
     After the installation process is finished, the `Status: Installed, description: Kyma installed` message appears.
     In case of an error, you can fetch the logs from the Installer by running:
-    ```
+    ``` bash
     kubectl -n kyma-installer logs -l 'name=kyma-installer'
     ```
 
@@ -256,7 +256,7 @@ Follow these steps:
 >**NOTE:** Skip this section if you use your own domain.
 
 After the installation, add the custom Kyma [`xip.io`](http://xip.io/) self-signed certificate to the trusted certificates of your OS. For MacOS run:
-```
+``` bash
 tmpfile=$(mktemp /tmp/temp-cert.XXXXXX) \
 && kubectl get configmap cluster-certificate-overrides -n kyma-installer -o jsonpath='{.data.global\.tlsCrt}' | base64 --decode > $tmpfile \
 && sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain $tmpfile \
@@ -267,7 +267,7 @@ tmpfile=$(mktemp /tmp/temp-cert.XXXXXX) \
 
 Run these commands:
 
-```
+``` bash
 export EXTERNAL_PUBLIC_IP=$(kubectl get service -n istio-system istio-ingressgateway -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
 
 export REMOTE_ENV_IP=$(kubectl get service -n kyma-system application-connector-ingress-nginx-ingress-controller -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
@@ -285,7 +285,7 @@ az network dns record-set a add-record -g $RS_GROUP -z $DNS_DOMAIN -n apiserver.
 ```
 
 Access your cluster under this address:
-```
+``` text
 https://console.$SUB_DOMAIN.$DNS_DOMAIN
 ```
 
@@ -295,9 +295,8 @@ https://console.$SUB_DOMAIN.$DNS_DOMAIN
 
 Access your cluster under this address:
 
-```
+``` text
 https://console.{SUB_DOMAIN}.{DNS_DOMAIN}
 ```
 
 >**NOTE:** To log in to your cluster, use the default `admin` static user. To learn how to get the login details for this user, see [this](#installation-install-kyma-locally-from-the-release-access-the-kyma-console) document.
-    ```

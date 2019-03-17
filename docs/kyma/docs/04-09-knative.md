@@ -13,12 +13,12 @@ You can install Kyma with [Knative](https://cloud.google.com/knative/) and use i
 
 When you install Kyma locally from a release, follow [this](#installation-install-kyma-locally-from-the-release-install-kyma-on-minikube) guide. 
 Ensure that you created the local Kubernetes cluster with `10240Mb` memory and `30Gb` disk size.
-```
+``` bash
 ./scripts/minikube.sh --domain "kyma.local" --vm-driver "hyperkit" --memory 10240Mb --disk-size 30g
 ```
 
 Run the following command before triggering the Kyma installation process:
-```
+``` bash
 kubectl -n kyma-installer patch configmap installation-config-overrides -p '{"data": {"global.knative": "true", "global.kymaEventBus": "false", "global.natsStreaming.clusterID": "knative-nats-streaming"}}'
 ```
 
@@ -26,13 +26,13 @@ kubectl -n kyma-installer patch configmap installation-config-overrides -p '{"da
 
 When you install Kyma locally from sources, add the `--knative` argument to the `run.sh` script. Run this command:
 
-```
+``` bash
 ./run.sh --knative
 ```
 
 ## Knative with a cluster deployment
 
 Run the following command before triggering the Kyma installation process:
-```
+``` bash
 kubectl -n kyma-installer patch configmap installation-config-overrides -p '{"data": {"global.knative": "true", "global.kymaEventBus": "false", "global.natsStreaming.clusterID": "knative-nats-streaming"}}'
 ```

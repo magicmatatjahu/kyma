@@ -28,7 +28,7 @@ See the [GraphQL schema](https://github.com/kyma-project/kyma/blob/master/compon
 
 This is an example GraphQL action implemented in Kyma out of the box.
 
-  ```
+  ``` graphql
   IDPPreset(name: String!): IDPPreset @HasAccess(attributes: {resource: "IDPPreset", verb: "get", apiGroup: "authentication.kyma-project.io", apiVersion: "v1alpha1"})
   ```
 
@@ -40,7 +40,7 @@ This query secures the access to [IDPPreset](#custom-resource-idppreset) custom 
 
 To allow access specifically to the example query, create this RBAC role in the cluster and bind it to a user or a client:
 
-  ```
+  ``` yaml
   apiVersion: rbac.authorization.k8s.io/v1beta1
   kind: Role
   metadata:

@@ -40,7 +40,7 @@ The following examples show how to create a ServiceInstance, how to get a list o
 
 * Create a ServiceInstance using the example of the Redis ServiceInstance for the 0.1.40 version of the Service Catalog:
 
-```
+``` yaml
 cat <<EOF | kubectl create -f -
 apiVersion: servicecatalog.k8s.io/v1beta1
 kind: ServiceInstance
@@ -57,19 +57,19 @@ EOF
 ```
 
 * Get the list of all ClusterServiceClasses:
-```
+``` bash
 kubectl get clusterserviceclasses
 ```
 * Get the list of all ClusterServiceClasses and their human-readable names:
-```
+``` bash
 kubectl get clusterserviceclasses -o=custom-columns=NAME:.metadata.name,EXTERNAL\ NAME:.spec.externalName
 ```
 
 * Get the list of all ClusterServicePlans and associated ClusterServiceClasses:
-```
+``` bash
 kubectl get clusterserviceplans -o=custom-columns=NAME:.metadata.name,EXTERNAL\ NAME:.spec.externalName,EXTERNAL\ SERVICE\ CLASS:.spec.clusterServiceClassRef
 ```
 * Get the list of all ServiceInstances from all Namespaces:
-```
+``` bash
 kubectl get serviceinstances --all-namespaces
 ```

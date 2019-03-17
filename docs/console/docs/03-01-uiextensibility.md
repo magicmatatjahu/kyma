@@ -18,7 +18,7 @@ A micro front-end is a standalone web application which is developed, tested and
 The Luigi Client enables communication between the micro front-end and the Console application.
 Include [Luigi Client](https://www.npmjs.com/package/@kyma-project/luigi-client) in the micro front-end's codebase as an npm dependency.
 
-``` console
+``` bash
 npm i @kyma-project/luigi-client
 ```
 It helps to read the context data that is sent by the Console when the user activates the micro front-end in the UI.

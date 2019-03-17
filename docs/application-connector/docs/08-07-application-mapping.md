@@ -12,7 +12,7 @@ To complete this guide, your cluster must have at least one App created.
 ## Steps
 
 1. List all Apps bound to the `production` Namespace:
-  ``` console
+  ``` bash
   kubectl get em -n production
   ```
 
@@ -29,6 +29,6 @@ To complete this guide, your cluster must have at least one App created.
   ```
 
 3. Check if the operation is successful. List all Namespaces to which your App is bound:
-  ``` console
+  ``` bash
   kubectl get em --all-namespaces -o jsonpath='{range .items[?(@.metadata.name=="{NAME_OF_YOUR_APP}")]}{@.metadata.namespace}{""}{end}'
   ```

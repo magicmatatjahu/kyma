@@ -18,7 +18,7 @@ Follow these steps to get the `kubeconfig` file and configure the CLI to connect
 3. Click the **Download config** button to download the `kubeconfig` file to a selected location on your machine.
 4. Open a terminal window.
 5. Export the **KUBECONFIG** environment variable to point to the downloaded `kubeconfig`. Run this command:
-  ```
+  ``` bash
   export KUBECONFIG={KUBECONFIG_FILE_PATH}
   ```
   >**NOTE:** Drag and drop the `kubeconfig` file in the terminal to easily add the path of the file to the `export KUBECONFIG` command you run.
@@ -28,6 +28,6 @@ Follow these steps to get the `kubeconfig` file and configure the CLI to connect
 >**NOTE:** Exporting the **KUBECONFIG** environment variable works only in the context of the given terminal window. If you close the window in which you exported the variable, or if you switch to a new terminal window, you must export the environment variable again to connect the CLI to the desired cluster.
 
 Alternatively, get the `kubeconfig` file by sending a `GET` request with a valid ID token issued for the user to the `/kube-config` endpoint of the `https://configurations-generator.{YOUR_CLUSTER_DOMAIN}` service. For example:
-```
+``` bash
 curl GET https://configurations-generator.{YOUR_CLUSTER_DOMAIN}/kube-config -H "Authorization: Bearer {VALID_ID_TOKEN}"
 ```

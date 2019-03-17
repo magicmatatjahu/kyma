@@ -7,7 +7,7 @@ The `backendmodules.ui.kyma-project.io` CustomResourceDefinition (CRD) is a deta
 
 To get the up-to-date CRD and show the output in the `yaml` format, run this command:
 
-``` console
+``` bash
 kubectl get crd backendmodules.ui.kyma-project.io -o yaml
 ```
 

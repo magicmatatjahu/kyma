@@ -13,7 +13,7 @@ The function CRD ships by default with Kubeless.
 
 See the content of the `kubeless-crd.yaml` file:
 
-````
+``` yaml
 apiVersion: apiextensions.k8s.io/v1beta1
 description: Kubernetes Native Serverless Framework
 kind: CustomResourceDefinition
@@ -29,12 +29,11 @@ spec:
     singular: {{ .Values.function.customResourceDefinition.names.singular | quote }}
   scope: Namespaced
   version: v1beta1
-
-````
+```
 
 Use the `.yaml` file to create the custom resource using the following command:
 
-```
+``` bash
 kubectl create -f <filename>
 ```
 

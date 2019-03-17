@@ -4,7 +4,7 @@ type: API
 ---
 
 You can get the API specification of the Application Registry for a given version of the service using this command:
-``` console
+``` bash
 curl https://gateway.{CLUSTER_DOMAIN}/{APP_NAME}/v1/metadata/api.yaml
 ```
 
@@ -12,12 +12,12 @@ To access the API specification of the Application Registry locally, provide the
 
 To get the NodePort, run this command:
 
-``` console
+``` bash
 kubectl -n kyma-system get svc application-connector-ingress-nginx-ingress-controller -o 'jsonpath={.spec.ports[?(@.port==443)].nodePort}'
 ```
 
 To access the specification, run:
 
-``` console
+``` bash
 curl https://gateway.kyma.local:{NODE_PORT}/{APP_NAME}/v1/metadata/api.yaml
 ```

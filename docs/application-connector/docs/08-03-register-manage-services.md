@@ -103,12 +103,12 @@ Valid certificate signed by the Kyma Certificate Authority.
 2. Include the request body you prepared in the following call to register a service:
 
   - For a cluster deployment:
-    ``` console
+    ``` bash
     curl -X POST -d '{YOUR_REQUEST_BODY}' https://gateway.{CLUSTER_DOMAIN}/{RE_NAME}/v1/metadata/services --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
     ```
 
   - For a local deployment:
-    ``` console
+    ``` bash
     curl -X POST -d '{YOUR_REQUEST_BODY}' https://gateway.kyma.local:$NODE_PORT/{RE_NAME}/v1/metadata/services --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
     ```
 
@@ -120,11 +120,11 @@ A successful response returns the ID of the registered service:
 ### Check the details of a registered service
 
   - For a cluster deployment:
-    ``` console
+    ``` bash
     curl https://gateway.{CLUSTER_DOMAIN}/{RE_NAME}/v1/metadata/services/{YOUR_SERVICE_ID} --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
     ```
 
   - For a local deployment:
-    ``` console
+    ``` bash
     curl https://gateway.kyma.local:{NODE_PORT}/{RE_NAME}/v1/metadata/services/{YOUR_SERVICE_ID} --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -k
     ```

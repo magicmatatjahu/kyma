@@ -15,7 +15,7 @@ To disable a component from the list of components that you install with Kyma, r
 
 1. Download the [newest version](https://github.com/kyma-project/kyma/releases) of Kyma.
 2. Customize installation by removing a component from the list of components in the Installation resource. For example, to disable the Application Connector installation, remove this entry:
-    ```
+    ``` yaml
     name: "application-connector"
     namespace: "kyma-system"
     ```
@@ -36,7 +36,7 @@ To disable a component from the list of components that you install with Kyma, r
 ### Verify the installation
 
 1. Check if all Pods are running in the `kyma-system` Namespace:
-  ```
+  ``` bash
   kubectl get pods -n kyma-system
   ```
 2. Sign in to the Kyma Console using the `admin@kyma.cx` email address as described in the [Install Kyma locally from the release](#installation-install-kyma-locally-from-the-release) document.
@@ -49,16 +49,16 @@ To disable a component from the list of components that you install with Kyma, r
 To install a component that is not installed with Kyma by default, modify the [Installation](#custom-resource-installation) custom resource and add the component that you want to install to the list of components :
 
 1. Edit the resource:
-    ```
+    ``` bash
     kubectl edit installation kyma-installation
     ```
 2. Add the new component to the list of components, for example:
-    ```
+    ``` yaml
     - name: "jaeger"
       namespace: "kyma-system"
     ```
 3. Trigger the installation:
-   ```
+   ``` bash
    kubectl label installation/kyma-installation action=install
    ```
 

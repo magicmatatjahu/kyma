@@ -13,7 +13,7 @@ To run Kyma locally, clone this Git repository to your machine.
 
 To start the local installation, run the following command:
 
-```
+``` bash
 ./installation/cmd/run.sh
 ```
 

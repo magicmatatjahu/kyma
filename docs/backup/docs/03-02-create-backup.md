@@ -41,7 +41,7 @@ spec:
 
 To create the backup, run the following command:
 
-``` console
+``` bash
 $ kubectl apply -f <filename>
 ```
 
@@ -76,7 +76,7 @@ spec:
 
 To schedule a backup, run the following command:
 
-``` console
+``` bash
 $ kubectl apply -f <filename>
 ```
 
@@ -84,7 +84,7 @@ $ kubectl apply -f <filename>
 
 To set the retention period of a backup, define the **ttl** parameter in the Backup specification [definition](https://github.com/heptio/velero/blob/master/docs/api-types/backup.md#definition):
 
-``` console
+``` text
 The amount of time before this backup is eligible for garbage collection.
 ttl: 24h0m0s 
 ```

@@ -30,11 +30,11 @@ Kyma comes with a local wildcard self-signed `server.crt` certificate that you c
 Follow these steps to "always trust" the Kyma certificate on Mac:
 
 1. Change the working directory to `installation`:
-  ```
+  ``` bash
   cd installation
   ```
 2. Run this command:
-  ```
+  ``` bash
   sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain certs/workspace/raw/server.crt
   ```
 
@@ -53,44 +53,44 @@ You can install Kyma either with all core subcomponents or only with the selecte
 To install Kyma, follow these steps:
 
 1. Change the working directory to `installation`:
-  ```
+  ``` bash
   cd installation
   ```
 
 2. Use the following command to run Kubernetes locally using Minikube:
-  ```
+  ``` bash
   ./scripts/minikube.sh --domain "kyma.local" --vm-driver "hyperkit"
   ```
 
 3. Wait until the `kube-dns` Pod is ready. Run this script to setup Tiller:
-  ```
+  ``` bash
   ./scripts/install-tiller.sh
   ```
 
 4. Go to [this](https://github.com/kyma-project/kyma/releases/) page and choose the latest release.
 
 5. Export the release version as an environment variable. Run:
-  ```
+  ``` bash
   export LATEST={KYMA_RELEASE_VERSION}
   ```
 
 6. Deploy the Kyma Installer in your cluster from the `$LATEST` release:
-  ```
+  ``` bash
   kubectl apply -f https://github.com/kyma-project/kyma/releases/download/$LATEST/kyma-installer-local.yaml
   ```
 
 7. Configure the Kyma installation using the local configuration file from the `$LATEST` release:
-  ```
+  ``` bash
   kubectl apply -f https://github.com/kyma-project/kyma/releases/download/$LATEST/kyma-config-local.yaml
   ```
 
 8. To trigger the installation process, label the `kyma-installation` custom resource:
-  ```
+  ``` bash
   kubectl label installation/kyma-installation action=install
   ```
 
 9. By default, the Kyma installation is a background process, which allows you to perform other tasks in the terminal window. Nevertheless, you can track the progress of the installation by running this script:
-  ```
+  ``` bash
   ./scripts/is-installed.sh
   ```
 
@@ -126,18 +126,18 @@ kubectl get secret admin-user -n kyma-system -o jsonpath="{.data.password}" | ba
 
 Additionally, confirm that you can access your Kubernetes Dashboard. Run the following command to check the IP address on which Minikube is running:
 
-```bash
+``` bash
 minikube ip
 ```
 
 The address of your Kubernetes Dashboard looks similar to this:
-```
+``` text
 http://{ip-address}:30000
 ```
 
 See the example of the website address:
 
-```
+``` text
 http://192.168.64.44:30000
 ```
 
@@ -152,12 +152,12 @@ Kyma uses the `autoscaling/v1` stable version, which supports only CPU autoscali
 Follow these steps to enable HPA:
 
 1. Enable the metrics server for resource metrics by running the following command:
-  ```
+  ``` bash
   minikube addons enable metrics-server
   ```
 
 2. Verify if the metrics server is active by checking the list of addons:
-  ```
+  ``` bash
   minikube addons list
   ```
 
@@ -166,11 +166,11 @@ Follow these steps to enable HPA:
 Use the `minikube.sh` script to restart the Minikube cluster without reinstalling Kyma. Follow these steps to stop and restart your cluster:
 
 1. Stop the Minikube cluster with Kyma installed. Run:
-  ```
+  ``` bash
   minikube stop
   ```
 2. Restart the cluster without reinstalling Kyma. Run:
-  ```
+  ``` bash
   ./scripts/minikube.sh --domain "kyma.local" --vm-driver "hyperkit"
   ```
 
@@ -178,19 +178,19 @@ The script discovers that a Minikube cluster is initialized and asks if you want
 
 To verify that the restart is successful, run this command and check if all Pods have the `RUNNING` status:
 
-```
+``` bash
 kubectl get pods --all-namespaces
 ```
 
 ## Troubleshooting
 
 If the Installer does not respond as expected, check the installation status using the `is-installed.sh` script with the `--verbose` flag added. Run:
-```
+``` bash
 scripts/is-installed.sh --verbose
 ```
 
 If the installation is successful but a component does not behave in an expected way, see if all deployed Pods are running. Run this command:  
-```
+``` bash
 kubectl get pods --all-namespaces
 ```
 

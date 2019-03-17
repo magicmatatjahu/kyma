@@ -26,7 +26,7 @@ EOF
 ## Check the App status
 
 To check the status of the created App and show the output in the `yaml` format, run this command:
-``` console
+``` bash
 kubectl get app {APP_NAME} -o yaml
 ```
 

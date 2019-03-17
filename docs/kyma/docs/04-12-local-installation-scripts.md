@@ -7,7 +7,7 @@ This document extends the [Install Kyma locally from sources](#installation-inst
 
 The following snippet is the main element of the `run.sh` script:
 
-```
+``` bash
 if [[ ! $SKIP_MINIKUBE_START ]]; then
     bash $SCRIPTS_DIR/minikube.sh --domain "$DOMAIN" --vm-driver "$VM_DRIVER" $MINIKUBE_EXTRA_ARGS
 fi

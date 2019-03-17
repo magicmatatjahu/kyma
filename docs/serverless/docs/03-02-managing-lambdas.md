@@ -7,7 +7,7 @@ Kubernetes provides Kyma with labels that allow you to arrange lambda functions 
 
 Behind the scenes, labeling takes place in the form of key value pairs. Here is an example of code that enhances a function:
 
-```
+``` json
 "labels": {
   "key1" : "value1",
   "key2" : "value2"

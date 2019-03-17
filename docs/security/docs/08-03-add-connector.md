@@ -18,17 +18,17 @@ After you complete the registration, [request](https://help.github.com/articles/
 
 Register the GitHub Dex connector by editing the `dex-config-map.yaml` ConfigMap file located in the `kyma/resources/dex/templates` directory. Follow this template:
 
-```
-    connectors:
-    - type: github
-      id: github
-      name: GitHub
-      config:
-        clientID: {GITHUB_CLIENT_ID}
-        clientSecret: {GITHUB_CLIENT_SECRET}
-        redirectURI: https://dex.kyma.local/callback
-        orgs:
-          - name: {GITHUB_ORGANIZATION}
+``` yaml
+connectors:
+- type: github
+  id: github
+  name: GitHub
+  config:
+    clientID: {GITHUB_CLIENT_ID}
+    clientSecret: {GITHUB_CLIENT_SECRET}
+    redirectURI: https://dex.kyma.local/callback
+    orgs:
+      - name: {GITHUB_ORGANIZATION}
 ```
 
 This table explains the placeholders used in the template:
@@ -43,7 +43,7 @@ This table explains the placeholders used in the template:
 
 To bind Github groups to the default roles added to every Kyma Namespace, add the **bindings** section to [this](https://github.com/kyma-project/kyma/blob/master/resources/core/charts/cluster-users/values.yaml) file. Follow this template:
 
-```
+``` yaml
 bindings:
   kymaAdmin:
     groups:

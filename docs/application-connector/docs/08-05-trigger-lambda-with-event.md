@@ -66,7 +66,7 @@ This guide shows how to create a simple lambda function and trigger it with an e
 ```
 
 2. Get the `externalName` of the Service Class of the registered service.
-``` console
+``` bash
 kubectl -n production get serviceclass {SERVICE_ID}  -o jsonpath='{.spec.externalName}'
 ```
 
@@ -176,7 +176,7 @@ EOF
 
 6. Send an event to trigger the created lambda.
   - On a cluster:
-    ``` console
+    ``` bash
     curl -X POST https://gateway.{CLUSTER_DOMAIN}/{APP_NAME}/v1/events -k --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -d \
     '{
         "event-type": "exampleEvent",
@@ -187,7 +187,7 @@ EOF
     }'
     ```
   - On a local deployment:
-    ``` console
+    ``` bash
     curl -X POST https://gateway.kyma.local:{NODE_PORT}/{APP_NAME}/v1/events -k --cert {CERT_FILE_NAME}.crt --key {KEY_FILE_NAME}.key -d \
     '{
         "event-type": "exampleEvent",
@@ -199,6 +199,6 @@ EOF
     ```
 
 7. Check the logs of the lambda function to see if it was triggered. Every time an event successfully triggers the function, this message appears in the logs: `Response acquired successfully! Uuid: {RECEIVED_UUID}`. Run this command:
-``` console
+``` bash
 kubectl -n production logs "$(kubectl -n production get po -l function=my-lambda -o jsonpath='{.items[0].metadata.name}')" -c my-lambda | grep "Response acquired successfully! Uuid: "
 ```

@@ -34,7 +34,7 @@ The update procedure consists of three main steps:
 - If you update an existing component, make all required changes to the Helm charts of the component located in the [`resource`](https://github.com/kyma-project/kyma/tree/master/resources) directory.
 
 - If you add a new component to your Kyma deployment, add a top-level Helm chart for that component. Additionally, run this command to edit the Installation custom resource and add the new component to the installed components list:
-  ```
+  ``` bash
   kubectl edit installation kyma-installation
   ```
 
@@ -47,35 +47,35 @@ The update procedure consists of three main steps:
 ## Update the Kyma Installer on a local deployment
 
 - Build a new image for the Kyma Installer:  
-  ```
+  ``` bash
   ./installation/scripts/build-kyma-installer.sh
   ```  
   > **NOTE:** If you started Kyma with the `run.sh` script with a `--vm-driver {value}` parameter, provide the same parameter to the `build-kyma-installer.sh` script.
 
 - Restart the Kyma Installer Pod:  
-  ```
+  ``` bash
   kubectl delete pod -n kyma-installer {INSTALLER_POD_NAME}
   ```
 
 ## Update the Kyma Installer on a cluster deployment
 
 - Build a new image for the Kyma Installer:
-  ```
+  ``` bash
   docker build -t {IMAGE_NAME}:{IMAGE_TAG} -f tools/kyma-installer/kyma.Dockerfile .
   ```
 
 - Push the image to your Docker registry.
 
 - Redeploy the Kyma Installer Pod using the new image. Run this command to edit the Deployment configuration:
-  ```
+  ``` bash
   kubectl edit deployment kyma-installer -n kyma-installer
   ```
   Change the `image` and `imagePullPolicy` attributes in this section:  
-    ```  
-         spec:
-           containers:
-           - image: <your_image_name>:<your_tag>
-             imagePullPolicy: Always
+    ``` yaml
+    spec:
+      containers:
+      - image: <your_image_name>:<your_tag>
+        imagePullPolicy: Always
     ```  
   > **NOTE:** If the desired image name and `imagePullPolicy` is already set in the deployment configuration, restart the Pod by running `kubectl delete pod -n kyma-installer {INSTALLER_POD_NAME}`
 
@@ -83,6 +83,6 @@ The update procedure consists of three main steps:
 
 Execute the following command to trigger the update process:
 
-```
+``` bash
 kubectl label installation/kyma-installation action=install
 ```

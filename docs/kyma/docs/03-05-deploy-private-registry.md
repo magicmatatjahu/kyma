@@ -21,12 +21,12 @@ A Secret resource passes your Docker registry credentials to the Kyma cluster in
 
 To create a Secret resource for your Docker registry, run the following command:
 
-```bash
+``` bash
 kubectl create secret docker-registry {secret-name} --docker-server={registry FQN} --docker-username={user-name} --docker-password={password} --docker-email={registry-email} --namespace={namespace}  
 ```
 
 Refer to the following example:
-```bash
+``` bash
 kubectl create secret docker-registry docker-registry-secret --docker-server=myregistry:5000 --docker-username=root --docker-password=password --docker-email=example@github.com --namespace=production
 ```
 
@@ -38,7 +38,7 @@ The Secret is associated with a specific Namespace. In the example, the Namespac
 
 2. Describe your deployment in the `.yml` file. Refer to the following example:
 
-```yaml
+``` yaml
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
@@ -69,7 +69,7 @@ spec:
 ```
 3. Submit you deployment file using this command:
 
-```bash
+``` bash
 kubectl apply -f deployment.yml
 ```
 Your deployment is now running on the Kyma cluster.

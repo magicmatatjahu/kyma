@@ -22,7 +22,7 @@ This tutorial shows how to expose custom metrics to Prometheus with a Golang ser
 
 For the `default` Namespace, the sidecar injection must be enabled. To enable the sidecar injection for all Pods in the `default` Namespace, run the following command:
 
-```bash
+``` bash
 kubectl label namespace default istio-injection=enabled
 namespace "default" labeled
 ```
@@ -31,7 +31,7 @@ For more details on deploying your application with Istio, read [this](https://i
 
 You must also add the **sidecar.istio.io/inject** annotation with the value set to `true` to the Pod template specification, to enable the injection as shown in [this](https://github.com/kyma-project/examples/blob/master/monitoring-custom-metrics/deployment/deployment.yaml#L12) example.
 
-```yaml
+``` yaml
 spec:
   template:
     metadata:
@@ -54,20 +54,20 @@ To expose Prometheus metrics in Golang, the Prometheus community provides [this]
 This is a basic example where `Gauge` and `Counter` metrics are exported using the `prometheus` package.
 
 1. Deploy the sample metrics application.
-    ```bash
+    ``` bash
     kubectl apply -f https://raw.githubusercontent.com/kyma-project/examples/master/monitoring-custom-metrics/deployment/deployment.yaml
 
     kubectl apply -f https://raw.githubusercontent.com/kyma-project/examples/master/monitoring-custom-metrics/deployment/service-monitor.yaml
     ```
 
-    ```bash
+    ``` bash
     kubectl get pods
     NAME                             READY     STATUS    RESTARTS   AGE
     sample-metrics-67c6885d8c-smt62   2/2       Running   0          2m
     ```
 
 2. Run the `port-forward` command on the `sample-metrics-8081` service for the`8081` port to check the metrics.
-    ```bash
+    ``` bash
     kubectl port-forward svc/sample-metrics-8081 8081:8081
     ```
     Open a browser and access [`http://localhost:8081/metrics`](http://localhost:8081/metrics)
@@ -80,7 +80,7 @@ Find the source code for the sample application [here](https://github.com/kyma-p
 
  Run the `port-forward` command on the `monitoring-prometheus` service:
 
-```bash
+``` bash
 kubectl port-forward svc/monitoring-prometheus -n kyma-system 9090:9090
 Forwarding from 127.0.0.1:9090 -> 9090
 Forwarding from [::1]:9090 -> 9090
@@ -100,7 +100,7 @@ Prometheus can reach the service using ServiceMonitor. ServiceMonitor is a speci
 
 In Kyma, the Prometheus server discovers all ServiceMonitors through the **serviceMonitorSelector** matching the `prometheus: monitoring` label.
 
-```yaml
+``` yaml
   serviceMonitorSelector:
     matchLabels:
       prometheus: {{ .Values.prometheusLabelValue | default .Release.Name | quote }}
@@ -127,13 +127,13 @@ For details on how to create dashboards in Grafana, see the following documents:
 Run the following commands to completely remove the example and all its resources from the cluster:
 
 1. Remove the **istio-injection** label from the `default` Namespace.
-    ```bash
+    ``` bash
     kubectl label namespace default istio-injection-
     ```
 2. Remove **ServiceMonitor** in the `kyma-system` Namespace.
-    ```bash
+    ``` bash
     kubectl delete servicemonitor -l example=monitoring-custom-metrics -n kyma-system
     ```
 3. Remove the `sample-metrics` Deployments in the `default` Namespace.
-    ```bash
+    ``` bash
     kubectl delete all -l example=monitoring-custom-metrics

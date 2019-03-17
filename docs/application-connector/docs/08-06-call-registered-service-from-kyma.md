@@ -5,13 +5,11 @@ type: Tutorials
 
 This guide shows how to call a registered external service from Kyma using a simple lambda function.
 
-
 ## Prerequisites
 
 - An Application (App) bound to the `production` Namespace
 - Client certificates generated for the connected App.
 - Map `my-lambda-production.kyma.local` to your Minikube IP to call the lambda function on a local Kyma deployment.
-
 
 ## Steps
 
@@ -33,7 +31,7 @@ This guide shows how to call a registered external service from Kyma using a sim
 ```
 
 2. Get the `externalName` of the Service Class of the registered service.
-``` console
+``` bash
 kubectl -n production get serviceclass {SERVICE_ID}  -o jsonpath='{.spec.externalName}'
 ```
 
@@ -180,11 +178,11 @@ EOF
 
 7. To verify that everything was setup correctly you can now call the lambda through https:
   - On a cluster
-    ``` console
+    ``` bash
     curl https://my-lambda-production.{CLUSTER_DOMAIN}/ -k
     ```
   - On a local deployment:
-    ``` console
+    ``` bash
     curl https://my-lambda-production.kyma.local/ -k
     ```
 
