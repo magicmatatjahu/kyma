@@ -294,3 +294,35 @@ func (r *clusterServiceClassResolver) ClusterServiceClassContentField(ctx contex
 
 	return &result, nil
 }
+
+func (r *clusterServiceClassResolver) ClusterServiceClassClusterDocsTopicsField(ctx context.Context, obj *gqlschema.ClusterServiceClass) ([]gqlschema.ClusterDocsTopic, error) {
+	if obj == nil {
+		glog.Error(errors.New("%s cannot be empty in order to resolve `clusterDocsTopics` field"), pretty.ClusterServiceClass)
+		return nil, gqlerror.NewInternal()
+	}
+
+	//content, err := r.contentRetriever.Content().Find("service-class", obj.Name)
+	//if err != nil {
+	//	if module.IsDisabledModuleError(err) {
+	//		return nil, err
+	//	}
+	//
+	//	glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", contentPretty.Content, pretty.ClusterServiceClass, obj.ExternalName))
+	//	return nil, gqlerror.New(err, contentPretty.Content)
+	//}
+	//
+	//if content == nil {
+	//	return nil, nil
+	//}
+	//
+	//var result gqlschema.JSON
+	//err = result.UnmarshalGQL(content.Raw)
+	//if err != nil {
+	//	glog.Error(errors.Wrapf(err, "while converting %s for %s %s", contentPretty.Content, pretty.ClusterServiceClass, obj.ExternalName))
+	//	return nil, gqlerror.New(err, contentPretty.Content)
+	//}
+	//
+	//return &result, nil
+
+	return nil, nil
+}

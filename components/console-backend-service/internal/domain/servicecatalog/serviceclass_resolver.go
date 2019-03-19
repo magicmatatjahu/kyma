@@ -299,3 +299,12 @@ func (r *serviceClassResolver) ServiceClassContentField(ctx context.Context, obj
 
 	return &result, nil
 }
+
+func (r *clusterServiceClassResolver) ServiceClassDocsTopicsField(ctx context.Context, obj *gqlschema.ServiceClass) ([]gqlschema.DocsTopic, error) {
+	if obj == nil {
+		glog.Error(errors.New("%s cannot be empty in order to resolve `docsTopics` field"), pretty.ClusterServiceClass)
+		return nil, gqlerror.NewInternal()
+	}
+
+	return nil, nil
+}

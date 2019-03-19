@@ -6,7 +6,6 @@ import (
 
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
 
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/disabled"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/name"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/rest"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/disabled"
 )
 
 type PluggableContainer struct {
@@ -145,6 +145,7 @@ type Resolver interface {
 	ClusterServiceClassODataSpecField(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*string, error)
 	ClusterServiceClassAsyncApiSpecField(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.JSON, error)
 	ClusterServiceClassContentField(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.JSON, error)
+	ClusterServiceClassClusterDocsTopicsField(ctx context.Context, obj *gqlschema.ClusterServiceClass) ([]gqlschema.ClusterDocsTopic, error)
 
 	ServiceClassQuery(ctx context.Context, name, namespace string) (*gqlschema.ServiceClass, error)
 	ServiceClassesQuery(ctx context.Context, namespace string, first *int, offset *int) ([]gqlschema.ServiceClass, error)
@@ -156,6 +157,7 @@ type Resolver interface {
 	ServiceClassODataSpecField(ctx context.Context, obj *gqlschema.ServiceClass) (*string, error)
 	ServiceClassAsyncApiSpecField(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.JSON, error)
 	ServiceClassContentField(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.JSON, error)
+	ServiceClassDocsTopicsField(ctx context.Context, obj *gqlschema.ServiceClass) ([]gqlschema.DocsTopic, error)
 
 	CreateServiceInstanceMutation(ctx context.Context, params gqlschema.ServiceInstanceCreateInput) (*gqlschema.ServiceInstance, error)
 	DeleteServiceInstanceMutation(ctx context.Context, name, namespace string) (*gqlschema.ServiceInstance, error)

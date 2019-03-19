@@ -22,15 +22,15 @@ required = [
 
 [[constraint]]
   name = "k8s.io/api"
-  version = "kubernetes-1.11.3"
+  version = "kubernetes-1.13.0"
 
 [[constraint]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.11.3"
+  version = "kubernetes-1.13.0"
 
 [[constraint]]
   name = "k8s.io/client-go"
-  version = "kubernetes-1.11.3"
+  version = "kubernetes-1.13.0"
 
 [[constraint]]
   revision = "44145f04b68cf362d9c4df2182967c2275eaefed"
@@ -70,23 +70,23 @@ required = [
 
 [[constraint]]
   name = "github.com/kyma-project/kyma"
-  revision = "26578a4d8414cf9c888dbec1bf2460d56cbfde2f"
+  revision = "07468d7da00d4eea097b945194c035df2a8127d8"
 
 [[override]]
   name = "k8s.io/api"
-  version = "kubernetes-1.11.3"
+  version = "kubernetes-1.13.0"
 
 [[override]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.11.3"
+  version = "kubernetes-1.13.0"
 
 [[constraint]]
   name = "k8s.io/apiserver"
-  version = "kubernetes-1.11.3"
+  version = "kubernetes-1.13.0"
 
 [[override]]
   name = "k8s.io/client-go"
-  version = "kubernetes-1.11.3"
+  version = "kubernetes-1.13.0"
 
 [[constraint]]
   name = "k8s.io/code-generator"

@@ -52,6 +52,13 @@ type ApplicationService struct {
 	Entries             []ApplicationEntry `json:"entries"`
 }
 
+type Asset struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+	Type      string `json:"type"`
+	Files     []File `json:"files"`
+}
+
 type AuthenticationPolicy struct {
 	Type    AuthenticationPolicyType `json:"type"`
 	Issuer  string                   `json:"issuer"`
@@ -66,6 +73,12 @@ type BindableResourcesOutputItem struct {
 	Kind        string              `json:"kind"`
 	DisplayName string              `json:"displayName"`
 	Resources   []UsageKindResource `json:"resources"`
+}
+
+type ClusterAsset struct {
+	Name  string `json:"name"`
+	Type  string `json:"type"`
+	Files []File `json:"files"`
 }
 
 type ClusterServiceBroker struct {
@@ -192,6 +205,11 @@ type ExceededQuota struct {
 	QuotaName         string   `json:"quotaName"`
 	ResourceName      string   `json:"resourceName"`
 	AffectedResources []string `json:"affectedResources"`
+}
+
+type File struct {
+	URL      string `json:"url"`
+	Metadata JSON   `json:"metadata"`
 }
 
 type Function struct {

@@ -21,6 +21,8 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/rest"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
 )
 
 type RootResolver struct {
@@ -31,6 +33,8 @@ type RootResolver struct {
 	sca            *servicecatalogaddons.PluggableContainer
 	app            *application.PluggableContainer
 	content        *content.PluggableContainer
+	assetstore	   *assetstore.PluggableContainer
+	cms			   *cms.PluggableContainer
 	kubeless       *kubeless.PluggableResolver
 	ac             *apicontroller.PluggableResolver
 	authentication *authentication.PluggableResolver
@@ -38,7 +42,6 @@ type RootResolver struct {
 
 func New(restConfig *rest.Config, contentCfg content.Config, appCfg application.Config, informerResyncPeriod time.Duration, featureToggles experimental.FeatureToggles) (*RootResolver, error) {
 	uiContainer, err := ui.New(restConfig, informerResyncPeriod)
-
 	makePluggable := module.MakePluggableFunc(uiContainer.BackendModuleInformer)
 
 	contentContainer, err := content.New(contentCfg)
@@ -46,6 +49,18 @@ func New(restConfig *rest.Config, contentCfg content.Config, appCfg application.
 		return nil, errors.Wrap(err, "while initializing Content resolver")
 	}
 	makePluggable(contentContainer)
+
+	assetStoreContainer, err := assetstore.New(restConfig, informerResyncPeriod)
+	if err != nil {
+		return nil, errors.Wrap(err, "while initializing CMS resolver")
+	}
+	makePluggable(assetStoreContainer)
+
+	cmsContainer, err := cms.New(restConfig, informerResyncPeriod, assetStoreContainer.AssetStoreRetriever)
+	if err != nil {
+		return nil, errors.Wrap(err, "while initializing CMS resolver")
+	}
+	makePluggable(cmsContainer)
 
 	scContainer, err := servicecatalog.New(restConfig, informerResyncPeriod, contentContainer.ContentRetriever)
 	if err != nil {
@@ -95,6 +110,8 @@ func New(restConfig *rest.Config, contentCfg content.Config, appCfg application.
 		sca:            scaContainer,
 		app:            appContainer,
 		content:        contentContainer,
+		assetstore:		assetStoreContainer,
+		cms:			cmsContainer,
 		ac:             acResolver,
 		kubeless:       kubelessResolver,
 		authentication: authenticationResolver,
@@ -112,6 +129,8 @@ func (r *RootResolver) WaitForCacheSync(stopCh <-chan struct{}) {
 	r.sca.StopCacheSyncOnClose(stopCh)
 	r.app.StopCacheSyncOnClose(stopCh)
 	r.content.StopCacheSyncOnClose(stopCh)
+	r.cms.StopCacheSyncOnClose(stopCh)
+	r.assetstore.StopCacheSyncOnClose(stopCh)
 	r.ac.StopCacheSyncOnClose(stopCh)
 	r.kubeless.StopCacheSyncOnClose(stopCh)
 	r.authentication.StopCacheSyncOnClose(stopCh)
@@ -385,6 +404,10 @@ func (r *queryResolver) ServiceBindingUsage(ctx context.Context, name, namespace
 	return r.sca.Resolver.ServiceBindingUsageQuery(ctx, name, namespace)
 }
 
+func (r *queryResolver) ClusterDocsTopics(ctx context.Context, viewContext *string, groupName string) ([]gqlschema.ClusterDocsTopic, error) {
+	return r.cms.Resolver.ClusterDocsTopicsQuery(ctx, viewContext, groupName)
+}
+
 func (r *queryResolver) Content(ctx context.Context, contentType, id string) (*gqlschema.JSON, error) {
 	return r.content.Resolver.ContentQuery(ctx, contentType, id)
 }
@@ -606,6 +629,10 @@ func (r *serviceClassResolver) Content(ctx context.Context, obj *gqlschema.Servi
 	return r.sc.Resolver.ServiceClassContentField(ctx, obj)
 }
 
+func (r *serviceClassResolver) DocsTopics(ctx context.Context, obj *gqlschema.ServiceClass) ([]gqlschema.DocsTopic, error) {
+	return r.sc.Resolver.ServiceClassDocsTopicsField(ctx, obj)
+}
+
 // Cluster Service Class
 
 type clusterServiceClassResolver struct {
@@ -642,6 +669,10 @@ func (r *clusterServiceClassResolver) AsyncAPISpec(ctx context.Context, obj *gql
 
 func (r *clusterServiceClassResolver) Content(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.JSON, error) {
 	return r.sc.Resolver.ClusterServiceClassContentField(ctx, obj)
+}
+
+func (r *clusterServiceClassResolver) ClusterDocsTopics(ctx context.Context, obj *gqlschema.ClusterServiceClass) ([]gqlschema.ClusterDocsTopic, error) {
+	return r.sc.Resolver.ClusterServiceClassClusterDocsTopicsField(ctx, obj)
 }
 
 type namespaceResolver struct {
