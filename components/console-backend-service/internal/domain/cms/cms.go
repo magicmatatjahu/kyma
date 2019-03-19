@@ -50,6 +50,7 @@ func New(restConfig *rest.Config, informerResyncPeriod time.Duration, assetStore
 			assetStoreRetriever: assetStoreRetriever,
 		},
 		Pluggable: module.NewPluggable("content"),
+		CmsRetriever: &cmsRetriever{},
 	}
 
 	err = container.Disable()
@@ -90,6 +91,7 @@ func (r *PluggableContainer) Enable() error {
 	r.Pluggable.EnableAndSyncDynamicInformerFactory(r.informerFactory, func() {
 		r.Resolver = &domainResolver{
 			clusterDocsTopicResolver: newClusterDocsTopicResolver(clusterDocsTopicService, assetStoreRetriever),
+			docsTopicResolver: newDocsTopicResolver(docsTopicService, assetStoreRetriever),
 		}
 		r.CmsRetriever.ClusterDocsTopicGetter = clusterDocsTopicService
 		r.CmsRetriever.DocsTopicGetter = docsTopicService
@@ -118,8 +120,11 @@ type resolverConfig struct {
 //go:generate failery -name=Resolver -case=underscore -output disabled -outpkg disabled
 type Resolver interface {
 	ClusterDocsTopicsQuery(ctx context.Context, viewContext *string, groupName string) ([]gqlschema.ClusterDocsTopic, error)
+	ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error)
+	DocsTopicAssetsField(ctx context.Context, obj *gqlschema.DocsTopic, typeArg *string) ([]gqlschema.Asset, error)
 }
 
 type domainResolver struct {
 	*clusterDocsTopicResolver
+	*docsTopicResolver
 }

@@ -5,6 +5,8 @@ import (
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"fmt"
 	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
 )
 
 type docsTopicService struct {
@@ -14,8 +16,8 @@ type docsTopicService struct {
 func newDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService, error) {
 	err := informer.AddIndexers(cache.Indexers{
 		"groupName": func(obj interface{}) ([]string, error) {
-			entity, ok := obj.(*v1alpha1.DocsTopic)
-			if !ok {
+			entity, err := extractDocsTopic(obj)
+			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
@@ -49,4 +51,19 @@ func (svc *docsTopicService) List(namespace, groupName string) ([]*v1alpha1.Docs
 	}
 
 	return docsTopics, nil
+}
+
+func extractDocsTopic(obj interface{}) (*v1alpha1.DocsTopic, error) {
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+	if err != nil {
+		return nil, errors.Wrapf(err, "while converting resource %s %s to unstructured", pretty.DocsTopic, obj)
+	}
+
+	var docsTopic v1alpha1.DocsTopic
+	err = runtime.DefaultUnstructuredConverter.FromUnstructured(u, &docsTopic)
+	if err != nil {
+		return nil, errors.Wrapf(err, "while converting unstructured to resource %s %s", pretty.DocsTopic, u)
+	}
+
+	return &docsTopic, nil
 }

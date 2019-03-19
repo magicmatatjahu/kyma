@@ -46,6 +46,7 @@ func New(restConfig *rest.Config, informerResyncPeriod time.Duration) (*Pluggabl
 			informerResyncPeriod: informerResyncPeriod,
 		},
 		Pluggable: module.NewPluggable("content"),
+		AssetStoreRetriever: &assetStoreRetriever{},
 	}
 
 	err = container.Disable()

@@ -144,6 +144,14 @@ func (r *RootResolver) EventActivation() gqlschema.EventActivationResolver {
 	return &eventActivationResolver{r.app}
 }
 
+func (r *RootResolver) ClusterDocsTopic() gqlschema.ClusterDocsTopicResolver {
+	return &clusterDocsTopicResolver{r.cms}
+}
+
+func (r *RootResolver) DocsTopic() gqlschema.DocsTopicResolver {
+	return &docsTopicResolver{r.cms}
+}
+
 func (r *RootResolver) Application() gqlschema.ApplicationResolver {
 	return &appResolver{r.app}
 }
@@ -675,10 +683,30 @@ func (r *clusterServiceClassResolver) ClusterDocsTopics(ctx context.Context, obj
 	return r.sc.Resolver.ClusterServiceClassClusterDocsTopicsField(ctx, obj)
 }
 
+// Namespace
+
 type namespaceResolver struct {
 	k8s *k8s.Resolver
 }
 
 func (r *namespaceResolver) Applications(ctx context.Context, obj *gqlschema.Namespace) ([]string, error) {
 	return r.k8s.ApplicationsField(ctx, obj)
+}
+
+// CMS
+
+type clusterDocsTopicResolver struct {
+	cms *cms.PluggableContainer
+}
+
+func (r *clusterDocsTopicResolver) Assets(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error) {
+	return r.cms.Resolver.ClusterDocsTopicAssetsField(ctx, obj, typeArg)
+}
+
+type docsTopicResolver struct {
+	cms *cms.PluggableContainer
+}
+
+func (r *docsTopicResolver) Assets(ctx context.Context, obj *gqlschema.DocsTopic, typeArg *string) ([]gqlschema.Asset, error) {
+	return r.cms.Resolver.DocsTopicAssetsField(ctx, obj, typeArg)
 }

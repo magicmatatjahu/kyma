@@ -39,3 +39,7 @@ func (r *clusterDocsTopicResolver) ClusterDocsTopicsQuery(ctx context.Context, v
 
 	return clusterDocsTopics, nil
 }
+
+func (r *clusterDocsTopicResolver) ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error) {
+	return nil, nil
+}

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"k8s.io/apimachinery/pkg/runtime"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
 )
 
 type clusterAssetService struct {
@@ -14,8 +16,8 @@ type clusterAssetService struct {
 func newClusterAssetService(informer cache.SharedIndexInformer) (*clusterAssetService, error) {
 	err := informer.AddIndexers(cache.Indexers{
 		"groupName": func(obj interface{}) ([]string, error) {
-			entity, ok := obj.(*v1alpha2.ClusterAsset)
-			if !ok {
+			entity, err := extractClusterAsset(obj)
+			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
@@ -50,4 +52,19 @@ func (svc *clusterAssetService) List(groupName string) ([]*v1alpha2.ClusterAsset
 	}
 
 	return clusterAssets, nil
+}
+
+func extractClusterAsset(obj interface{}) (*v1alpha2.ClusterAsset, error) {
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+	if err != nil {
+		return nil, errors.Wrapf(err, "while converting resource %s %s to unstructured", pretty.ClusterAsset, obj)
+	}
+
+	var clusterAsset v1alpha2.ClusterAsset
+	err = runtime.DefaultUnstructuredConverter.FromUnstructured(u, &clusterAsset)
+	if err != nil {
+		return nil, errors.Wrapf(err, "while converting unstructured to resource %s %s", pretty.ClusterAsset, u)
+	}
+
+	return &clusterAsset, nil
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
 )
 
 type clusterDocsTopicService struct {
@@ -14,12 +16,12 @@ type clusterDocsTopicService struct {
 func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDocsTopicService, error) {
 	err := informer.AddIndexers(cache.Indexers{
 		"groupName": func(obj interface{}) ([]string, error) {
-			entity, ok := obj.(*v1alpha1.ClusterDocsTopic)
-			if !ok {
+			_, err := extractClusterDocsTopic(obj)
+			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
-			return []string{fmt.Sprintf("%s", entity.Name)}, nil
+			return []string{fmt.Sprintf("%s", "lol")}, nil
 		},
 	})
 	if err != nil {
@@ -31,32 +33,9 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 	}, nil
 }
 
-//func (svc *clusterDocsTopicService) FindByGroupName(groupName string) (*v1alpha1.ClusterDocsTopic, error) {
-//	key := fmt.Sprintf("%s", groupName)
-//	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	if len(items) == 0 {
-//		return nil, nil
-//	}
-//
-//	if len(items) > 1 {
-//		return nil, fmt.Errorf("Multiple ClusterDocsTopic resources with the same groupName %s", groupName)
-//	}
-//
-//	item := items[0]
-//	clusterDocsTopic, ok := item.(*v1alpha1.ClusterDocsTopic)
-//	if !ok {
-//		return nil, fmt.Errorf("Incorrect item type: %T, should be: *ClusterDocsTopic", item)
-//	}
-//
-//	return clusterDocsTopic, nil
-//}
-
 func (svc *clusterDocsTopicService) List(groupName string) ([]*v1alpha1.ClusterDocsTopic, error) {
 	key := fmt.Sprintf("%s", groupName)
+	fmt.Println(key)
 	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
 	if err != nil {
 		return nil, err
@@ -64,9 +43,9 @@ func (svc *clusterDocsTopicService) List(groupName string) ([]*v1alpha1.ClusterD
 
 	var clusterDocsTopics []*v1alpha1.ClusterDocsTopic
 	for _, item := range items {
-		clusterDocsTopic, ok := item.(*v1alpha1.ClusterDocsTopic)
-		if !ok {
-			return nil, fmt.Errorf("Incorrect item type: %T, should be: *ClusterDocsTopic", item)
+		clusterDocsTopic, err := extractClusterDocsTopic(item)
+		if err != nil {
+			return nil, err
 		}
 
 		clusterDocsTopics = append(clusterDocsTopics, clusterDocsTopic)
@@ -75,3 +54,17 @@ func (svc *clusterDocsTopicService) List(groupName string) ([]*v1alpha1.ClusterD
 	return clusterDocsTopics, nil
 }
 
+func extractClusterDocsTopic(obj interface{}) (*v1alpha1.ClusterDocsTopic, error) {
+	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+	if err != nil {
+		return nil, errors.Wrapf(err, "while converting resource %s %s to unstructured", pretty.ClusterDocsTopic, obj)
+	}
+
+	var clusterDocsTopic v1alpha1.ClusterDocsTopic
+	err = runtime.DefaultUnstructuredConverter.FromUnstructured(u, &clusterDocsTopic)
+	if err != nil {
+		return nil, errors.Wrapf(err, "while converting unstructured to resource %s %s", pretty.ClusterDocsTopic, u)
+	}
+
+	return &clusterDocsTopic, nil
+}
