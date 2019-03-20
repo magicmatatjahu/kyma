@@ -14,9 +14,13 @@ type docsTopicService struct {
 }
 
 func newDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService, error) {
-	err := informer.AddIndexers(cache.Indexers{
+	svc := &docsTopicService{
+		informer: informer,
+	}
+
+	err := svc.informer.AddIndexers(cache.Indexers{
 		"groupName": func(obj interface{}) ([]string, error) {
-			entity, err := extractDocsTopic(obj)
+			entity, err := svc.extractDocsTopic(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
@@ -28,9 +32,7 @@ func newDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService,
 		return nil, errors.Wrap(err, "while adding indexers")
 	}
 
-	return &docsTopicService{
-		informer: informer,
-	}, nil
+	return svc, nil
 }
 
 func (svc *docsTopicService) List(namespace, groupName string) ([]*v1alpha1.DocsTopic, error) {
@@ -42,9 +44,9 @@ func (svc *docsTopicService) List(namespace, groupName string) ([]*v1alpha1.Docs
 
 	var docsTopics []*v1alpha1.DocsTopic
 	for _, item := range items {
-		docsTopic, ok := item.(*v1alpha1.DocsTopic)
-		if !ok {
-			return nil, fmt.Errorf("Incorrect item type: %T, should be: *DocsTopic", item)
+		docsTopic, err := svc.extractDocsTopic(item)
+		if err != nil {
+			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *DocsTopic", item)
 		}
 
 		docsTopics = append(docsTopics, docsTopic)
@@ -53,7 +55,7 @@ func (svc *docsTopicService) List(namespace, groupName string) ([]*v1alpha1.Docs
 	return docsTopics, nil
 }
 
-func extractDocsTopic(obj interface{}) (*v1alpha1.DocsTopic, error) {
+func (svc *docsTopicService) extractDocsTopic(obj interface{}) (*v1alpha1.DocsTopic, error) {
 	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
 	if err != nil {
 		return nil, errors.Wrapf(err, "while converting resource %s %s to unstructured", pretty.DocsTopic, obj)

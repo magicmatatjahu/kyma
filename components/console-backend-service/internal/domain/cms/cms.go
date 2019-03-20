@@ -15,19 +15,6 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
 )
 
-type cmsRetriever struct {
-	ClusterDocsTopicGetter      shared.ClusterDocsTopicGetter
-	DocsTopicGetter      		shared.DocsTopicGetter
-}
-
-func (r *cmsRetriever) ClusterDocsTopic() shared.ClusterDocsTopicGetter {
-	return r.ClusterDocsTopicGetter
-}
-
-func (r *cmsRetriever) DocsTopic() shared.DocsTopicGetter {
-	return r.DocsTopicGetter
-}
-
 type PluggableContainer struct {
 	*module.Pluggable
 	cfg *resolverConfig
@@ -95,6 +82,8 @@ func (r *PluggableContainer) Enable() error {
 		}
 		r.CmsRetriever.ClusterDocsTopicGetter = clusterDocsTopicService
 		r.CmsRetriever.DocsTopicGetter = docsTopicService
+		r.CmsRetriever.GqlClusterDocsTopicConverter = &clusterDocsTopicConverter{}
+		r.CmsRetriever.GqlDocsTopicConverter = &docsTopicConverter{}
 	})
 
 	return nil
@@ -105,6 +94,8 @@ func (r *PluggableContainer) Disable() error {
 		r.Resolver = disabled.NewResolver(disabledErr)
 		r.CmsRetriever.ClusterDocsTopicGetter = disabled.NewClusterDocsTopicGetter(disabledErr)
 		r.CmsRetriever.DocsTopicGetter = disabled.NewDocsTopicGetter(disabledErr)
+		r.CmsRetriever.GqlClusterDocsTopicConverter = disabled.NewGqlClusterDocsTopicConverter(disabledErr)
+		r.CmsRetriever.GqlDocsTopicConverter = disabled.NewGqlDocsTopicConverter(disabledErr)
 		r.informerFactory = nil
 	})
 

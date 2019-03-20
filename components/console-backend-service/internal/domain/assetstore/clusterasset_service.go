@@ -14,9 +14,13 @@ type clusterAssetService struct {
 }
 
 func newClusterAssetService(informer cache.SharedIndexInformer) (*clusterAssetService, error) {
-	err := informer.AddIndexers(cache.Indexers{
+	svc := &clusterAssetService{
+		informer: informer,
+	}
+
+	err := svc.informer.AddIndexers(cache.Indexers{
 		"groupName": func(obj interface{}) ([]string, error) {
-			entity, err := extractClusterAsset(obj)
+			entity, err := svc.extractClusterAsset(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
@@ -28,9 +32,7 @@ func newClusterAssetService(informer cache.SharedIndexInformer) (*clusterAssetSe
 		return nil, errors.Wrap(err, "while adding indexers")
 	}
 
-	return &clusterAssetService{
-		informer: informer,
-	}, nil
+	return svc, nil
 }
 
 
@@ -54,7 +56,7 @@ func (svc *clusterAssetService) List(groupName string) ([]*v1alpha2.ClusterAsset
 	return clusterAssets, nil
 }
 
-func extractClusterAsset(obj interface{}) (*v1alpha2.ClusterAsset, error) {
+func (svc *clusterAssetService) extractClusterAsset(obj interface{}) (*v1alpha2.ClusterAsset, error) {
 	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
 	if err != nil {
 		return nil, errors.Wrapf(err, "while converting resource %s %s to unstructured", pretty.ClusterAsset, obj)

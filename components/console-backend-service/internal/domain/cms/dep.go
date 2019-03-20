@@ -12,6 +12,7 @@ type clusterDocsTopicGetter interface {
 }
 
 //go:generate mockery -name=gqlClusterDocsTopicConverter -output=automock -outpkg=automock -case=underscore
+//go:generate failery -name=gqlClusterDocsTopicConverter -case=underscore -output disabled -outpkg disabled
 type gqlClusterDocsTopicConverter interface {
 	ToGQL(in *v1alpha1.ClusterDocsTopic) (*gqlschema.ClusterDocsTopic, error)
 	ToGQLs(in []*v1alpha1.ClusterDocsTopic) ([]gqlschema.ClusterDocsTopic, error)
@@ -24,6 +25,7 @@ type docsTopicGetter interface {
 }
 
 //go:generate mockery -name=gqlDocsTopicConverter -output=automock -outpkg=automock -case=underscore
+//go:generate failery -name=gqlDocsTopicConverter -case=underscore -output disabled -outpkg disabled
 type gqlDocsTopicConverter interface {
 	ToGQL(in *v1alpha1.DocsTopic) (*gqlschema.DocsTopic, error)
 	ToGQLs(in []*v1alpha1.DocsTopic) ([]gqlschema.DocsTopic, error)

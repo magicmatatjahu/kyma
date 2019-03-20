@@ -14,9 +14,13 @@ type clusterDocsTopicService struct {
 }
 
 func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDocsTopicService, error) {
-	err := informer.AddIndexers(cache.Indexers{
+	svc := &clusterDocsTopicService{
+		informer: informer,
+	}
+
+	err := svc.informer.AddIndexers(cache.Indexers{
 		"groupName": func(obj interface{}) ([]string, error) {
-			_, err := extractClusterDocsTopic(obj)
+			_, err := svc.extractClusterDocsTopic(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
@@ -28,14 +32,11 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 		return nil, errors.Wrap(err, "while adding indexers")
 	}
 
-	return &clusterDocsTopicService{
-		informer: informer,
-	}, nil
+	return svc, nil
 }
 
 func (svc *clusterDocsTopicService) List(groupName string) ([]*v1alpha1.ClusterDocsTopic, error) {
 	key := fmt.Sprintf("%s", groupName)
-	fmt.Println(key)
 	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
 	if err != nil {
 		return nil, err
@@ -43,9 +44,9 @@ func (svc *clusterDocsTopicService) List(groupName string) ([]*v1alpha1.ClusterD
 
 	var clusterDocsTopics []*v1alpha1.ClusterDocsTopic
 	for _, item := range items {
-		clusterDocsTopic, err := extractClusterDocsTopic(item)
+		clusterDocsTopic, err := svc.extractClusterDocsTopic(item)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterDocsTopic", item)
 		}
 
 		clusterDocsTopics = append(clusterDocsTopics, clusterDocsTopic)
@@ -54,7 +55,7 @@ func (svc *clusterDocsTopicService) List(groupName string) ([]*v1alpha1.ClusterD
 	return clusterDocsTopics, nil
 }
 
-func extractClusterDocsTopic(obj interface{}) (*v1alpha1.ClusterDocsTopic, error) {
+func (svc *clusterDocsTopicService) extractClusterDocsTopic(obj interface{}) (*v1alpha1.ClusterDocsTopic, error) {
 	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
 	if err != nil {
 		return nil, errors.Wrapf(err, "while converting resource %s %s to unstructured", pretty.ClusterDocsTopic, obj)

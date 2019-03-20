@@ -5,7 +5,6 @@ import (
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/dynamic"
 	"time"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
 	"k8s.io/client-go/rest"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -14,19 +13,6 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"context"
 )
-
-type assetStoreRetriever struct {
-	ClusterAssetGetter      shared.ClusterAssetGetter
-	AssetGetter      		shared.AssetGetter
-}
-
-func (r *assetStoreRetriever) ClusterAsset() shared.ClusterAssetGetter {
-	return r.ClusterAssetGetter
-}
-
-func (r *assetStoreRetriever) Asset() shared.AssetGetter {
-	return r.AssetGetter
-}
 
 type PluggableContainer struct {
 	*module.Pluggable
@@ -92,6 +78,8 @@ func (r *PluggableContainer) Enable() error {
 		}
 		r.AssetStoreRetriever.ClusterAssetGetter = clusterAssetService
 		r.AssetStoreRetriever.AssetGetter = assetService
+		r.AssetStoreRetriever.GqlClusterAssetConverter = &clusterAssetConverter{}
+		r.AssetStoreRetriever.GqlAssetConverter = &assetConverter{}
 	})
 
 	return nil
@@ -102,6 +90,8 @@ func (r *PluggableContainer) Disable() error {
 		r.Resolver = disabled.NewResolver(disabledErr)
 		r.AssetStoreRetriever.ClusterAssetGetter = disabled.NewClusterAssetGetter(disabledErr)
 		r.AssetStoreRetriever.AssetGetter = disabled.NewAssetGetter(disabledErr)
+		r.AssetStoreRetriever.GqlClusterAssetConverter = disabled.NewGqlClusterAssetConverter(disabledErr)
+		r.AssetStoreRetriever.GqlAssetConverter = disabled.NewGqlAssetConverter(disabledErr)
 		r.informerFactory = nil
 	})
 
