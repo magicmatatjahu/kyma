@@ -33,6 +33,8 @@ type Config struct {
 
 type ResolverRoot interface {
 	Application() ApplicationResolver
+	Asset() AssetResolver
+	ClusterAsset() ClusterAssetResolver
 	ClusterDocsTopic() ClusterDocsTopicResolver
 	ClusterServiceClass() ClusterServiceClassResolver
 	Deployment() DeploymentResolver
@@ -391,7 +393,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		ClusterDocsTopics     func(childComplexity int, viewContext *string, groupName string) int
+		ClusterDocsTopics     func(childComplexity int, viewContext *string, groupName *string) int
 		ServiceInstance       func(childComplexity int, name string, namespace string) int
 		ServiceInstances      func(childComplexity int, namespace string, first *int, offset *int, status *InstanceStatusType) int
 		ClusterServiceClasses func(childComplexity int, first *int, offset *int) int
@@ -706,6 +708,12 @@ type ApplicationResolver interface {
 	EnabledInNamespaces(ctx context.Context, obj *Application) ([]string, error)
 	Status(ctx context.Context, obj *Application) (ApplicationStatus, error)
 }
+type AssetResolver interface {
+	Files(ctx context.Context, obj *Asset, filterExtension *string) ([]File, error)
+}
+type ClusterAssetResolver interface {
+	Files(ctx context.Context, obj *ClusterAsset, filterExtension *string) ([]File, error)
+}
 type ClusterDocsTopicResolver interface {
 	Assets(ctx context.Context, obj *ClusterDocsTopic, typeArg *string) ([]ClusterAsset, error)
 }
@@ -759,7 +767,7 @@ type NamespaceResolver interface {
 	Applications(ctx context.Context, obj *Namespace) ([]string, error)
 }
 type QueryResolver interface {
-	ClusterDocsTopics(ctx context.Context, viewContext *string, groupName string) ([]ClusterDocsTopic, error)
+	ClusterDocsTopics(ctx context.Context, viewContext *string, groupName *string) ([]ClusterDocsTopic, error)
 	ServiceInstance(ctx context.Context, name string, namespace string) (*ServiceInstance, error)
 	ServiceInstances(ctx context.Context, namespace string, first *int, offset *int, status *InstanceStatusType) ([]ServiceInstance, error)
 	ClusterServiceClasses(ctx context.Context, first *int, offset *int) ([]ClusterServiceClass, error)
@@ -1641,10 +1649,15 @@ func field_Query_clusterDocsTopics_args(rawArgs map[string]interface{}) (map[str
 		}
 	}
 	args["viewContext"] = arg0
-	var arg1 string
+	var arg1 *string
 	if tmp, ok := rawArgs["groupName"]; ok {
 		var err error
-		arg1, err = graphql.UnmarshalString(tmp)
+		var ptr1 string
+		if tmp != nil {
+			ptr1, err = graphql.UnmarshalString(tmp)
+			arg1 = &ptr1
+		}
+
 		if err != nil {
 			return nil, err
 		}
@@ -4510,7 +4523,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ClusterDocsTopics(childComplexity, args["viewContext"].(*string), args["groupName"].(string)), true
+		return e.complexity.Query.ClusterDocsTopics(childComplexity, args["viewContext"].(*string), args["groupName"].(*string)), true
 
 	case "Query.serviceInstance":
 		if e.complexity.Query.ServiceInstance == nil {
@@ -7462,6 +7475,7 @@ var assetImplementors = []string{"Asset"}
 func (ec *executionContext) _Asset(ctx context.Context, sel ast.SelectionSet, obj *Asset) graphql.Marshaler {
 	fields := graphql.CollectFields(ctx, sel, assetImplementors)
 
+	var wg sync.WaitGroup
 	out := graphql.NewOrderedMap(len(fields))
 	invalid := false
 	for i, field := range fields {
@@ -7486,15 +7500,19 @@ func (ec *executionContext) _Asset(ctx context.Context, sel ast.SelectionSet, ob
 				invalid = true
 			}
 		case "files":
-			out.Values[i] = ec._Asset_files(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Asset_files(ctx, field, obj)
+				if out.Values[i] == graphql.Null {
+					invalid = true
+				}
+				wg.Done()
+			}(i, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-
+	wg.Wait()
 	if invalid {
 		return graphql.Null
 	}
@@ -7601,7 +7619,7 @@ func (ec *executionContext) _Asset_files(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Files, nil
+		return ec.resolvers.Asset().Files(rctx, obj, args["filterExtension"].(*string))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -7986,6 +8004,7 @@ var clusterAssetImplementors = []string{"ClusterAsset"}
 func (ec *executionContext) _ClusterAsset(ctx context.Context, sel ast.SelectionSet, obj *ClusterAsset) graphql.Marshaler {
 	fields := graphql.CollectFields(ctx, sel, clusterAssetImplementors)
 
+	var wg sync.WaitGroup
 	out := graphql.NewOrderedMap(len(fields))
 	invalid := false
 	for i, field := range fields {
@@ -8005,15 +8024,19 @@ func (ec *executionContext) _ClusterAsset(ctx context.Context, sel ast.Selection
 				invalid = true
 			}
 		case "files":
-			out.Values[i] = ec._ClusterAsset_files(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._ClusterAsset_files(ctx, field, obj)
+				if out.Values[i] == graphql.Null {
+					invalid = true
+				}
+				wg.Done()
+			}(i, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-
+	wg.Wait()
 	if invalid {
 		return graphql.Null
 	}
@@ -8093,7 +8116,7 @@ func (ec *executionContext) _ClusterAsset_files(ctx context.Context, field graph
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Files, nil
+		return ec.resolvers.ClusterAsset().Files(rctx, obj, args["filterExtension"].(*string))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -14868,7 +14891,7 @@ func (ec *executionContext) _Query_clusterDocsTopics(ctx context.Context, field 
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ClusterDocsTopics(rctx, args["viewContext"].(*string), args["groupName"].(string))
+		return ec.resolvers.Query().ClusterDocsTopics(rctx, args["viewContext"].(*string), args["groupName"].(*string))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -26076,7 +26099,7 @@ type ConfigMapEvent {
 # Queries
 
 type Query {
-    clusterDocsTopics(viewContext: String, groupName: String!): [ClusterDocsTopic!]!
+    clusterDocsTopics(viewContext: String, groupName: String): [ClusterDocsTopic!]!
 
     serviceInstance(name: String!, namespace: String!): ServiceInstance @HasAccess(attributes: {resource: "serviceinstances", verb: "get", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace", nameArg: "name"})
     serviceInstances(namespace: String!, first: Int, offset: Int, status: InstanceStatusType): [ServiceInstance!]! @HasAccess(attributes: {resource: "serviceinstances", verb: "list", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace"})

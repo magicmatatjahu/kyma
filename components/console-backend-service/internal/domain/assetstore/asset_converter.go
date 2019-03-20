@@ -14,6 +14,7 @@ func (c *assetConverter) ToGQL(item *v1alpha2.Asset) (*gqlschema.Asset, error) {
 
 	asset := gqlschema.Asset{
 		Name: item.Name,
+		Namespace: item.Namespace,
 	}
 
 	return &asset, nil

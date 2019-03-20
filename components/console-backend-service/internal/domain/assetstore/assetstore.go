@@ -11,6 +11,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/disabled"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"context"
 )
 
 type assetStoreRetriever struct {
@@ -30,6 +32,7 @@ type PluggableContainer struct {
 	*module.Pluggable
 	cfg *resolverConfig
 
+	Resolver Resolver
 	AssetStoreRetriever *assetStoreRetriever
 	informerFactory dynamicinformer.DynamicSharedInformerFactory
 }
@@ -83,6 +86,10 @@ func (r *PluggableContainer) Enable() error {
 	}
 
 	r.Pluggable.EnableAndSyncDynamicInformerFactory(r.informerFactory, func() {
+		r.Resolver = &domainResolver{
+			clusterAssetResolver: newClusterAssetResolver(clusterAssetService),
+			assetResolver: newAssetResolver(assetService),
+		}
 		r.AssetStoreRetriever.ClusterAssetGetter = clusterAssetService
 		r.AssetStoreRetriever.AssetGetter = assetService
 	})
@@ -92,6 +99,7 @@ func (r *PluggableContainer) Enable() error {
 
 func (r *PluggableContainer) Disable() error {
 	r.Pluggable.Disable(func(disabledErr error) {
+		r.Resolver = disabled.NewResolver(disabledErr)
 		r.AssetStoreRetriever.ClusterAssetGetter = disabled.NewClusterAssetGetter(disabledErr)
 		r.AssetStoreRetriever.AssetGetter = disabled.NewAssetGetter(disabledErr)
 		r.informerFactory = nil
@@ -100,7 +108,18 @@ func (r *PluggableContainer) Disable() error {
 	return nil
 }
 
+//go:generate failery -name=Resolver -case=underscore -output disabled -outpkg disabled
+type Resolver interface {
+	ClusterAssetFilesField(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtension *string) ([]gqlschema.File, error)
+	AssetFilesField(ctx context.Context, obj *gqlschema.Asset, filterExtension *string) ([]gqlschema.File, error)
+}
+
 type resolverConfig struct {
 	dynamicClient             dynamic.Interface
 	informerResyncPeriod      time.Duration
+}
+
+type domainResolver struct {
+	*clusterAssetResolver
+	*assetResolver
 }

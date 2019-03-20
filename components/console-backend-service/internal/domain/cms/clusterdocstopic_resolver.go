@@ -8,6 +8,7 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
+	"fmt"
 )
 
 type clusterDocsTopicResolver struct {
@@ -24,8 +25,8 @@ func newClusterDocsTopicResolver(clusterDocsTopicService *clusterDocsTopicServic
 	}
 }
 
-func (r *clusterDocsTopicResolver) ClusterDocsTopicsQuery(ctx context.Context, viewContext *string, groupName string) ([]gqlschema.ClusterDocsTopic, error) {
-	items, err := r.clusterDocsTopicSvc.List(groupName)
+func (r *clusterDocsTopicResolver) ClusterDocsTopicsQuery(ctx context.Context, viewContext *string, groupName *string) ([]gqlschema.ClusterDocsTopic, error) {
+	items, err := r.clusterDocsTopicSvc.List(*groupName)
 	if err != nil {
 		glog.Error(errors.Wrapf(err, "while listing %s", pretty.ClusterDocsTopics))
 		return nil, gqlerror.New(err, pretty.ClusterDocsTopics)
@@ -41,5 +42,6 @@ func (r *clusterDocsTopicResolver) ClusterDocsTopicsQuery(ctx context.Context, v
 }
 
 func (r *clusterDocsTopicResolver) ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error) {
+	fmt.Println(typeArg)
 	return nil, nil
 }

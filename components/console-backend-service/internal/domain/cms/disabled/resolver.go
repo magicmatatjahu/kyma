@@ -25,7 +25,7 @@ func (_m *Resolver) ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlsch
 }
 
 // ClusterDocsTopicsQuery provides a failing mock function with given fields: ctx, viewContext, groupName
-func (_m *Resolver) ClusterDocsTopicsQuery(ctx context.Context, viewContext *string, groupName string) ([]gqlschema.ClusterDocsTopic, error) {
+func (_m *Resolver) ClusterDocsTopicsQuery(ctx context.Context, viewContext *string, groupName *string) ([]gqlschema.ClusterDocsTopic, error) {
 	var r0 []gqlschema.ClusterDocsTopic
 	var r1 error
 	r1 = _m.err

@@ -32,6 +32,16 @@ models:
     fields:
       assets:
         resolver: true
+  Asset:
+    model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.Asset"
+    fields:
+      files:
+        resolver: true
+  ClusterAsset:
+    model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.ClusterAsset"
+    fields:
+      files:
+        resolver: true
   ServiceInstance:
     model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.ServiceInstance"
     fields:

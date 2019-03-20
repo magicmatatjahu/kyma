@@ -152,6 +152,14 @@ func (r *RootResolver) DocsTopic() gqlschema.DocsTopicResolver {
 	return &docsTopicResolver{r.cms}
 }
 
+func (r *RootResolver) ClusterAsset() gqlschema.ClusterAssetResolver {
+	return &clusterAssetResolver{r.assetstore}
+}
+
+func (r *RootResolver) Asset() gqlschema.AssetResolver {
+	return &assetResolver{r.assetstore}
+}
+
 func (r *RootResolver) Application() gqlschema.ApplicationResolver {
 	return &appResolver{r.app}
 }
@@ -412,7 +420,7 @@ func (r *queryResolver) ServiceBindingUsage(ctx context.Context, name, namespace
 	return r.sca.Resolver.ServiceBindingUsageQuery(ctx, name, namespace)
 }
 
-func (r *queryResolver) ClusterDocsTopics(ctx context.Context, viewContext *string, groupName string) ([]gqlschema.ClusterDocsTopic, error) {
+func (r *queryResolver) ClusterDocsTopics(ctx context.Context, viewContext *string, groupName *string) ([]gqlschema.ClusterDocsTopic, error) {
 	return r.cms.Resolver.ClusterDocsTopicsQuery(ctx, viewContext, groupName)
 }
 
@@ -709,4 +717,22 @@ type docsTopicResolver struct {
 
 func (r *docsTopicResolver) Assets(ctx context.Context, obj *gqlschema.DocsTopic, typeArg *string) ([]gqlschema.Asset, error) {
 	return r.cms.Resolver.DocsTopicAssetsField(ctx, obj, typeArg)
+}
+
+// Asset Store
+
+type clusterAssetResolver struct {
+	assetstore *assetstore.PluggableContainer
+}
+
+func (r *clusterAssetResolver) Files(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtension *string) ([]gqlschema.File, error) {
+	return r.assetstore.Resolver.ClusterAssetFilesField(ctx, obj, filterExtension)
+}
+
+type assetResolver struct {
+	assetstore *assetstore.PluggableContainer
+}
+
+func (r *assetResolver) Files(ctx context.Context, obj *gqlschema.Asset, filterExtension *string) ([]gqlschema.File, error) {
+	return r.assetstore.Resolver.AssetFilesField(ctx, obj, filterExtension)
 }
