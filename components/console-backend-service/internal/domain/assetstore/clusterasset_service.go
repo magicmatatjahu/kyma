@@ -7,10 +7,12 @@ import (
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"k8s.io/apimachinery/pkg/runtime"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
+	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 )
 
 type clusterAssetService struct {
 	informer cache.SharedIndexInformer
+	notifier notifier
 }
 
 func newClusterAssetService(informer cache.SharedIndexInformer) (*clusterAssetService, error) {
@@ -19,14 +21,6 @@ func newClusterAssetService(informer cache.SharedIndexInformer) (*clusterAssetSe
 	}
 
 	err := svc.informer.AddIndexers(cache.Indexers{
-		"groupName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractClusterAsset(obj)
-			if err != nil {
-				return nil, errors.New("Cannot convert item")
-			}
-
-			return []string{fmt.Sprintf("%s", entity.Spec.BucketRef)}, nil
-		},
 		"docsTopicName": func(obj interface{}) ([]string, error) {
 			entity, err := svc.extractClusterAsset(obj)
 			if err != nil {
@@ -47,6 +41,10 @@ func newClusterAssetService(informer cache.SharedIndexInformer) (*clusterAssetSe
 	if err != nil {
 		return nil, errors.Wrap(err, "while adding indexers")
 	}
+
+	notifier := resource.NewNotifier()
+	informer.AddEventHandler(notifier)
+	svc.notifier = notifier
 
 	return svc, nil
 }
@@ -115,6 +113,14 @@ func (svc *clusterAssetService) ListForDocsTopicByType(docsTopicName string, typ
 	}
 
 	return clusterAssets, nil
+}
+
+func (svc *clusterAssetService) Subscribe(listener resource.Listener) {
+	svc.notifier.AddListener(listener)
+}
+
+func (svc *clusterAssetService) Unsubscribe(listener resource.Listener) {
+	svc.notifier.DeleteListener(listener)
 }
 
 func (svc *clusterAssetService) extractClusterAsset(obj interface{}) (*v1alpha2.ClusterAsset, error) {

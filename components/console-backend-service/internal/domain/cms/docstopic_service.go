@@ -80,6 +80,14 @@ func (svc *docsTopicService) ListForServiceClass(namespace, className string) ([
 	return docsTopics, nil
 }
 
+func (svc *docsTopicService) Subscribe(listener resource.Listener) {
+	svc.notifier.AddListener(listener)
+}
+
+func (svc *docsTopicService) Unsubscribe(listener resource.Listener) {
+	svc.notifier.DeleteListener(listener)
+}
+
 func (svc *docsTopicService) extractDocsTopic(obj interface{}) (*v1alpha1.DocsTopic, error) {
 	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
 	if err != nil {
@@ -93,12 +101,4 @@ func (svc *docsTopicService) extractDocsTopic(obj interface{}) (*v1alpha1.DocsTo
 	}
 
 	return &docsTopic, nil
-}
-
-func (svc *docsTopicService) Subscribe(listener resource.Listener) {
-	svc.notifier.AddListener(listener)
-}
-
-func (svc *docsTopicService) Unsubscribe(listener resource.Listener) {
-	svc.notifier.DeleteListener(listener)
 }

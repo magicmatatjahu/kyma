@@ -8,6 +8,8 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener"
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 )
 
 type clusterAssetResolver struct {
@@ -54,4 +56,22 @@ func (r *clusterAssetResolver) ClusterAssetFilesField(ctx context.Context, obj *
 	}
 
 	return files, nil
+}
+
+func (r *clusterAssetResolver) ClusterAssetEventSubscription(ctx context.Context) (<-chan gqlschema.ClusterAssetEvent, error) {
+	channel := make(chan gqlschema.ClusterAssetEvent, 1)
+	filter := func(entity *v1alpha2.ClusterAsset) bool {
+		return true
+	}
+
+	clusterAssetListener := listener.NewClusterAsset(channel, filter, r.clusterAssetConverter)
+
+	r.clusterAssetSvc.Subscribe(clusterAssetListener)
+	go func() {
+		defer close(channel)
+		defer r.clusterAssetSvc.Unsubscribe(clusterAssetListener)
+		<-ctx.Done()
+	}()
+
+	return channel, nil
 }

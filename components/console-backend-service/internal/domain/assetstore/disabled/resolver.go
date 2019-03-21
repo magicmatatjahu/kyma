@@ -15,9 +15,27 @@ func NewResolver(err error) *Resolver {
 	return &Resolver{err: err}
 }
 
+// AssetEventSubscription provides a failing mock function with given fields: ctx
+func (_m *Resolver) AssetEventSubscription(ctx context.Context) (<-chan gqlschema.AssetEvent, error) {
+	var r0 <-chan gqlschema.AssetEvent
+	var r1 error
+	r1 = _m.err
+
+	return r0, r1
+}
+
 // AssetFilesField provides a failing mock function with given fields: ctx, obj, filterExtensions
 func (_m *Resolver) AssetFilesField(ctx context.Context, obj *gqlschema.Asset, filterExtensions []string) ([]gqlschema.File, error) {
 	var r0 []gqlschema.File
+	var r1 error
+	r1 = _m.err
+
+	return r0, r1
+}
+
+// ClusterAssetEventSubscription provides a failing mock function with given fields: ctx
+func (_m *Resolver) ClusterAssetEventSubscription(ctx context.Context) (<-chan gqlschema.ClusterAssetEvent, error) {
+	var r0 <-chan gqlschema.ClusterAssetEvent
 	var r1 error
 	r1 = _m.err
 

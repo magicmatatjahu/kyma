@@ -114,6 +114,11 @@ type ComplexityRoot struct {
 		Files     func(childComplexity int, filterExtensions []string) int
 	}
 
+	AssetEvent struct {
+		Type  func(childComplexity int) int
+		Asset func(childComplexity int) int
+	}
+
 	AuthenticationPolicy struct {
 		Type    func(childComplexity int) int
 		Issuer  func(childComplexity int) int
@@ -134,6 +139,11 @@ type ComplexityRoot struct {
 		Name  func(childComplexity int) int
 		Type  func(childComplexity int) int
 		Files func(childComplexity int, filterExtensions []string) int
+	}
+
+	ClusterAssetEvent struct {
+		Type         func(childComplexity int) int
+		ClusterAsset func(childComplexity int) int
 	}
 
 	ClusterDocsTopic struct {
@@ -676,6 +686,8 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
+		ClusterAssetEvent         func(childComplexity int) int
+		AssetEvent                func(childComplexity int) int
 		ClusterDocsTopicEvent     func(childComplexity int) int
 		DocsTopicEvent            func(childComplexity int) int
 		ServiceInstanceEvent      func(childComplexity int, namespace string) int
@@ -848,6 +860,8 @@ type ServiceInstanceResolver interface {
 	ServiceBindingUsages(ctx context.Context, obj *ServiceInstance) ([]ServiceBindingUsage, error)
 }
 type SubscriptionResolver interface {
+	ClusterAssetEvent(ctx context.Context) (<-chan ClusterAssetEvent, error)
+	AssetEvent(ctx context.Context) (<-chan AssetEvent, error)
 	ClusterDocsTopicEvent(ctx context.Context) (<-chan ClusterDocsTopicEvent, error)
 	DocsTopicEvent(ctx context.Context) (<-chan DocsTopicEvent, error)
 	ServiceInstanceEvent(ctx context.Context, namespace string) (<-chan ServiceInstanceEvent, error)
@@ -3258,6 +3272,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Asset.Files(childComplexity, args["filterExtensions"].([]string)), true
 
+	case "AssetEvent.type":
+		if e.complexity.AssetEvent.Type == nil {
+			break
+		}
+
+		return e.complexity.AssetEvent.Type(childComplexity), true
+
+	case "AssetEvent.asset":
+		if e.complexity.AssetEvent.Asset == nil {
+			break
+		}
+
+		return e.complexity.AssetEvent.Asset(childComplexity), true
+
 	case "AuthenticationPolicy.type":
 		if e.complexity.AuthenticationPolicy.Type == nil {
 			break
@@ -3332,6 +3360,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ClusterAsset.Files(childComplexity, args["filterExtensions"].([]string)), true
+
+	case "ClusterAssetEvent.type":
+		if e.complexity.ClusterAssetEvent.Type == nil {
+			break
+		}
+
+		return e.complexity.ClusterAssetEvent.Type(childComplexity), true
+
+	case "ClusterAssetEvent.clusterAsset":
+		if e.complexity.ClusterAssetEvent.ClusterAsset == nil {
+			break
+		}
+
+		return e.complexity.ClusterAssetEvent.ClusterAsset(childComplexity), true
 
 	case "ClusterDocsTopic.name":
 		if e.complexity.ClusterDocsTopic.Name == nil {
@@ -6039,6 +6081,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ServiceStatus.LoadBalancer(childComplexity), true
 
+	case "Subscription.clusterAssetEvent":
+		if e.complexity.Subscription.ClusterAssetEvent == nil {
+			break
+		}
+
+		return e.complexity.Subscription.ClusterAssetEvent(childComplexity), true
+
+	case "Subscription.assetEvent":
+		if e.complexity.Subscription.AssetEvent == nil {
+			break
+		}
+
+		return e.complexity.Subscription.AssetEvent(childComplexity), true
+
 	case "Subscription.clusterDocsTopicEvent":
 		if e.complexity.Subscription.ClusterDocsTopicEvent == nil {
 			break
@@ -7746,6 +7802,96 @@ func (ec *executionContext) _Asset_files(ctx context.Context, field graphql.Coll
 	return arr1
 }
 
+var assetEventImplementors = []string{"AssetEvent"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _AssetEvent(ctx context.Context, sel ast.SelectionSet, obj *AssetEvent) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, assetEventImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AssetEvent")
+		case "type":
+			out.Values[i] = ec._AssetEvent_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "asset":
+			out.Values[i] = ec._AssetEvent_asset(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AssetEvent_type(ctx context.Context, field graphql.CollectedField, obj *AssetEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "AssetEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(SubscriptionEventType)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return res
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AssetEvent_asset(ctx context.Context, field graphql.CollectedField, obj *AssetEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "AssetEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Asset, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Asset)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._Asset(ctx, field.Selections, &res)
+}
+
 var authenticationPolicyImplementors = []string{"AuthenticationPolicy"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -8241,6 +8387,96 @@ func (ec *executionContext) _ClusterAsset_files(ctx context.Context, field graph
 	}
 	wg.Wait()
 	return arr1
+}
+
+var clusterAssetEventImplementors = []string{"ClusterAssetEvent"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _ClusterAssetEvent(ctx context.Context, sel ast.SelectionSet, obj *ClusterAssetEvent) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, clusterAssetEventImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClusterAssetEvent")
+		case "type":
+			out.Values[i] = ec._ClusterAssetEvent_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "clusterAsset":
+			out.Values[i] = ec._ClusterAssetEvent_clusterAsset(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ClusterAssetEvent_type(ctx context.Context, field graphql.CollectedField, obj *ClusterAssetEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ClusterAssetEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(SubscriptionEventType)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return res
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ClusterAssetEvent_clusterAsset(ctx context.Context, field graphql.CollectedField, obj *ClusterAssetEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ClusterAssetEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterAsset, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ClusterAsset)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._ClusterAsset(ctx, field.Selections, &res)
 }
 
 var clusterDocsTopicImplementors = []string{"ClusterDocsTopic"}
@@ -22895,6 +23131,10 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	}
 
 	switch fields[0].Name {
+	case "clusterAssetEvent":
+		return ec._Subscription_clusterAssetEvent(ctx, fields[0])
+	case "assetEvent":
+		return ec._Subscription_assetEvent(ctx, fields[0])
 	case "clusterDocsTopicEvent":
 		return ec._Subscription_clusterDocsTopicEvent(ctx, fields[0])
 	case "docsTopicEvent":
@@ -22921,6 +23161,56 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 		return ec._Subscription_secretEvent(ctx, fields[0])
 	default:
 		panic("unknown field " + strconv.Quote(fields[0].Name))
+	}
+}
+
+func (ec *executionContext) _Subscription_clusterAssetEvent(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Field: field,
+	})
+	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
+	//          and Tracer stack
+	rctx := ctx
+	results, err := ec.resolvers.Subscription().ClusterAssetEvent(rctx)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-results
+		if !ok {
+			return nil
+		}
+		var out graphql.OrderedMap
+		out.Add(field.Alias, func() graphql.Marshaler {
+			return ec._ClusterAssetEvent(ctx, field.Selections, &res)
+		}())
+		return &out
+	}
+}
+
+func (ec *executionContext) _Subscription_assetEvent(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Field: field,
+	})
+	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
+	//          and Tracer stack
+	rctx := ctx
+	results, err := ec.resolvers.Subscription().AssetEvent(rctx)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-results
+		if !ok {
+			return nil
+		}
+		var out graphql.OrderedMap
+		out.Add(field.Alias, func() graphql.Marshaler {
+			return ec._AssetEvent(ctx, field.Selections, &res)
+		}())
+		return &out
 	}
 }
 
@@ -25722,10 +26012,20 @@ type Asset {
     files(filterExtensions: [String!]): [File!]!
 }
 
+type AssetEvent {
+    type: SubscriptionEventType!
+    asset: Asset!
+}
+
 type ClusterAsset {
     name: String!
     type: String!
     files(filterExtensions: [String!]): [File!]!
+}
+
+type ClusterAssetEvent {
+    type: SubscriptionEventType!
+    clusterAsset: ClusterAsset!
 }
 
 # CMS
@@ -26526,6 +26826,8 @@ type Mutation {
 # Subscriptions
 
 type Subscription {
+    clusterAssetEvent: ClusterAssetEvent!
+    assetEvent: AssetEvent!
     clusterDocsTopicEvent: ClusterDocsTopicEvent!
     docsTopicEvent: DocsTopicEvent!
     serviceInstanceEvent(namespace: String!): ServiceInstanceEvent!

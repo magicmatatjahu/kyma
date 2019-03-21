@@ -102,6 +102,8 @@ func (r *PluggableContainer) Disable() error {
 type Resolver interface {
 	ClusterAssetFilesField(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtensions []string) ([]gqlschema.File, error)
 	AssetFilesField(ctx context.Context, obj *gqlschema.Asset, filterExtensions []string) ([]gqlschema.File, error)
+	ClusterAssetEventSubscription(ctx context.Context) (<-chan gqlschema.ClusterAssetEvent, error)
+	AssetEventSubscription(ctx context.Context) (<-chan gqlschema.AssetEvent, error)
 }
 
 type resolverConfig struct {

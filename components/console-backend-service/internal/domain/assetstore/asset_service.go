@@ -7,10 +7,12 @@ import (
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"k8s.io/apimachinery/pkg/runtime"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
+	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 )
 
 type assetService struct {
 	informer cache.SharedIndexInformer
+	notifier notifier
 }
 
 func newAssetService(informer cache.SharedIndexInformer) (*assetService, error) {
@@ -19,14 +21,6 @@ func newAssetService(informer cache.SharedIndexInformer) (*assetService, error) 
 	}
 
 	err := svc.informer.AddIndexers(cache.Indexers{
-		"groupName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractAsset(obj)
-			if err != nil {
-				return nil, errors.New("Cannot convert item")
-			}
-
-			return []string{fmt.Sprintf("%s", entity.Spec.BucketRef)}, nil
-		},
 		"docsTopicName": func(obj interface{}) ([]string, error) {
 			entity, err := svc.extractAsset(obj)
 			if err != nil {
@@ -47,6 +41,10 @@ func newAssetService(informer cache.SharedIndexInformer) (*assetService, error) 
 	if err != nil {
 		return nil, errors.Wrap(err, "while adding indexers")
 	}
+
+	notifier := resource.NewNotifier()
+	informer.AddEventHandler(notifier)
+	svc.notifier = notifier
 
 	return svc, nil
 }
@@ -117,6 +115,14 @@ func (svc *assetService) ListForDocsTopicByType(namespace, docsTopicName string,
 	}
 
 	return assets, nil
+}
+
+func (svc *assetService) Subscribe(listener resource.Listener) {
+	svc.notifier.AddListener(listener)
+}
+
+func (svc *assetService) Unsubscribe(listener resource.Listener) {
+	svc.notifier.DeleteListener(listener)
 }
 
 func (svc *assetService) extractAsset(obj interface{}) (*v1alpha2.Asset, error) {

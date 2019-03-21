@@ -36,10 +36,20 @@ type Asset {
     files(filterExtensions: [String!]): [File!]!
 }
 
+type AssetEvent {
+    type: SubscriptionEventType!
+    asset: Asset!
+}
+
 type ClusterAsset {
     name: String!
     type: String!
     files(filterExtensions: [String!]): [File!]!
+}
+
+type ClusterAssetEvent {
+    type: SubscriptionEventType!
+    clusterAsset: ClusterAsset!
 }
 
 # CMS
@@ -840,6 +850,8 @@ type Mutation {
 # Subscriptions
 
 type Subscription {
+    clusterAssetEvent: ClusterAssetEvent!
+    assetEvent: AssetEvent!
     clusterDocsTopicEvent: ClusterDocsTopicEvent!
     docsTopicEvent: DocsTopicEvent!
     serviceInstanceEvent(namespace: String!): ServiceInstanceEvent!

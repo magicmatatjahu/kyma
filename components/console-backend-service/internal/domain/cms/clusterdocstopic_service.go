@@ -88,6 +88,14 @@ func (svc *clusterDocsTopicService) ListForServiceClass(className string) ([]*v1
 	return clusterDocsTopics, nil
 }
 
+func (svc *clusterDocsTopicService) Subscribe(listener resource.Listener) {
+	svc.notifier.AddListener(listener)
+}
+
+func (svc *clusterDocsTopicService) Unsubscribe(listener resource.Listener) {
+	svc.notifier.DeleteListener(listener)
+}
+
 func (svc *clusterDocsTopicService) extractClusterDocsTopic(obj interface{}) (*v1alpha1.ClusterDocsTopic, error) {
 	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
 	if err != nil {
@@ -101,12 +109,4 @@ func (svc *clusterDocsTopicService) extractClusterDocsTopic(obj interface{}) (*v
 	}
 
 	return &clusterDocsTopic, nil
-}
-
-func (svc *clusterDocsTopicService) Subscribe(listener resource.Listener) {
-	svc.notifier.AddListener(listener)
-}
-
-func (svc *clusterDocsTopicService) Unsubscribe(listener resource.Listener) {
-	svc.notifier.DeleteListener(listener)
 }

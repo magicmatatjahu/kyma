@@ -478,6 +478,14 @@ type subscriptionResolver struct {
 	*RootResolver
 }
 
+func (r *subscriptionResolver) ClusterAssetEvent(ctx context.Context) (<-chan gqlschema.ClusterAssetEvent, error) {
+	return r.assetstore.Resolver.ClusterAssetEventSubscription(ctx)
+}
+
+func (r *subscriptionResolver) AssetEvent(ctx context.Context) (<-chan gqlschema.AssetEvent, error) {
+	return r.assetstore.Resolver.AssetEventSubscription(ctx)
+}
+
 func (r *subscriptionResolver) ClusterDocsTopicEvent(ctx context.Context) (<-chan gqlschema.ClusterDocsTopicEvent, error) {
 	return r.cms.Resolver.ClusterDocsTopicEventSubscription(ctx)
 }

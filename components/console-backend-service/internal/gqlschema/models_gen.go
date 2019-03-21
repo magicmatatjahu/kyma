@@ -52,6 +52,11 @@ type ApplicationService struct {
 	Entries             []ApplicationEntry `json:"entries"`
 }
 
+type AssetEvent struct {
+	Type  SubscriptionEventType `json:"type"`
+	Asset Asset                 `json:"asset"`
+}
+
 type AuthenticationPolicy struct {
 	Type    AuthenticationPolicyType `json:"type"`
 	Issuer  string                   `json:"issuer"`
@@ -66,6 +71,11 @@ type BindableResourcesOutputItem struct {
 	Kind        string              `json:"kind"`
 	DisplayName string              `json:"displayName"`
 	Resources   []UsageKindResource `json:"resources"`
+}
+
+type ClusterAssetEvent struct {
+	Type         SubscriptionEventType `json:"type"`
+	ClusterAsset ClusterAsset          `json:"clusterAsset"`
 }
 
 type ClusterDocsTopicEvent struct {

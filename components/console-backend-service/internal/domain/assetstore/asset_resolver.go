@@ -8,6 +8,8 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 	"github.com/pkg/errors"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener"
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 )
 
 type assetResolver struct {
@@ -54,4 +56,22 @@ func (r *assetResolver) AssetFilesField(ctx context.Context, obj *gqlschema.Asse
 	}
 
 	return files, nil
+}
+
+func (r *assetResolver) AssetEventSubscription(ctx context.Context) (<-chan gqlschema.AssetEvent, error) {
+	channel := make(chan gqlschema.AssetEvent, 1)
+	filter := func(entity *v1alpha2.Asset) bool {
+		return true
+	}
+
+	assetListener := listener.NewAsset(channel, filter, r.assetConverter)
+
+	r.assetSvc.Subscribe(assetListener)
+	go func() {
+		defer close(channel)
+		defer r.assetSvc.Unsubscribe(assetListener)
+		<-ctx.Done()
+	}()
+
+	return channel, nil
 }
