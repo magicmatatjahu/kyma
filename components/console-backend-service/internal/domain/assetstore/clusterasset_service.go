@@ -27,6 +27,22 @@ func newClusterAssetService(informer cache.SharedIndexInformer) (*clusterAssetSe
 
 			return []string{fmt.Sprintf("%s", entity.Spec.BucketRef)}, nil
 		},
+		"docsTopicName": func(obj interface{}) ([]string, error) {
+			entity, err := svc.extractClusterAsset(obj)
+			if err != nil {
+				return nil, errors.New("Cannot convert item")
+			}
+
+			return []string{entity.Labels["docstopic.cms.kyma-project.io"]}, nil
+		},
+		"docsTopicName/type": func(obj interface{}) ([]string, error) {
+			entity, err := svc.extractClusterAsset(obj)
+			if err != nil {
+				return nil, errors.New("Cannot convert item")
+			}
+
+			return []string{fmt.Sprintf("%s/%s", entity.Labels["docstopic.cms.kyma-project.io"], entity.Labels["type.cms.kyma-project.io"])}, nil
+		},
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "while adding indexers")
@@ -45,9 +61,9 @@ func (svc *clusterAssetService) List(groupName string) ([]*v1alpha2.ClusterAsset
 
 	var clusterAssets []*v1alpha2.ClusterAsset
 	for _, item := range items {
-		clusterAsset, ok := item.(*v1alpha2.ClusterAsset)
-		if !ok {
-			return nil, fmt.Errorf("Incorrect item type: %T, should be: *ClusterAsset", item)
+		clusterAsset, err := svc.extractClusterAsset(item)
+		if err != nil {
+			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterAsset", item)
 		}
 
 		clusterAssets = append(clusterAssets, clusterAsset)
@@ -56,14 +72,13 @@ func (svc *clusterAssetService) List(groupName string) ([]*v1alpha2.ClusterAsset
 	return clusterAssets, nil
 }
 
-func (svc *clusterAssetService) ListByType(typeArg *string) ([]*v1alpha2.ClusterAsset, error) {
+func (svc *clusterAssetService) ListForDocsTopicByType(docsTopicName string, typeArg *string) ([]*v1alpha2.ClusterAsset, error) {
 	var items []interface{}
 	var err error
 	if typeArg != nil {
-		key := fmt.Sprintf("%s", *typeArg)
-		items, err = svc.informer.GetIndexer().ByIndex("groupName", key)
+		items, err = svc.informer.GetIndexer().ByIndex("docsTopicName/type", fmt.Sprintf("%s/%s", docsTopicName, *typeArg))
 	} else {
-		items = svc.informer.GetStore().List()
+		items, err = svc.informer.GetIndexer().ByIndex("docsTopicName", docsTopicName)
 	}
 
 	if err != nil {
@@ -72,9 +87,9 @@ func (svc *clusterAssetService) ListByType(typeArg *string) ([]*v1alpha2.Cluster
 
 	var clusterAssets []*v1alpha2.ClusterAsset
 	for _, item := range items {
-		clusterAsset, ok := item.(*v1alpha2.ClusterAsset)
-		if !ok {
-			return nil, fmt.Errorf("Incorrect item type: %T, should be: *ClusterAsset", item)
+		clusterAsset, err := svc.extractClusterAsset(item)
+		if err != nil {
+			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterAsset", item)
 		}
 
 		clusterAssets = append(clusterAssets, clusterAsset)

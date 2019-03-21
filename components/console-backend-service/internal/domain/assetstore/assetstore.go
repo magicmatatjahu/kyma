@@ -88,8 +88,8 @@ func (r *PluggableContainer) Enable() error {
 func (r *PluggableContainer) Disable() error {
 	r.Pluggable.Disable(func(disabledErr error) {
 		r.Resolver = disabled.NewResolver(disabledErr)
-		r.AssetStoreRetriever.ClusterAssetGetter = disabled.NewClusterAssetGetter(disabledErr)
-		r.AssetStoreRetriever.AssetGetter = disabled.NewAssetGetter(disabledErr)
+		r.AssetStoreRetriever.ClusterAssetGetter = disabled.NewClusterAssetSvc(disabledErr)
+		//r.AssetStoreRetriever.AssetGetter = disabled.NewAssetGetter(disabledErr)
 		r.AssetStoreRetriever.GqlClusterAssetConverter = disabled.NewGqlClusterAssetConverter(disabledErr)
 		r.AssetStoreRetriever.GqlAssetConverter = disabled.NewGqlAssetConverter(disabledErr)
 		r.informerFactory = nil

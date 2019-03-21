@@ -21,21 +21,13 @@ func newDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService,
 	}
 
 	err := svc.informer.AddIndexers(cache.Indexers{
-		"groupName": func(obj interface{}) ([]string, error) {
+		"serviceClassName": func(obj interface{}) ([]string, error) {
 			entity, err := svc.extractDocsTopic(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
 			return []string{fmt.Sprintf("%s/%s", entity.Namespace, entity.Name)}, nil
-		},
-		"serviceClassName": func(obj interface{}) ([]string, error) {
-			docsTopic, err := svc.extractDocsTopic(obj)
-			if err != nil {
-				return nil, errors.New("Cannot convert item")
-			}
-
-			return []string{fmt.Sprintf("%s/%s", docsTopic.Namespace, docsTopic.Name)}, nil
 		},
 	})
 	if err != nil {

@@ -7,10 +7,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
+	assetstorePretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
-	"fmt"
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 )
 
 type clusterDocsTopicResolver struct {
@@ -44,8 +45,27 @@ func (r *clusterDocsTopicResolver) ClusterDocsTopicsQuery(ctx context.Context, v
 }
 
 func (r *clusterDocsTopicResolver) ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error) {
-	fmt.Println(*typeArg)
-	return nil, nil
+	if obj == nil {
+		glog.Error(errors.New("%s cannot be empty in order to resolve `assets` field"), pretty.ClusterDocsTopic)
+		return nil, gqlerror.NewInternal()
+	}
+
+	items, err := r.assetStoreRetriever.ClusterAsset().ListForDocsTopicByType(obj.Name, typeArg)
+	if err != nil {
+		if module.IsDisabledModuleError(err) {
+			return nil, err
+		}
+		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", assetstorePretty.ClusterAssets, pretty.ClusterDocsTopic, obj.Name))
+		return nil, gqlerror.New(err, assetstorePretty.ClusterAssets)
+	}
+
+	clusterAssets, err := r.assetStoreRetriever.ClusterAssetConverter().ToGQLs(items)
+	if err != nil {
+		glog.Error(errors.Wrapf(err, "while converting %s", assetstorePretty.ClusterAssets))
+		return nil, gqlerror.New(err, assetstorePretty.ClusterAssets)
+	}
+
+	return clusterAssets, nil
 }
 
 func (r *clusterDocsTopicResolver) ClusterDocsTopicEventSubscription(ctx context.Context) (<-chan gqlschema.ClusterDocsTopicEvent, error) {

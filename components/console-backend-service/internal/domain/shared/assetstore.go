@@ -16,11 +16,13 @@ type AssetStoreRetriever interface {
 //go:generate mockery -name=ClusterAssetGetter -output=automock -outpkg=automock -case=underscore
 type ClusterAssetGetter interface {
 	List(groupName string) ([]*v1alpha2.ClusterAsset, error)
+	ListForDocsTopicByType(docsTopicName string, typeArg *string) ([]*v1alpha2.ClusterAsset, error)
 }
 
 //go:generate mockery -name=AssetGetter -output=automock -outpkg=automock -case=underscore
 type AssetGetter interface {
 	List(namespace, groupName string) ([]*v1alpha2.Asset, error)
+	ListForDocsTopicByType(namespace, docsTopicName string, typeArg *string) ([]*v1alpha2.Asset, error)
 }
 
 //go:generate mockery -name=GqlClusterAssetConverter -output=automock -outpkg=automock -case=underscore

@@ -5,10 +5,11 @@ import (
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 )
 
-//go:generate mockery -name=clusterAssetGetter -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=clusterAssetGetter -case=underscore -output disabled -outpkg disabled
-type clusterAssetGetter interface {
+//go:generate mockery -name=clusterAssetSvc -output=automock -outpkg=automock -case=underscore
+//go:generate failery -name=clusterAssetSvc -case=underscore -output disabled -outpkg disabled
+type clusterAssetSvc interface {
 	List(groupName string) ([]*v1alpha2.ClusterAsset, error)
+	ListForDocsTopicByType(docsTopicName string, typeArg *string) ([]*v1alpha2.ClusterAsset, error)
 }
 
 //go:generate mockery -name=gqlClusterAssetConverter -output=automock -outpkg=automock -case=underscore
@@ -18,10 +19,11 @@ type gqlClusterAssetConverter interface {
 	ToGQLs(in []*v1alpha2.ClusterAsset) ([]gqlschema.ClusterAsset, error)
 }
 
-//go:generate mockery -name=assetGetter -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=assetGetter -case=underscore -output disabled -outpkg disabled
-type assetGetter interface {
+//go:generate mockery -name=assetSvc -output=automock -outpkg=automock -case=underscore
+//go:generate failery -name=assetSvc -case=underscore -output disabled -outpkg disabled
+type assetSvc interface {
 	List(namespace, groupName string) ([]*v1alpha2.Asset, error)
+	ListForDocsTopicByType(namespace, docsTopicName string, typeArg *string) ([]*v1alpha2.Asset, error)
 }
 
 //go:generate mockery -name=gqlAssetConverter -output=automock -outpkg=automock -case=underscore

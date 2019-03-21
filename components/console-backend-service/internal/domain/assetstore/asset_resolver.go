@@ -6,7 +6,7 @@ import (
 )
 
 type assetResolver struct {
-	assetSvc assetGetter
+	assetSvc assetSvc
 	assetConverter gqlAssetConverter
 }
 

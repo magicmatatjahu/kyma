@@ -6,7 +6,7 @@ import (
 )
 
 type clusterAssetResolver struct {
-	clusterAssetSvc clusterAssetGetter
+	clusterAssetSvc clusterAssetSvc
 	clusterAssetConverter gqlClusterAssetConverter
 }
 
