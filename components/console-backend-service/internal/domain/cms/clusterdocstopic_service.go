@@ -21,13 +21,29 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 	}
 
 	err := svc.informer.AddIndexers(cache.Indexers{
-		"groupName": func(obj interface{}) ([]string, error) {
-			_, err := svc.extractClusterDocsTopic(obj)
+		"viewContext/groupName": func(obj interface{}) ([]string, error) {
+			entity, err := svc.extractClusterDocsTopic(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
-			return []string{fmt.Sprintf("%s", "lol")}, nil
+			return []string{fmt.Sprintf("%s/%s", entity.Labels["viewContext.cms.kyma-project.io"], entity.Labels["groupName.cms.kyma-project.io"])}, nil
+		},
+		"viewContext": func(obj interface{}) ([]string, error) {
+			entity, err := svc.extractClusterDocsTopic(obj)
+			if err != nil {
+				return nil, errors.New("Cannot convert item")
+			}
+
+			return []string{entity.Labels["viewContext.cms.kyma-project.io"]}, nil
+		},
+		"groupName": func(obj interface{}) ([]string, error) {
+			entity, err := svc.extractClusterDocsTopic(obj)
+			if err != nil {
+				return nil, errors.New("Cannot convert item")
+			}
+
+			return []string{entity.Labels["groupName.cms.kyma-project.io"]}, nil
 		},
 		"serviceClassName": func(obj interface{}) ([]string, error) {
 			entity, err := svc.extractClusterDocsTopic(obj)
@@ -49,9 +65,19 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 	return svc, nil
 }
 
-func (svc *clusterDocsTopicService) List(groupName string) ([]*v1alpha1.ClusterDocsTopic, error) {
-	key := fmt.Sprintf("%s", groupName)
-	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
+func (svc *clusterDocsTopicService) List(viewContext *string, groupName *string) ([]*v1alpha1.ClusterDocsTopic, error) {
+	var items []interface{}
+	var err error
+	if viewContext != nil && groupName != nil {
+		items, err = svc.informer.GetIndexer().ByIndex("viewContext/groupName", fmt.Sprintf("%s/%s", *viewContext, *groupName))
+	} else if viewContext != nil {
+		items, err = svc.informer.GetIndexer().ByIndex("viewContext", *viewContext)
+	} else if groupName != nil {
+		items, err = svc.informer.GetIndexer().ByIndex("groupName", *groupName)
+	} else {
+		items = svc.informer.GetStore().List()
+	}
+
 	if err != nil {
 		return nil, err
 	}

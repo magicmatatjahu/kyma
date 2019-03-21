@@ -10,29 +10,6 @@ type DocsTopicGetter struct {
 	mock.Mock
 }
 
-// List provides a mock function with given fields: namespace, groupName
-func (_m *DocsTopicGetter) List(namespace string, groupName string) ([]*v1alpha1.DocsTopic, error) {
-	ret := _m.Called(namespace, groupName)
-
-	var r0 []*v1alpha1.DocsTopic
-	if rf, ok := ret.Get(0).(func(string, string) []*v1alpha1.DocsTopic); ok {
-		r0 = rf(namespace, groupName)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*v1alpha1.DocsTopic)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(namespace, groupName)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // ListForServiceClass provides a mock function with given fields: namespace, className
 func (_m *DocsTopicGetter) ListForServiceClass(namespace string, className string) ([]*v1alpha1.DocsTopic, error) {
 	ret := _m.Called(namespace, className)

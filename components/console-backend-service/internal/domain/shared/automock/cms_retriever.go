@@ -25,6 +25,22 @@ func (_m *CmsRetriever) ClusterDocsTopic() shared.ClusterDocsTopicGetter {
 	return r0
 }
 
+// ClusterDocsTopicConverter provides a mock function with given fields:
+func (_m *CmsRetriever) ClusterDocsTopicConverter() shared.GqlClusterDocsTopicConverter {
+	ret := _m.Called()
+
+	var r0 shared.GqlClusterDocsTopicConverter
+	if rf, ok := ret.Get(0).(func() shared.GqlClusterDocsTopicConverter); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(shared.GqlClusterDocsTopicConverter)
+		}
+	}
+
+	return r0
+}
+
 // DocsTopic provides a mock function with given fields:
 func (_m *CmsRetriever) DocsTopic() shared.DocsTopicGetter {
 	ret := _m.Called()
@@ -35,6 +51,22 @@ func (_m *CmsRetriever) DocsTopic() shared.DocsTopicGetter {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(shared.DocsTopicGetter)
+		}
+	}
+
+	return r0
+}
+
+// DocsTopicConverter provides a mock function with given fields:
+func (_m *CmsRetriever) DocsTopicConverter() shared.GqlDocsTopicConverter {
+	ret := _m.Called()
+
+	var r0 shared.GqlDocsTopicConverter
+	if rf, ok := ret.Get(0).(func() shared.GqlDocsTopicConverter); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(shared.GqlDocsTopicConverter)
 		}
 	}
 

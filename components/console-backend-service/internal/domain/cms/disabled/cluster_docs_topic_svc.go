@@ -15,8 +15,8 @@ func NewClusterDocsTopicSvc(err error) *clusterDocsTopicSvc {
 	return &clusterDocsTopicSvc{err: err}
 }
 
-// List provides a failing mock function with given fields: groupName
-func (_m *clusterDocsTopicSvc) List(groupName string) ([]*v1alpha1.ClusterDocsTopic, error) {
+// List provides a failing mock function with given fields: viewContext, groupName
+func (_m *clusterDocsTopicSvc) List(viewContext *string, groupName *string) ([]*v1alpha1.ClusterDocsTopic, error) {
 	var r0 []*v1alpha1.ClusterDocsTopic
 	var r1 error
 	r1 = _m.err

@@ -29,7 +29,7 @@ func newClusterDocsTopicResolver(clusterDocsTopicService *clusterDocsTopicServic
 }
 
 func (r *clusterDocsTopicResolver) ClusterDocsTopicsQuery(ctx context.Context, viewContext *string, groupName *string) ([]gqlschema.ClusterDocsTopic, error) {
-	items, err := r.clusterDocsTopicSvc.List(*groupName)
+	items, err := r.clusterDocsTopicSvc.List(viewContext, groupName)
 	if err != nil {
 		glog.Error(errors.Wrapf(err, "while listing %s", pretty.ClusterDocsTopics))
 		return nil, gqlerror.New(err, pretty.ClusterDocsTopics)

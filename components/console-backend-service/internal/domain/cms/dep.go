@@ -9,7 +9,7 @@ import (
 //go:generate mockery -name=clusterDocsTopicSvc -output=automock -outpkg=automock -case=underscore
 //go:generate failery -name=clusterDocsTopicSvc -case=underscore -output disabled -outpkg disabled
 type clusterDocsTopicSvc interface {
-	List(groupName string) ([]*v1alpha1.ClusterDocsTopic, error)
+	List(viewContext *string, groupName *string) ([]*v1alpha1.ClusterDocsTopic, error)
 	ListForServiceClass(className string) ([]*v1alpha1.ClusterDocsTopic, error)
 	Subscribe(listener resource.Listener)
 	Unsubscribe(listener resource.Listener)

@@ -10,13 +10,13 @@ type clusterDocsTopicSvc struct {
 	mock.Mock
 }
 
-// List provides a mock function with given fields: groupName
-func (_m *clusterDocsTopicSvc) List(groupName string) ([]*v1alpha1.ClusterDocsTopic, error) {
-	ret := _m.Called(groupName)
+// List provides a mock function with given fields: viewContext, groupName
+func (_m *clusterDocsTopicSvc) List(viewContext *string, groupName *string) ([]*v1alpha1.ClusterDocsTopic, error) {
+	ret := _m.Called(viewContext, groupName)
 
 	var r0 []*v1alpha1.ClusterDocsTopic
-	if rf, ok := ret.Get(0).(func(string) []*v1alpha1.ClusterDocsTopic); ok {
-		r0 = rf(groupName)
+	if rf, ok := ret.Get(0).(func(*string, *string) []*v1alpha1.ClusterDocsTopic); ok {
+		r0 = rf(viewContext, groupName)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*v1alpha1.ClusterDocsTopic)
@@ -24,8 +24,8 @@ func (_m *clusterDocsTopicSvc) List(groupName string) ([]*v1alpha1.ClusterDocsTo
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(groupName)
+	if rf, ok := ret.Get(1).(func(*string, *string) error); ok {
+		r1 = rf(viewContext, groupName)
 	} else {
 		r1 = ret.Error(1)
 	}

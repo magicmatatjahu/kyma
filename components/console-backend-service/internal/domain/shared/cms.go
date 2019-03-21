@@ -15,13 +15,11 @@ type CmsRetriever interface {
 
 //go:generate mockery -name=ClusterDocsTopicGetter -output=automock -outpkg=automock -case=underscore
 type ClusterDocsTopicGetter interface {
-	List(groupName string) ([]*v1alpha1.ClusterDocsTopic, error)
 	ListForServiceClass(className string) ([]*v1alpha1.ClusterDocsTopic, error)
 }
 
 //go:generate mockery -name=DocsTopicGetter -output=automock -outpkg=automock -case=underscore
 type DocsTopicGetter interface {
-	List(namespace, groupName string) ([]*v1alpha1.DocsTopic, error)
 	ListForServiceClass(namespace, className string) ([]*v1alpha1.DocsTopic, error)
 }
 
