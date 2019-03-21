@@ -309,7 +309,7 @@ func (r *clusterServiceClassResolver) ServiceClassDocsTopicsField(ctx context.Co
 		return nil, gqlerror.NewInternal()
 	}
 
-	items, err := r.cmsRetriever.DocsTopic().List(obj.Namespace, "lol")
+	items, err := r.cmsRetriever.DocsTopic().ListForServiceClass(obj.Namespace, obj.ExternalName)
 	if err != nil {
 		if module.IsDisabledModuleError(err) {
 			return nil, err

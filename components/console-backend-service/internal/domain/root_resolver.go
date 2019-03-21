@@ -482,6 +482,10 @@ func (r *subscriptionResolver) ClusterDocsTopicEvent(ctx context.Context) (<-cha
 	return r.cms.Resolver.ClusterDocsTopicEventSubscription(ctx)
 }
 
+func (r *subscriptionResolver) DocsTopicEvent(ctx context.Context) (<-chan gqlschema.DocsTopicEvent, error) {
+	return r.cms.Resolver.DocsTopicEventSubscription(ctx)
+}
+
 func (r *subscriptionResolver) ServiceInstanceEvent(ctx context.Context, namespace string) (<-chan gqlschema.ServiceInstanceEvent, error) {
 	return r.sc.Resolver.ServiceInstanceEventSubscription(ctx, namespace)
 }

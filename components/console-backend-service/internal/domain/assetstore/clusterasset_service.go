@@ -56,6 +56,33 @@ func (svc *clusterAssetService) List(groupName string) ([]*v1alpha2.ClusterAsset
 	return clusterAssets, nil
 }
 
+func (svc *clusterAssetService) ListByType(typeArg *string) ([]*v1alpha2.ClusterAsset, error) {
+	var items []interface{}
+	var err error
+	if typeArg != nil {
+		key := fmt.Sprintf("%s", *typeArg)
+		items, err = svc.informer.GetIndexer().ByIndex("groupName", key)
+	} else {
+		items = svc.informer.GetStore().List()
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var clusterAssets []*v1alpha2.ClusterAsset
+	for _, item := range items {
+		clusterAsset, ok := item.(*v1alpha2.ClusterAsset)
+		if !ok {
+			return nil, fmt.Errorf("Incorrect item type: %T, should be: *ClusterAsset", item)
+		}
+
+		clusterAssets = append(clusterAssets, clusterAsset)
+	}
+
+	return clusterAssets, nil
+}
+
 func (svc *clusterAssetService) extractClusterAsset(obj interface{}) (*v1alpha2.ClusterAsset, error) {
 	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
 	if err != nil {

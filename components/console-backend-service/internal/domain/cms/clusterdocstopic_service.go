@@ -29,6 +29,14 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 
 			return []string{fmt.Sprintf("%s", "lol")}, nil
 		},
+		"serviceClassName": func(obj interface{}) ([]string, error) {
+			clusterDocsTopic, err := svc.extractClusterDocsTopic(obj)
+			if err != nil {
+				return nil, errors.New("Cannot convert item")
+			}
+
+			return []string{clusterDocsTopic.Name}, nil
+		},
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "while adding indexers")
@@ -44,6 +52,25 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 func (svc *clusterDocsTopicService) List(groupName string) ([]*v1alpha1.ClusterDocsTopic, error) {
 	key := fmt.Sprintf("%s", groupName)
 	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
+	if err != nil {
+		return nil, err
+	}
+
+	var clusterDocsTopics []*v1alpha1.ClusterDocsTopic
+	for _, item := range items {
+		clusterDocsTopic, err := svc.extractClusterDocsTopic(item)
+		if err != nil {
+			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterDocsTopic", item)
+		}
+
+		clusterDocsTopics = append(clusterDocsTopics, clusterDocsTopic)
+	}
+
+	return clusterDocsTopics, nil
+}
+
+func (svc *clusterDocsTopicService) ListForServiceClass(className string) ([]*v1alpha1.ClusterDocsTopic, error) {
+	items, err := svc.informer.GetIndexer().ByIndex("serviceClassName", className)
 	if err != nil {
 		return nil, err
 	}

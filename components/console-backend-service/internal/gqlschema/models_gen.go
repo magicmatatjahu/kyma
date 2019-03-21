@@ -179,6 +179,11 @@ type DeploymentStatus struct {
 	Conditions        []DeploymentCondition `json:"conditions"`
 }
 
+type DocsTopicEvent struct {
+	Type      SubscriptionEventType `json:"type"`
+	DocsTopic DocsTopic             `json:"docsTopic"`
+}
+
 type EnvPrefix struct {
 	Name string `json:"name"`
 }

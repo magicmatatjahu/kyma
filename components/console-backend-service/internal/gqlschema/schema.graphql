@@ -53,6 +53,11 @@ type DocsTopic {
     description: String!
 }
 
+type DocsTopicEvent {
+    type: SubscriptionEventType!
+    docsTopic: DocsTopic!
+}
+
 type ClusterDocsTopic {
     name: String!
     groupName: String!
@@ -836,6 +841,7 @@ type Mutation {
 
 type Subscription {
     clusterDocsTopicEvent: ClusterDocsTopicEvent!
+    docsTopicEvent: DocsTopicEvent!
     serviceInstanceEvent(namespace: String!): ServiceInstanceEvent!
     serviceBindingEvent(namespace: String!): ServiceBindingEvent! @HasAccess(attributes: {resource: "servicebindings", verb: "watch", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace"})
     serviceBindingUsageEvent(namespace: String!): ServiceBindingUsageEvent!

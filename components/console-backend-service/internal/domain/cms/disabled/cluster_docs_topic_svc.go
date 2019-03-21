@@ -24,6 +24,15 @@ func (_m *clusterDocsTopicSvc) List(groupName string) ([]*v1alpha1.ClusterDocsTo
 	return r0, r1
 }
 
+// ListForServiceClass provides a failing mock function with given fields: className
+func (_m *clusterDocsTopicSvc) ListForServiceClass(className string) ([]*v1alpha1.ClusterDocsTopic, error) {
+	var r0 []*v1alpha1.ClusterDocsTopic
+	var r1 error
+	r1 = _m.err
+
+	return r0, r1
+}
+
 // Subscribe provides a failing mock function with given fields: listener
 func (_m *clusterDocsTopicSvc) Subscribe(listener resource.Listener) {
 }

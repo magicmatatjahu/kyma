@@ -280,6 +280,11 @@ type ComplexityRoot struct {
 		Description func(childComplexity int) int
 	}
 
+	DocsTopicEvent struct {
+		Type      func(childComplexity int) int
+		DocsTopic func(childComplexity int) int
+	}
+
 	EnvPrefix struct {
 		Name func(childComplexity int) int
 	}
@@ -672,6 +677,7 @@ type ComplexityRoot struct {
 
 	Subscription struct {
 		ClusterDocsTopicEvent     func(childComplexity int) int
+		DocsTopicEvent            func(childComplexity int) int
 		ServiceInstanceEvent      func(childComplexity int, namespace string) int
 		ServiceBindingEvent       func(childComplexity int, namespace string) int
 		ServiceBindingUsageEvent  func(childComplexity int, namespace string) int
@@ -843,6 +849,7 @@ type ServiceInstanceResolver interface {
 }
 type SubscriptionResolver interface {
 	ClusterDocsTopicEvent(ctx context.Context) (<-chan ClusterDocsTopicEvent, error)
+	DocsTopicEvent(ctx context.Context) (<-chan DocsTopicEvent, error)
 	ServiceInstanceEvent(ctx context.Context, namespace string) (<-chan ServiceInstanceEvent, error)
 	ServiceBindingEvent(ctx context.Context, namespace string) (<-chan ServiceBindingEvent, error)
 	ServiceBindingUsageEvent(ctx context.Context, namespace string) (<-chan ServiceBindingUsageEvent, error)
@@ -3931,6 +3938,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DocsTopic.Description(childComplexity), true
 
+	case "DocsTopicEvent.type":
+		if e.complexity.DocsTopicEvent.Type == nil {
+			break
+		}
+
+		return e.complexity.DocsTopicEvent.Type(childComplexity), true
+
+	case "DocsTopicEvent.docsTopic":
+		if e.complexity.DocsTopicEvent.DocsTopic == nil {
+			break
+		}
+
+		return e.complexity.DocsTopicEvent.DocsTopic(childComplexity), true
+
 	case "EnvPrefix.name":
 		if e.complexity.EnvPrefix.Name == nil {
 			break
@@ -6000,6 +6021,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Subscription.ClusterDocsTopicEvent(childComplexity), true
+
+	case "Subscription.docsTopicEvent":
+		if e.complexity.Subscription.DocsTopicEvent == nil {
+			break
+		}
+
+		return e.complexity.Subscription.DocsTopicEvent(childComplexity), true
 
 	case "Subscription.serviceInstanceEvent":
 		if e.complexity.Subscription.ServiceInstanceEvent == nil {
@@ -11744,6 +11772,96 @@ func (ec *executionContext) _DocsTopic_description(ctx context.Context, field gr
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalString(res)
+}
+
+var docsTopicEventImplementors = []string{"DocsTopicEvent"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _DocsTopicEvent(ctx context.Context, sel ast.SelectionSet, obj *DocsTopicEvent) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, docsTopicEventImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DocsTopicEvent")
+		case "type":
+			out.Values[i] = ec._DocsTopicEvent_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "docsTopic":
+			out.Values[i] = ec._DocsTopicEvent_docsTopic(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _DocsTopicEvent_type(ctx context.Context, field graphql.CollectedField, obj *DocsTopicEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "DocsTopicEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(SubscriptionEventType)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return res
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _DocsTopicEvent_docsTopic(ctx context.Context, field graphql.CollectedField, obj *DocsTopicEvent) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "DocsTopicEvent",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DocsTopic, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(DocsTopic)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._DocsTopic(ctx, field.Selections, &res)
 }
 
 var envPrefixImplementors = []string{"EnvPrefix"}
@@ -22755,6 +22873,8 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	switch fields[0].Name {
 	case "clusterDocsTopicEvent":
 		return ec._Subscription_clusterDocsTopicEvent(ctx, fields[0])
+	case "docsTopicEvent":
+		return ec._Subscription_docsTopicEvent(ctx, fields[0])
 	case "serviceInstanceEvent":
 		return ec._Subscription_serviceInstanceEvent(ctx, fields[0])
 	case "serviceBindingEvent":
@@ -22800,6 +22920,31 @@ func (ec *executionContext) _Subscription_clusterDocsTopicEvent(ctx context.Cont
 		var out graphql.OrderedMap
 		out.Add(field.Alias, func() graphql.Marshaler {
 			return ec._ClusterDocsTopicEvent(ctx, field.Selections, &res)
+		}())
+		return &out
+	}
+}
+
+func (ec *executionContext) _Subscription_docsTopicEvent(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Field: field,
+	})
+	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
+	//          and Tracer stack
+	rctx := ctx
+	results, err := ec.resolvers.Subscription().DocsTopicEvent(rctx)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-results
+		if !ok {
+			return nil
+		}
+		var out graphql.OrderedMap
+		out.Add(field.Alias, func() graphql.Marshaler {
+			return ec._DocsTopicEvent(ctx, field.Selections, &res)
 		}())
 		return &out
 	}
@@ -25570,6 +25715,11 @@ type DocsTopic {
     description: String!
 }
 
+type DocsTopicEvent {
+    type: SubscriptionEventType!
+    docsTopic: DocsTopic!
+}
+
 type ClusterDocsTopic {
     name: String!
     groupName: String!
@@ -26353,6 +26503,7 @@ type Mutation {
 
 type Subscription {
     clusterDocsTopicEvent: ClusterDocsTopicEvent!
+    docsTopicEvent: DocsTopicEvent!
     serviceInstanceEvent(namespace: String!): ServiceInstanceEvent!
     serviceBindingEvent(namespace: String!): ServiceBindingEvent! @HasAccess(attributes: {resource: "servicebindings", verb: "watch", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace"})
     serviceBindingUsageEvent(namespace: String!): ServiceBindingUsageEvent!
