@@ -19,7 +19,7 @@ func (c *clusterDocsTopicConverter) ToGQL(item *v1alpha1.ClusterDocsTopic) (*gql
 		Name: item.Name,
 		Description: item.Spec.Description,
 		DisplayName: item.Spec.DisplayName,
-		GroupName: item.Labels["cms.kyma-project.io/groupName"],
+		GroupName: item.Labels["groupName.cms.kyma-project.io"],
 	}
 
 	return &clusterDocsTopic, nil
