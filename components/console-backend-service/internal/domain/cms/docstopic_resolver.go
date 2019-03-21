@@ -7,7 +7,7 @@ import (
 )
 
 type docsTopicResolver struct {
-	docsTopicSvc docsTopicGetter
+	docsTopicSvc docsTopicSvc
 	assetStoreRetriever shared.AssetStoreRetriever
 	docsTopicConverter gqlDocsTopicConverter
 }

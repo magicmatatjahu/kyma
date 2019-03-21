@@ -7,10 +7,12 @@ import (
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
+	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 )
 
 type clusterDocsTopicService struct {
 	informer cache.SharedIndexInformer
+	notifier notifier
 }
 
 func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDocsTopicService, error) {
@@ -31,6 +33,10 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 	if err != nil {
 		return nil, errors.Wrap(err, "while adding indexers")
 	}
+
+	notifier := resource.NewNotifier()
+	informer.AddEventHandler(notifier)
+	svc.notifier = notifier
 
 	return svc, nil
 }
@@ -68,4 +74,12 @@ func (svc *clusterDocsTopicService) extractClusterDocsTopic(obj interface{}) (*v
 	}
 
 	return &clusterDocsTopic, nil
+}
+
+func (svc *clusterDocsTopicService) Subscribe(listener resource.Listener) {
+	svc.notifier.AddListener(listener)
+}
+
+func (svc *clusterDocsTopicService) Unsubscribe(listener resource.Listener) {
+	svc.notifier.DeleteListener(listener)
 }

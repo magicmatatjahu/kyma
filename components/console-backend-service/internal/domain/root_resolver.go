@@ -478,6 +478,10 @@ type subscriptionResolver struct {
 	*RootResolver
 }
 
+func (r *subscriptionResolver) ClusterDocsTopicEvent(ctx context.Context) (<-chan gqlschema.ClusterDocsTopicEvent, error) {
+	return r.cms.Resolver.ClusterDocsTopicEventSubscription(ctx)
+}
+
 func (r *subscriptionResolver) ServiceInstanceEvent(ctx context.Context, namespace string) (<-chan gqlschema.ServiceInstanceEvent, error) {
 	return r.sc.Resolver.ServiceInstanceEventSubscription(ctx, namespace)
 }

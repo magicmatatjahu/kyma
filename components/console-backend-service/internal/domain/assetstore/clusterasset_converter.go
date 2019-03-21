@@ -14,6 +14,7 @@ func (c *clusterAssetConverter) ToGQL(item *v1alpha2.ClusterAsset) (*gqlschema.C
 
 	clusterAsset := gqlschema.ClusterAsset{
 		Name: item.Name,
+		Type: item.Labels["lol"],
 	}
 
 	return &clusterAsset, nil

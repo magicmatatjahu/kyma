@@ -92,8 +92,8 @@ func (r *PluggableContainer) Enable() error {
 func (r *PluggableContainer) Disable() error {
 	r.Pluggable.Disable(func(disabledErr error) {
 		r.Resolver = disabled.NewResolver(disabledErr)
-		r.CmsRetriever.ClusterDocsTopicGetter = disabled.NewClusterDocsTopicGetter(disabledErr)
-		r.CmsRetriever.DocsTopicGetter = disabled.NewDocsTopicGetter(disabledErr)
+		r.CmsRetriever.ClusterDocsTopicGetter = disabled.NewClusterDocsTopicSvc(disabledErr)
+		r.CmsRetriever.DocsTopicGetter = disabled.NewDocsTopicSvc(disabledErr)
 		r.CmsRetriever.GqlClusterDocsTopicConverter = disabled.NewGqlClusterDocsTopicConverter(disabledErr)
 		r.CmsRetriever.GqlDocsTopicConverter = disabled.NewGqlDocsTopicConverter(disabledErr)
 		r.informerFactory = nil
@@ -111,6 +111,7 @@ type resolverConfig struct {
 //go:generate failery -name=Resolver -case=underscore -output disabled -outpkg disabled
 type Resolver interface {
 	ClusterDocsTopicsQuery(ctx context.Context, viewContext *string, groupName *string) ([]gqlschema.ClusterDocsTopic, error)
+	ClusterDocsTopicEventSubscription(ctx context.Context) (<-chan gqlschema.ClusterDocsTopicEvent, error)
 	ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error)
 	DocsTopicAssetsField(ctx context.Context, obj *gqlschema.DocsTopic, typeArg *string) ([]gqlschema.Asset, error)
 }
