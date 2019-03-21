@@ -14,6 +14,15 @@ func NewClusterAssetSvc(err error) *clusterAssetSvc {
 	return &clusterAssetSvc{err: err}
 }
 
+// Find provides a failing mock function with given fields: name
+func (_m *clusterAssetSvc) Find(name string) (*v1alpha2.ClusterAsset, error) {
+	var r0 *v1alpha2.ClusterAsset
+	var r1 error
+	r1 = _m.err
+
+	return r0, r1
+}
+
 // List provides a failing mock function with given fields: groupName
 func (_m *clusterAssetSvc) List(groupName string) ([]*v1alpha2.ClusterAsset, error) {
 	var r0 []*v1alpha2.ClusterAsset
@@ -23,8 +32,8 @@ func (_m *clusterAssetSvc) List(groupName string) ([]*v1alpha2.ClusterAsset, err
 	return r0, r1
 }
 
-// ListForDocsTopicByType provides a failing mock function with given fields: docsTopicName, typeArg
-func (_m *clusterAssetSvc) ListForDocsTopicByType(docsTopicName string, typeArg *string) ([]*v1alpha2.ClusterAsset, error) {
+// ListForDocsTopicByType provides a failing mock function with given fields: docsTopicName, types
+func (_m *clusterAssetSvc) ListForDocsTopicByType(docsTopicName string, types []string) ([]*v1alpha2.ClusterAsset, error) {
 	var r0 []*v1alpha2.ClusterAsset
 	var r1 error
 	r1 = _m.err

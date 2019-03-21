@@ -15,8 +15,8 @@ func NewResolver(err error) *Resolver {
 	return &Resolver{err: err}
 }
 
-// AssetFilesField provides a failing mock function with given fields: ctx, obj, typeArg
-func (_m *Resolver) AssetFilesField(ctx context.Context, obj *gqlschema.Asset, typeArg *string) ([]gqlschema.File, error) {
+// AssetFilesField provides a failing mock function with given fields: ctx, obj, filterExtensions
+func (_m *Resolver) AssetFilesField(ctx context.Context, obj *gqlschema.Asset, filterExtensions []string) ([]gqlschema.File, error) {
 	var r0 []gqlschema.File
 	var r1 error
 	r1 = _m.err
@@ -24,8 +24,8 @@ func (_m *Resolver) AssetFilesField(ctx context.Context, obj *gqlschema.Asset, t
 	return r0, r1
 }
 
-// ClusterAssetFilesField provides a failing mock function with given fields: ctx, obj, typeArg
-func (_m *Resolver) ClusterAssetFilesField(ctx context.Context, obj *gqlschema.ClusterAsset, typeArg *string) ([]gqlschema.File, error) {
+// ClusterAssetFilesField provides a failing mock function with given fields: ctx, obj, filterExtensions
+func (_m *Resolver) ClusterAssetFilesField(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtensions []string) ([]gqlschema.File, error) {
 	var r0 []gqlschema.File
 	var r1 error
 	r1 = _m.err

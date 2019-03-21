@@ -89,7 +89,7 @@ func (r *PluggableContainer) Disable() error {
 	r.Pluggable.Disable(func(disabledErr error) {
 		r.Resolver = disabled.NewResolver(disabledErr)
 		r.AssetStoreRetriever.ClusterAssetGetter = disabled.NewClusterAssetSvc(disabledErr)
-		//r.AssetStoreRetriever.AssetGetter = disabled.NewAssetGetter(disabledErr)
+		r.AssetStoreRetriever.AssetGetter = disabled.NewAssetSvc(disabledErr)
 		r.AssetStoreRetriever.GqlClusterAssetConverter = disabled.NewGqlClusterAssetConverter(disabledErr)
 		r.AssetStoreRetriever.GqlAssetConverter = disabled.NewGqlAssetConverter(disabledErr)
 		r.informerFactory = nil
@@ -100,8 +100,8 @@ func (r *PluggableContainer) Disable() error {
 
 //go:generate failery -name=Resolver -case=underscore -output disabled -outpkg disabled
 type Resolver interface {
-	ClusterAssetFilesField(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtension *string) ([]gqlschema.File, error)
-	AssetFilesField(ctx context.Context, obj *gqlschema.Asset, filterExtension *string) ([]gqlschema.File, error)
+	ClusterAssetFilesField(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtensions []string) ([]gqlschema.File, error)
+	AssetFilesField(ctx context.Context, obj *gqlschema.Asset, filterExtensions []string) ([]gqlschema.File, error)
 }
 
 type resolverConfig struct {

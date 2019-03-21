@@ -111,7 +111,7 @@ type ComplexityRoot struct {
 		Name      func(childComplexity int) int
 		Namespace func(childComplexity int) int
 		Type      func(childComplexity int) int
-		Files     func(childComplexity int, filterExtension *string) int
+		Files     func(childComplexity int, filterExtensions []string) int
 	}
 
 	AuthenticationPolicy struct {
@@ -133,13 +133,13 @@ type ComplexityRoot struct {
 	ClusterAsset struct {
 		Name  func(childComplexity int) int
 		Type  func(childComplexity int) int
-		Files func(childComplexity int, filterExtension *string) int
+		Files func(childComplexity int, filterExtensions []string) int
 	}
 
 	ClusterDocsTopic struct {
 		Name        func(childComplexity int) int
 		GroupName   func(childComplexity int) int
-		Assets      func(childComplexity int, typeArg *string) int
+		Assets      func(childComplexity int, types []string) int
 		DisplayName func(childComplexity int) int
 		Description func(childComplexity int) int
 	}
@@ -275,7 +275,7 @@ type ComplexityRoot struct {
 		Name        func(childComplexity int) int
 		Namespace   func(childComplexity int) int
 		GroupName   func(childComplexity int) int
-		Assets      func(childComplexity int, typeArg *string) int
+		Assets      func(childComplexity int, types []string) int
 		DisplayName func(childComplexity int) int
 		Description func(childComplexity int) int
 	}
@@ -721,13 +721,13 @@ type ApplicationResolver interface {
 	Status(ctx context.Context, obj *Application) (ApplicationStatus, error)
 }
 type AssetResolver interface {
-	Files(ctx context.Context, obj *Asset, filterExtension *string) ([]File, error)
+	Files(ctx context.Context, obj *Asset, filterExtensions []string) ([]File, error)
 }
 type ClusterAssetResolver interface {
-	Files(ctx context.Context, obj *ClusterAsset, filterExtension *string) ([]File, error)
+	Files(ctx context.Context, obj *ClusterAsset, filterExtensions []string) ([]File, error)
 }
 type ClusterDocsTopicResolver interface {
-	Assets(ctx context.Context, obj *ClusterDocsTopic, typeArg *string) ([]ClusterAsset, error)
+	Assets(ctx context.Context, obj *ClusterDocsTopic, types []string) ([]ClusterAsset, error)
 }
 type ClusterServiceClassResolver interface {
 	Plans(ctx context.Context, obj *ClusterServiceClass) ([]ClusterServicePlan, error)
@@ -744,7 +744,7 @@ type DeploymentResolver interface {
 	BoundServiceInstanceNames(ctx context.Context, obj *Deployment) ([]string, error)
 }
 type DocsTopicResolver interface {
-	Assets(ctx context.Context, obj *DocsTopic, typeArg *string) ([]Asset, error)
+	Assets(ctx context.Context, obj *DocsTopic, types []string) ([]Asset, error)
 }
 type EventActivationResolver interface {
 	Events(ctx context.Context, obj *EventActivation) ([]EventActivationEvent, error)
@@ -864,60 +864,78 @@ type SubscriptionResolver interface {
 
 func field_Asset_files_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["filterExtension"]; ok {
+	var arg0 []string
+	if tmp, ok := rawArgs["filterExtensions"]; ok {
 		var err error
-		var ptr1 string
+		var rawIf1 []interface{}
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalString(tmp)
-			arg0 = &ptr1
+			if tmp1, ok := tmp.([]interface{}); ok {
+				rawIf1 = tmp1
+			} else {
+				rawIf1 = []interface{}{tmp}
+			}
 		}
-
+		arg0 = make([]string, len(rawIf1))
+		for idx1 := range rawIf1 {
+			arg0[idx1], err = graphql.UnmarshalString(rawIf1[idx1])
+		}
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filterExtension"] = arg0
+	args["filterExtensions"] = arg0
 	return args, nil
 
 }
 
 func field_ClusterAsset_files_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["filterExtension"]; ok {
+	var arg0 []string
+	if tmp, ok := rawArgs["filterExtensions"]; ok {
 		var err error
-		var ptr1 string
+		var rawIf1 []interface{}
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalString(tmp)
-			arg0 = &ptr1
+			if tmp1, ok := tmp.([]interface{}); ok {
+				rawIf1 = tmp1
+			} else {
+				rawIf1 = []interface{}{tmp}
+			}
 		}
-
+		arg0 = make([]string, len(rawIf1))
+		for idx1 := range rawIf1 {
+			arg0[idx1], err = graphql.UnmarshalString(rawIf1[idx1])
+		}
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["filterExtension"] = arg0
+	args["filterExtensions"] = arg0
 	return args, nil
 
 }
 
 func field_ClusterDocsTopic_assets_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["type"]; ok {
+	var arg0 []string
+	if tmp, ok := rawArgs["types"]; ok {
 		var err error
-		var ptr1 string
+		var rawIf1 []interface{}
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalString(tmp)
-			arg0 = &ptr1
+			if tmp1, ok := tmp.([]interface{}); ok {
+				rawIf1 = tmp1
+			} else {
+				rawIf1 = []interface{}{tmp}
+			}
 		}
-
+		arg0 = make([]string, len(rawIf1))
+		for idx1 := range rawIf1 {
+			arg0[idx1], err = graphql.UnmarshalString(rawIf1[idx1])
+		}
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["type"] = arg0
+	args["types"] = arg0
 	return args, nil
 
 }
@@ -964,20 +982,26 @@ func field_ClusterServiceClass_instances_args(rawArgs map[string]interface{}) (m
 
 func field_DocsTopic_assets_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["type"]; ok {
+	var arg0 []string
+	if tmp, ok := rawArgs["types"]; ok {
 		var err error
-		var ptr1 string
+		var rawIf1 []interface{}
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalString(tmp)
-			arg0 = &ptr1
+			if tmp1, ok := tmp.([]interface{}); ok {
+				rawIf1 = tmp1
+			} else {
+				rawIf1 = []interface{}{tmp}
+			}
 		}
-
+		arg0 = make([]string, len(rawIf1))
+		for idx1 := range rawIf1 {
+			arg0[idx1], err = graphql.UnmarshalString(rawIf1[idx1])
+		}
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["type"] = arg0
+	args["types"] = arg0
 	return args, nil
 
 }
@@ -3232,7 +3256,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Asset.Files(childComplexity, args["filterExtension"].(*string)), true
+		return e.complexity.Asset.Files(childComplexity, args["filterExtensions"].([]string)), true
 
 	case "AuthenticationPolicy.type":
 		if e.complexity.AuthenticationPolicy.Type == nil {
@@ -3307,7 +3331,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.ClusterAsset.Files(childComplexity, args["filterExtension"].(*string)), true
+		return e.complexity.ClusterAsset.Files(childComplexity, args["filterExtensions"].([]string)), true
 
 	case "ClusterDocsTopic.name":
 		if e.complexity.ClusterDocsTopic.Name == nil {
@@ -3333,7 +3357,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.ClusterDocsTopic.Assets(childComplexity, args["type"].(*string)), true
+		return e.complexity.ClusterDocsTopic.Assets(childComplexity, args["types"].([]string)), true
 
 	case "ClusterDocsTopic.displayName":
 		if e.complexity.ClusterDocsTopic.DisplayName == nil {
@@ -3922,7 +3946,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.DocsTopic.Assets(childComplexity, args["type"].(*string)), true
+		return e.complexity.DocsTopic.Assets(childComplexity, args["types"].([]string)), true
 
 	case "DocsTopic.displayName":
 		if e.complexity.DocsTopic.DisplayName == nil {
@@ -7675,7 +7699,7 @@ func (ec *executionContext) _Asset_files(ctx context.Context, field graphql.Coll
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Asset().Files(rctx, obj, args["filterExtension"].(*string))
+		return ec.resolvers.Asset().Files(rctx, obj, args["filterExtensions"].([]string))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -8172,7 +8196,7 @@ func (ec *executionContext) _ClusterAsset_files(ctx context.Context, field graph
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ClusterAsset().Files(rctx, obj, args["filterExtension"].(*string))
+		return ec.resolvers.ClusterAsset().Files(rctx, obj, args["filterExtensions"].([]string))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -8347,7 +8371,7 @@ func (ec *executionContext) _ClusterDocsTopic_assets(ctx context.Context, field 
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ClusterDocsTopic().Assets(rctx, obj, args["type"].(*string))
+		return ec.resolvers.ClusterDocsTopic().Assets(rctx, obj, args["types"].([]string))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -11673,7 +11697,7 @@ func (ec *executionContext) _DocsTopic_assets(ctx context.Context, field graphql
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.DocsTopic().Assets(rctx, obj, args["type"].(*string))
+		return ec.resolvers.DocsTopic().Assets(rctx, obj, args["types"].([]string))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -25688,20 +25712,20 @@ input ResourceAttributes {
 
 type File {
     url: String!
-    metadata: JSON! # JSON with file metadata, like in https://raw.githubusercontent.com/kyma-project/kyma/master/docs/console/docs/01-01-console.md
+    metadata: JSON!
 }
 
 type Asset {
     name: String!
     namespace: String!
-    type: String! # ("asyncapi", "markdown", "openapi", etc.)
-    files(filterExtension: String): [File!]!
+    type: String!
+    files(filterExtensions: [String!]): [File!]!
 }
 
 type ClusterAsset {
     name: String!
-    type: String! # ("asyncapi", "markdown", "openapi", etc.)
-    files(filterExtension: String): [File!]!
+    type: String!
+    files(filterExtensions: [String!]): [File!]!
 }
 
 # CMS
@@ -25710,7 +25734,7 @@ type DocsTopic {
     name: String!
     namespace: String!
     groupName: String!
-    assets(type: String): [Asset!]!
+    assets(types: [String!]): [Asset!]!
     displayName: String!
     description: String!
 }
@@ -25723,7 +25747,7 @@ type DocsTopicEvent {
 type ClusterDocsTopic {
     name: String!
     groupName: String!
-    assets(type: String): [ClusterAsset!]!
+    assets(types: [String!]): [ClusterAsset!]!
     displayName: String!
     description: String!
 }

@@ -21,6 +21,14 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 	}
 
 	err := svc.informer.AddIndexers(cache.Indexers{
+		"groupName": func(obj interface{}) ([]string, error) {
+			_, err := svc.extractClusterDocsTopic(obj)
+			if err != nil {
+				return nil, errors.New("Cannot convert item")
+			}
+
+			return []string{fmt.Sprintf("%s", "lol")}, nil
+		},
 		"serviceClassName": func(obj interface{}) ([]string, error) {
 			entity, err := svc.extractClusterDocsTopic(obj)
 			if err != nil {

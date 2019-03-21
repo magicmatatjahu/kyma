@@ -26,20 +26,20 @@ input ResourceAttributes {
 
 type File {
     url: String!
-    metadata: JSON! # JSON with file metadata, like in https://raw.githubusercontent.com/kyma-project/kyma/master/docs/console/docs/01-01-console.md
+    metadata: JSON!
 }
 
 type Asset {
     name: String!
     namespace: String!
-    type: String! # ("asyncapi", "markdown", "openapi", etc.)
-    files(filterExtension: String): [File!]!
+    type: String!
+    files(filterExtensions: [String!]): [File!]!
 }
 
 type ClusterAsset {
     name: String!
-    type: String! # ("asyncapi", "markdown", "openapi", etc.)
-    files(filterExtension: String): [File!]!
+    type: String!
+    files(filterExtensions: [String!]): [File!]!
 }
 
 # CMS
@@ -48,7 +48,7 @@ type DocsTopic {
     name: String!
     namespace: String!
     groupName: String!
-    assets(type: String): [Asset!]!
+    assets(types: [String!]): [Asset!]!
     displayName: String!
     description: String!
 }
@@ -61,7 +61,7 @@ type DocsTopicEvent {
 type ClusterDocsTopic {
     name: String!
     groupName: String!
-    assets(type: String): [ClusterAsset!]!
+    assets(types: [String!]): [ClusterAsset!]!
     displayName: String!
     description: String!
 }

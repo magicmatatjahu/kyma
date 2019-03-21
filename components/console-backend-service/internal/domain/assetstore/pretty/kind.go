@@ -7,6 +7,8 @@ const (
 	Assets
 	ClusterAsset
 	ClusterAssets
+	File
+	Files
 )
 
 func (k Kind) String() string {
@@ -19,6 +21,10 @@ func (k Kind) String() string {
 		return "Cluster Asset"
 	case ClusterAssets:
 		return "Cluster Assets"
+	case File:
+		return "File"
+	case Files:
+		return "Files"
 	default:
 		return ""
 	}

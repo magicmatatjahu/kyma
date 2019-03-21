@@ -51,6 +51,22 @@ func newAssetService(informer cache.SharedIndexInformer) (*assetService, error) 
 	return svc, nil
 }
 
+func (svc *assetService) Find(namespace, name string) (*v1alpha2.Asset, error) {
+	key := fmt.Sprintf("%s/%s", namespace, name)
+
+	item, exists, err := svc.informer.GetStore().GetByKey(key)
+	if err != nil || !exists {
+		return nil, err
+	}
+
+	asset, err := svc.extractAsset(item)
+	if err != nil {
+		errors.Wrapf(err, "Incorrect item type: %T, should be: *Asset", item)
+	}
+
+	return asset, nil
+}
+
 func (svc *assetService) List(namespace, groupName string) ([]*v1alpha2.Asset, error) {
 	key := fmt.Sprintf("%s", groupName)
 	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
@@ -71,13 +87,19 @@ func (svc *assetService) List(namespace, groupName string) ([]*v1alpha2.Asset, e
 	return assets, nil
 }
 
-func (svc *assetService) ListForDocsTopicByType(namespace, docsTopicName string, typeArg *string) ([]*v1alpha2.Asset, error) {
+func (svc *assetService) ListForDocsTopicByType(namespace, docsTopicName string, types []string) ([]*v1alpha2.Asset, error) {
 	var items []interface{}
 	var err error
-	if typeArg != nil {
-		items, err = svc.informer.GetIndexer().ByIndex("docsTopicName/type", fmt.Sprintf("%s/%s/%s", namespace, docsTopicName, *typeArg))
+	if len(types) == 0 {
+		items, err = svc.informer.GetIndexer().ByIndex("docsTopicName/type", fmt.Sprintf("%s/%s", namespace, docsTopicName))
 	} else {
-		items, err = svc.informer.GetIndexer().ByIndex("docsTopicName", fmt.Sprintf("%s/%s", namespace, docsTopicName))
+		for _, typeArg := range types {
+			its, err := svc.informer.GetIndexer().ByIndex("docsTopicName/type", fmt.Sprintf("%s/%s/%s", namespace, docsTopicName, typeArg))
+			if err != nil {
+				return nil, err
+			}
+			items = append(items, its...)
+		}
 	}
 
 	if err != nil {

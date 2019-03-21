@@ -113,8 +113,8 @@ type Resolver interface {
 	ClusterDocsTopicsQuery(ctx context.Context, viewContext *string, groupName *string) ([]gqlschema.ClusterDocsTopic, error)
 	ClusterDocsTopicEventSubscription(ctx context.Context) (<-chan gqlschema.ClusterDocsTopicEvent, error)
 	DocsTopicEventSubscription(ctx context.Context) (<-chan gqlschema.DocsTopicEvent, error)
-	ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error)
-	DocsTopicAssetsField(ctx context.Context, obj *gqlschema.DocsTopic, typeArg *string) ([]gqlschema.Asset, error)
+	ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, types []string) ([]gqlschema.ClusterAsset, error)
+	DocsTopicAssetsField(ctx context.Context, obj *gqlschema.DocsTopic, types []string) ([]gqlschema.Asset, error)
 }
 
 type domainResolver struct {

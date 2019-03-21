@@ -20,6 +20,7 @@ func (c *docsTopicConverter) ToGQL(item *v1alpha1.DocsTopic) (*gqlschema.DocsTop
 		Namespace: item.Namespace,
 		Description: item.Spec.Description,
 		DisplayName: item.Spec.DisplayName,
+		GroupName: item.Labels["cms.kyma-project.io/groupName"],
 	}
 
 	return &docsTopic, nil

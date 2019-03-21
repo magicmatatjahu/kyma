@@ -15,8 +15,8 @@ func NewResolver(err error) *Resolver {
 	return &Resolver{err: err}
 }
 
-// ClusterDocsTopicAssetsField provides a failing mock function with given fields: ctx, obj, typeArg
-func (_m *Resolver) ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error) {
+// ClusterDocsTopicAssetsField provides a failing mock function with given fields: ctx, obj, types
+func (_m *Resolver) ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, types []string) ([]gqlschema.ClusterAsset, error) {
 	var r0 []gqlschema.ClusterAsset
 	var r1 error
 	r1 = _m.err
@@ -42,8 +42,8 @@ func (_m *Resolver) ClusterDocsTopicsQuery(ctx context.Context, viewContext *str
 	return r0, r1
 }
 
-// DocsTopicAssetsField provides a failing mock function with given fields: ctx, obj, typeArg
-func (_m *Resolver) DocsTopicAssetsField(ctx context.Context, obj *gqlschema.DocsTopic, typeArg *string) ([]gqlschema.Asset, error) {
+// DocsTopicAssetsField provides a failing mock function with given fields: ctx, obj, types
+func (_m *Resolver) DocsTopicAssetsField(ctx context.Context, obj *gqlschema.DocsTopic, types []string) ([]gqlschema.Asset, error) {
 	var r0 []gqlschema.Asset
 	var r1 error
 	r1 = _m.err

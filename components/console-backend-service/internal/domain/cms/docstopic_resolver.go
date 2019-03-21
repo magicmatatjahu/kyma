@@ -28,13 +28,13 @@ func newDocsTopicResolver(docsTopicService *docsTopicService, assetStoreRetrieve
 	}
 }
 
-func (r *docsTopicResolver) DocsTopicAssetsField(ctx context.Context, obj *gqlschema.DocsTopic, typeArg *string) ([]gqlschema.Asset, error) {
+func (r *docsTopicResolver) DocsTopicAssetsField(ctx context.Context, obj *gqlschema.DocsTopic, types []string) ([]gqlschema.Asset, error) {
 	if obj == nil {
 		glog.Error(errors.New("%s cannot be empty in order to resolve `assets` field"), pretty.DocsTopic)
 		return nil, gqlerror.NewInternal()
 	}
 
-	items, err := r.assetStoreRetriever.Asset().ListForDocsTopicByType(obj.Namespace, obj.Name, typeArg)
+	items, err := r.assetStoreRetriever.Asset().ListForDocsTopicByType(obj.Namespace, obj.Name, types)
 	if err != nil {
 		if module.IsDisabledModuleError(err) {
 			return nil, err

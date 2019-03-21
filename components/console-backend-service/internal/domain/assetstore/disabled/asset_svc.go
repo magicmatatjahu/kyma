@@ -14,6 +14,15 @@ func NewAssetSvc(err error) *assetSvc {
 	return &assetSvc{err: err}
 }
 
+// Find provides a failing mock function with given fields: namespace, name
+func (_m *assetSvc) Find(namespace string, name string) (*v1alpha2.Asset, error) {
+	var r0 *v1alpha2.Asset
+	var r1 error
+	r1 = _m.err
+
+	return r0, r1
+}
+
 // List provides a failing mock function with given fields: namespace, groupName
 func (_m *assetSvc) List(namespace string, groupName string) ([]*v1alpha2.Asset, error) {
 	var r0 []*v1alpha2.Asset
@@ -23,8 +32,8 @@ func (_m *assetSvc) List(namespace string, groupName string) ([]*v1alpha2.Asset,
 	return r0, r1
 }
 
-// ListForDocsTopicByType provides a failing mock function with given fields: namespace, docsTopicName, typeArg
-func (_m *assetSvc) ListForDocsTopicByType(namespace string, docsTopicName string, typeArg *string) ([]*v1alpha2.Asset, error) {
+// ListForDocsTopicByType provides a failing mock function with given fields: namespace, docsTopicName, types
+func (_m *assetSvc) ListForDocsTopicByType(namespace string, docsTopicName string, types []string) ([]*v1alpha2.Asset, error) {
 	var r0 []*v1alpha2.Asset
 	var r1 error
 	r1 = _m.err

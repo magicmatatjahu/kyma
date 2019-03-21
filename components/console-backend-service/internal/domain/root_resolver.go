@@ -715,16 +715,16 @@ type clusterDocsTopicResolver struct {
 	cms *cms.PluggableContainer
 }
 
-func (r *clusterDocsTopicResolver) Assets(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error) {
-	return r.cms.Resolver.ClusterDocsTopicAssetsField(ctx, obj, typeArg)
+func (r *clusterDocsTopicResolver) Assets(ctx context.Context, obj *gqlschema.ClusterDocsTopic, types []string) ([]gqlschema.ClusterAsset, error) {
+	return r.cms.Resolver.ClusterDocsTopicAssetsField(ctx, obj, types)
 }
 
 type docsTopicResolver struct {
 	cms *cms.PluggableContainer
 }
 
-func (r *docsTopicResolver) Assets(ctx context.Context, obj *gqlschema.DocsTopic, typeArg *string) ([]gqlschema.Asset, error) {
-	return r.cms.Resolver.DocsTopicAssetsField(ctx, obj, typeArg)
+func (r *docsTopicResolver) Assets(ctx context.Context, obj *gqlschema.DocsTopic, types []string) ([]gqlschema.Asset, error) {
+	return r.cms.Resolver.DocsTopicAssetsField(ctx, obj, types)
 }
 
 // Asset Store
@@ -733,14 +733,14 @@ type clusterAssetResolver struct {
 	assetstore *assetstore.PluggableContainer
 }
 
-func (r *clusterAssetResolver) Files(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtension *string) ([]gqlschema.File, error) {
-	return r.assetstore.Resolver.ClusterAssetFilesField(ctx, obj, filterExtension)
+func (r *clusterAssetResolver) Files(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtensions []string) ([]gqlschema.File, error) {
+	return r.assetstore.Resolver.ClusterAssetFilesField(ctx, obj, filterExtensions)
 }
 
 type assetResolver struct {
 	assetstore *assetstore.PluggableContainer
 }
 
-func (r *assetResolver) Files(ctx context.Context, obj *gqlschema.Asset, filterExtension *string) ([]gqlschema.File, error) {
-	return r.assetstore.Resolver.AssetFilesField(ctx, obj, filterExtension)
+func (r *assetResolver) Files(ctx context.Context, obj *gqlschema.Asset, filterExtensions []string) ([]gqlschema.File, error) {
+	return r.assetstore.Resolver.AssetFilesField(ctx, obj, filterExtensions)
 }

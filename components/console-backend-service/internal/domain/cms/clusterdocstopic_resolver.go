@@ -44,13 +44,13 @@ func (r *clusterDocsTopicResolver) ClusterDocsTopicsQuery(ctx context.Context, v
 	return clusterDocsTopics, nil
 }
 
-func (r *clusterDocsTopicResolver) ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, typeArg *string) ([]gqlschema.ClusterAsset, error) {
+func (r *clusterDocsTopicResolver) ClusterDocsTopicAssetsField(ctx context.Context, obj *gqlschema.ClusterDocsTopic, types []string) ([]gqlschema.ClusterAsset, error) {
 	if obj == nil {
 		glog.Error(errors.New("%s cannot be empty in order to resolve `assets` field"), pretty.ClusterDocsTopic)
 		return nil, gqlerror.NewInternal()
 	}
 
-	items, err := r.assetStoreRetriever.ClusterAsset().ListForDocsTopicByType(obj.Name, typeArg)
+	items, err := r.assetStoreRetriever.ClusterAsset().ListForDocsTopicByType(obj.Name, types)
 	if err != nil {
 		if module.IsDisabledModuleError(err) {
 			return nil, err

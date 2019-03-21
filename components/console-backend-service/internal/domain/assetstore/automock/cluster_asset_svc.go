@@ -9,6 +9,29 @@ type clusterAssetSvc struct {
 	mock.Mock
 }
 
+// Find provides a mock function with given fields: name
+func (_m *clusterAssetSvc) Find(name string) (*v1alpha2.ClusterAsset, error) {
+	ret := _m.Called(name)
+
+	var r0 *v1alpha2.ClusterAsset
+	if rf, ok := ret.Get(0).(func(string) *v1alpha2.ClusterAsset); ok {
+		r0 = rf(name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v1alpha2.ClusterAsset)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // List provides a mock function with given fields: groupName
 func (_m *clusterAssetSvc) List(groupName string) ([]*v1alpha2.ClusterAsset, error) {
 	ret := _m.Called(groupName)
@@ -32,13 +55,13 @@ func (_m *clusterAssetSvc) List(groupName string) ([]*v1alpha2.ClusterAsset, err
 	return r0, r1
 }
 
-// ListForDocsTopicByType provides a mock function with given fields: docsTopicName, typeArg
-func (_m *clusterAssetSvc) ListForDocsTopicByType(docsTopicName string, typeArg *string) ([]*v1alpha2.ClusterAsset, error) {
-	ret := _m.Called(docsTopicName, typeArg)
+// ListForDocsTopicByType provides a mock function with given fields: docsTopicName, types
+func (_m *clusterAssetSvc) ListForDocsTopicByType(docsTopicName string, types []string) ([]*v1alpha2.ClusterAsset, error) {
+	ret := _m.Called(docsTopicName, types)
 
 	var r0 []*v1alpha2.ClusterAsset
-	if rf, ok := ret.Get(0).(func(string, *string) []*v1alpha2.ClusterAsset); ok {
-		r0 = rf(docsTopicName, typeArg)
+	if rf, ok := ret.Get(0).(func(string, []string) []*v1alpha2.ClusterAsset); ok {
+		r0 = rf(docsTopicName, types)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*v1alpha2.ClusterAsset)
@@ -46,8 +69,8 @@ func (_m *clusterAssetSvc) ListForDocsTopicByType(docsTopicName string, typeArg 
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, *string) error); ok {
-		r1 = rf(docsTopicName, typeArg)
+	if rf, ok := ret.Get(1).(func(string, []string) error); ok {
+		r1 = rf(docsTopicName, types)
 	} else {
 		r1 = ret.Error(1)
 	}

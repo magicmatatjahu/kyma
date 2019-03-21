@@ -9,6 +9,29 @@ type assetSvc struct {
 	mock.Mock
 }
 
+// Find provides a mock function with given fields: namespace, name
+func (_m *assetSvc) Find(namespace string, name string) (*v1alpha2.Asset, error) {
+	ret := _m.Called(namespace, name)
+
+	var r0 *v1alpha2.Asset
+	if rf, ok := ret.Get(0).(func(string, string) *v1alpha2.Asset); ok {
+		r0 = rf(namespace, name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v1alpha2.Asset)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(namespace, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // List provides a mock function with given fields: namespace, groupName
 func (_m *assetSvc) List(namespace string, groupName string) ([]*v1alpha2.Asset, error) {
 	ret := _m.Called(namespace, groupName)
@@ -32,13 +55,13 @@ func (_m *assetSvc) List(namespace string, groupName string) ([]*v1alpha2.Asset,
 	return r0, r1
 }
 
-// ListForDocsTopicByType provides a mock function with given fields: namespace, docsTopicName, typeArg
-func (_m *assetSvc) ListForDocsTopicByType(namespace string, docsTopicName string, typeArg *string) ([]*v1alpha2.Asset, error) {
-	ret := _m.Called(namespace, docsTopicName, typeArg)
+// ListForDocsTopicByType provides a mock function with given fields: namespace, docsTopicName, types
+func (_m *assetSvc) ListForDocsTopicByType(namespace string, docsTopicName string, types []string) ([]*v1alpha2.Asset, error) {
+	ret := _m.Called(namespace, docsTopicName, types)
 
 	var r0 []*v1alpha2.Asset
-	if rf, ok := ret.Get(0).(func(string, string, *string) []*v1alpha2.Asset); ok {
-		r0 = rf(namespace, docsTopicName, typeArg)
+	if rf, ok := ret.Get(0).(func(string, string, []string) []*v1alpha2.Asset); ok {
+		r0 = rf(namespace, docsTopicName, types)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*v1alpha2.Asset)
@@ -46,8 +69,8 @@ func (_m *assetSvc) ListForDocsTopicByType(namespace string, docsTopicName strin
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string, *string) error); ok {
-		r1 = rf(namespace, docsTopicName, typeArg)
+	if rf, ok := ret.Get(1).(func(string, string, []string) error); ok {
+		r1 = rf(namespace, docsTopicName, types)
 	} else {
 		r1 = ret.Error(1)
 	}
