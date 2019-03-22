@@ -2,7 +2,7 @@ package assetstore
 
 import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
-	"k8s.io/client-go/dynamic/dynamicinformer"
+	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
 	"k8s.io/client-go/dynamic"
 	"time"
 	"k8s.io/client-go/rest"

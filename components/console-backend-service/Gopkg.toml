@@ -22,15 +22,15 @@ required = [
 
 [[constraint]]
   name = "k8s.io/api"
-  version = "kubernetes-1.13.0"
+  version = "kubernetes-1.12.3"
 
 [[constraint]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.13.0"
+  version = "kubernetes-1.12.3"
 
 [[constraint]]
   name = "k8s.io/client-go"
-  version = "kubernetes-1.13.0"
+  version = "kubernetes-1.12.3"
 
 [[constraint]]
   revision = "44145f04b68cf362d9c4df2182967c2275eaefed"
@@ -74,19 +74,19 @@ required = [
 
 [[override]]
   name = "k8s.io/api"
-  version = "kubernetes-1.13.0"
+  version = "kubernetes-1.12.3"
 
 [[override]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.13.0"
+  version = "kubernetes-1.12.3"
 
 [[constraint]]
   name = "k8s.io/apiserver"
-  version = "kubernetes-1.13.0"
+  version = "kubernetes-1.12.3"
 
 [[override]]
   name = "k8s.io/client-go"
-  version = "kubernetes-1.13.0"
+  version = "kubernetes-1.12.3"
 
 [[constraint]]
   name = "k8s.io/code-generator"

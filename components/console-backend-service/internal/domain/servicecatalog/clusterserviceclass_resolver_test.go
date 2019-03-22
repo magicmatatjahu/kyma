@@ -33,7 +33,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassQuery(t *testing.T) {
 		converter.On("ToGQL", resource).Return(expected, nil).Once()
 		defer converter.AssertExpectations(t)
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil)
+		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil, nil)
 		resolver.SetClassConverter(converter)
 
 		result, err := resolver.ClusterServiceClassQuery(nil, name)
@@ -48,7 +48,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassQuery(t *testing.T) {
 		resourceGetter.On("Find", name).Return(nil, nil).Once()
 		defer resourceGetter.AssertExpectations(t)
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil)
+		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil, nil)
 
 		result, err := resolver.ClusterServiceClassQuery(nil, name)
 
@@ -64,7 +64,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassQuery(t *testing.T) {
 		resourceGetter.On("Find", name).Return(resource, expected).Once()
 		defer resourceGetter.AssertExpectations(t)
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil)
+		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil, nil)
 
 		result, err := resolver.ClusterServiceClassQuery(nil, name)
 
@@ -101,7 +101,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassesQuery(t *testing.T) {
 		converter.On("ToGQLs", resources).Return(expected, nil)
 		defer converter.AssertExpectations(t)
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil)
+		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil, nil)
 		resolver.SetClassConverter(converter)
 
 		result, err := resolver.ClusterServiceClassesQuery(nil, nil, nil)
@@ -116,7 +116,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassesQuery(t *testing.T) {
 		resourceGetter := automock.NewClusterServiceClassListGetter()
 		resourceGetter.On("List", pager.PagingParams{}).Return(resources, nil).Once()
 		defer resourceGetter.AssertExpectations(t)
-		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil)
+		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil, nil)
 		var expected []gqlschema.ClusterServiceClass
 
 		result, err := resolver.ClusterServiceClassesQuery(nil, nil, nil)
@@ -133,7 +133,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassesQuery(t *testing.T) {
 		resourceGetter := automock.NewClusterServiceClassListGetter()
 		resourceGetter.On("List", pager.PagingParams{}).Return(resources, expected).Once()
 		defer resourceGetter.AssertExpectations(t)
-		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil)
+		resolver := servicecatalog.NewClusterServiceClassResolver(resourceGetter, nil, nil, nil, nil)
 
 		_, err := resolver.ClusterServiceClassesQuery(nil, nil, nil)
 
@@ -174,7 +174,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassInstancesField(t *testin
 					ExternalName: externalName,
 				}
 
-				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil)
+				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil, nil)
 
 				result, err := resolver.ClusterServiceClassInstancesField(nil, &parentObj, testCase.Namespace)
 
@@ -210,7 +210,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassInstancesField(t *testin
 					ExternalName: externalName,
 				}
 
-				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil)
+				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil, nil)
 
 				result, err := resolver.ClusterServiceClassInstancesField(nil, parentObj, testCase.Namespace)
 
@@ -242,7 +242,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassInstancesField(t *testin
 					ExternalName: externalName,
 				}
 
-				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil)
+				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil, nil)
 
 				_, err := resolver.ClusterServiceClassInstancesField(nil, &parentObj, testCase.Namespace)
 
@@ -277,7 +277,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassActivatedField(t *testin
 					ExternalName: externalName,
 				}
 
-				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil)
+				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil, nil)
 
 				result, err := resolver.ClusterServiceClassActivatedField(nil, &parentObj, testCase.Namespace)
 
@@ -307,7 +307,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassActivatedField(t *testin
 					ExternalName: externalName,
 				}
 
-				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil)
+				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil, nil)
 
 				result, err := resolver.ClusterServiceClassActivatedField(nil, parentObj, testCase.Namespace)
 
@@ -339,7 +339,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassActivatedField(t *testin
 					ExternalName: externalName,
 				}
 
-				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil)
+				resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, resourceGetter, nil, nil)
 
 				_, err := resolver.ClusterServiceClassActivatedField(nil, &parentObj, testCase.Namespace)
 
@@ -378,7 +378,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassPlansField(t *testing.T)
 		parentObj := gqlschema.ClusterServiceClass{
 			Name: name,
 		}
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, resourceGetter, nil, nil)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, resourceGetter, nil, nil, nil)
 		resolver.SetPlanConverter(converter)
 
 		result, err := resolver.ClusterServiceClassPlansField(nil, &parentObj)
@@ -396,7 +396,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassPlansField(t *testing.T)
 		parentObj := gqlschema.ClusterServiceClass{
 			Name: name,
 		}
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, resourceGetter, nil, nil)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, resourceGetter, nil, nil, nil)
 
 		result, err := resolver.ClusterServiceClassPlansField(nil, &parentObj)
 
@@ -414,7 +414,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassPlansField(t *testing.T)
 		parentObj := gqlschema.ClusterServiceClass{
 			Name: name,
 		}
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, resourceGetter, nil, nil)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, resourceGetter, nil, nil, nil)
 
 		result, err := resolver.ClusterServiceClassPlansField(nil, &parentObj)
 
@@ -447,7 +447,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassContentField(t *testing.
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassContentField(nil, &parentObj)
 
@@ -468,7 +468,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassContentField(t *testing.
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassContentField(nil, &parentObj)
 
@@ -490,7 +490,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassContentField(t *testing.
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassContentField(nil, &parentObj)
 
@@ -523,7 +523,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassApiSpecField(t *testing.
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassApiSpecField(nil, &parentObj)
 
@@ -544,7 +544,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassApiSpecField(t *testing.
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassApiSpecField(nil, &parentObj)
 
@@ -566,7 +566,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassApiSpecField(t *testing.
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassApiSpecField(nil, &parentObj)
 
@@ -599,7 +599,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassOpenApiSpecField(t *test
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassOpenApiSpecField(nil, &parentObj)
 
@@ -620,7 +620,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassOpenApiSpecField(t *test
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassOpenApiSpecField(nil, &parentObj)
 
@@ -642,7 +642,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassOpenApiSpecField(t *test
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassOpenApiSpecField(nil, &parentObj)
 
@@ -671,7 +671,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassODataSpecField(t *testin
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassODataSpecField(nil, &parentObj)
 
@@ -692,7 +692,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassODataSpecField(t *testin
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassODataSpecField(nil, &parentObj)
 
@@ -714,7 +714,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassODataSpecField(t *testin
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassODataSpecField(nil, &parentObj)
 
@@ -747,7 +747,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassAsyncApiSpecField(t *tes
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassAsyncApiSpecField(nil, &parentObj)
 
@@ -768,7 +768,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassAsyncApiSpecField(t *tes
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassAsyncApiSpecField(nil, &parentObj)
 
@@ -790,7 +790,7 @@ func TestClusterServiceClassResolver_ClusterServiceClassAsyncApiSpecField(t *tes
 			Name: name,
 		}
 
-		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever)
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, retriever, nil)
 
 		result, err := resolver.ClusterServiceClassAsyncApiSpecField(nil, &parentObj)
 
@@ -799,3 +799,5 @@ func TestClusterServiceClassResolver_ClusterServiceClassAsyncApiSpecField(t *tes
 		assert.Nil(t, result)
 	})
 }
+
+//TODO: Write tests for cms retriever!

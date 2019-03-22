@@ -1,14 +1,11 @@
 package cms
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/status"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 )
 
-type docsTopicConverter struct {
-	extractor status.DocsTopicExtractor
-}
+type docsTopicConverter struct {}
 
 func (c *docsTopicConverter) ToGQL(item *v1alpha1.DocsTopic) (*gqlschema.DocsTopic, error) {
 	if item == nil {
