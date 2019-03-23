@@ -11,9 +11,11 @@ func (c *fileConverter) ToGQL(file *File) (*gqlschema.File, error) {
 		return nil, nil
 	}
 
+	metadata := c.extractMetadata(file.Metadata)
+
 	result := gqlschema.File{
 		URL: file.URL,
-		Metadata: file.Metadata,
+		Metadata: metadata,
 	}
 	return &result, nil
 }
@@ -31,4 +33,15 @@ func (c *fileConverter) ToGQLs(files []*File) ([]gqlschema.File, error) {
 		}
 	}
 	return result, nil
+}
+
+func (c *fileConverter) extractMetadata(metadata map[string]interface{}) gqlschema.JSON {
+	if metadata == nil {
+		return nil
+	}
+
+	result := make(gqlschema.JSON)
+	result = metadata
+
+	return result
 }

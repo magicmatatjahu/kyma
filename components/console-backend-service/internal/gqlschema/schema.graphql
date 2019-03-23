@@ -34,6 +34,7 @@ type Asset {
     namespace: String!
     type: String!
     files(filterExtensions: [String!]): [File!]!
+    status: AssetStatus!
 }
 
 type AssetEvent {
@@ -45,11 +46,24 @@ type ClusterAsset {
     name: String!
     type: String!
     files(filterExtensions: [String!]): [File!]!
+    status: AssetStatus!
 }
 
 type ClusterAssetEvent {
     type: SubscriptionEventType!
     clusterAsset: ClusterAsset!
+}
+
+type AssetStatus {
+    phase: AssetPhaseType!
+    reason: String!
+    message: String!
+}
+
+enum AssetPhaseType {
+    READY
+    PENDING
+    FAILED
 }
 
 # CMS
@@ -61,6 +75,7 @@ type DocsTopic {
     assets(types: [String!]): [Asset!]!
     displayName: String!
     description: String!
+    status: DocsTopicStatus!
 }
 
 type DocsTopicEvent {
@@ -74,11 +89,24 @@ type ClusterDocsTopic {
     assets(types: [String!]): [ClusterAsset!]!
     displayName: String!
     description: String!
+    status: DocsTopicStatus!
 }
 
 type ClusterDocsTopicEvent {
     type: SubscriptionEventType!
     clusterDocsTopic: ClusterDocsTopic!
+}
+
+type DocsTopicStatus {
+    phase: DocsTopicPhaseType!
+    reason: String!
+    message: String!
+}
+
+enum DocsTopicPhaseType {
+    READY
+    PENDING
+    FAILED
 }
 
 # Content

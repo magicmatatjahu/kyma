@@ -5,4 +5,5 @@ type ClusterDocsTopic struct {
 	GroupName   string         `json:"groupName"`
 	DisplayName string         `json:"displayName"`
 	Description string         `json:"description"`
+	Status      DocsTopicStatus `json:"status"`
 }

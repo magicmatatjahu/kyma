@@ -52,7 +52,7 @@ func New(restConfig *rest.Config, contentCfg content.Config, appCfg application.
 
 	assetStoreContainer, err := assetstore.New(restConfig, informerResyncPeriod)
 	if err != nil {
-		return nil, errors.Wrap(err, "while initializing CMS resolver")
+		return nil, errors.Wrap(err, "while initializing AssetStore resolver")
 	}
 	makePluggable(assetStoreContainer)
 

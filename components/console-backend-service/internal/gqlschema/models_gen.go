@@ -57,6 +57,12 @@ type AssetEvent struct {
 	Asset Asset                 `json:"asset"`
 }
 
+type AssetStatus struct {
+	Phase   AssetPhaseType `json:"phase"`
+	Reason  string         `json:"reason"`
+	Message string         `json:"message"`
+}
+
 type AuthenticationPolicy struct {
 	Type    AuthenticationPolicyType `json:"type"`
 	Issuer  string                   `json:"issuer"`
@@ -192,6 +198,12 @@ type DeploymentStatus struct {
 type DocsTopicEvent struct {
 	Type      SubscriptionEventType `json:"type"`
 	DocsTopic DocsTopic             `json:"docsTopic"`
+}
+
+type DocsTopicStatus struct {
+	Phase   DocsTopicPhaseType `json:"phase"`
+	Reason  string             `json:"reason"`
+	Message string             `json:"message"`
 }
 
 type EnvPrefix struct {
@@ -531,6 +543,43 @@ func (e ApplicationStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type AssetPhaseType string
+
+const (
+	AssetPhaseTypeReady   AssetPhaseType = "READY"
+	AssetPhaseTypePending AssetPhaseType = "PENDING"
+	AssetPhaseTypeFailed  AssetPhaseType = "FAILED"
+)
+
+func (e AssetPhaseType) IsValid() bool {
+	switch e {
+	case AssetPhaseTypeReady, AssetPhaseTypePending, AssetPhaseTypeFailed:
+		return true
+	}
+	return false
+}
+
+func (e AssetPhaseType) String() string {
+	return string(e)
+}
+
+func (e *AssetPhaseType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = AssetPhaseType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid AssetPhaseType", str)
+	}
+	return nil
+}
+
+func (e AssetPhaseType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type AuthenticationPolicyType string
 
 const (
@@ -600,6 +649,43 @@ func (e *ContainerStateType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ContainerStateType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type DocsTopicPhaseType string
+
+const (
+	DocsTopicPhaseTypeReady   DocsTopicPhaseType = "READY"
+	DocsTopicPhaseTypePending DocsTopicPhaseType = "PENDING"
+	DocsTopicPhaseTypeFailed  DocsTopicPhaseType = "FAILED"
+)
+
+func (e DocsTopicPhaseType) IsValid() bool {
+	switch e {
+	case DocsTopicPhaseTypeReady, DocsTopicPhaseTypePending, DocsTopicPhaseTypeFailed:
+		return true
+	}
+	return false
+}
+
+func (e DocsTopicPhaseType) String() string {
+	return string(e)
+}
+
+func (e *DocsTopicPhaseType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = DocsTopicPhaseType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid DocsTopicPhaseType", str)
+	}
+	return nil
+}
+
+func (e DocsTopicPhaseType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
