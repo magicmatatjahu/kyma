@@ -17,6 +17,11 @@ func TestClusterAssetConverter_ToGQL(t *testing.T) {
 		expected := gqlschema.ClusterAsset{
 			Name:              "ExampleName",
 			Type:         	   "ExampleType",
+			Status:            gqlschema.AssetStatus{
+				Phase: gqlschema.AssetPhaseTypeReady,
+				Reason: "ExampleReason",
+				Message: "ExampleMessage",
+			},
 		}
 
 		result, err := converter.ToGQL(item)

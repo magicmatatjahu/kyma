@@ -19,6 +19,11 @@ func TestClusterDocsTopicConverter_ToGQL(t *testing.T) {
 			DisplayName:       "DisplayName",
 			Description:       "Description",
 			GroupName:         "exampleGroupName",
+			Status:            gqlschema.DocsTopicStatus{
+				Phase: gqlschema.DocsTopicPhaseTypeReady,
+				Reason: "ExampleReason",
+				Message: "ExampleMessage",
+			},
 		}
 
 		result, err := converter.ToGQL(item)

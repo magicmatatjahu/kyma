@@ -18,6 +18,11 @@ func TestAssetConverter_ToGQL(t *testing.T) {
 			Name:              "ExampleName",
 			Namespace:         "ExampleNamespace",
 			Type:         	   "ExampleType",
+			Status:            gqlschema.AssetStatus{
+				Phase: gqlschema.AssetPhaseTypeReady,
+				Reason: "ExampleReason",
+				Message: "ExampleMessage",
+			},
 		}
 
 		result, err := converter.ToGQL(item)

@@ -52,18 +52,18 @@ func (l *Asset) onEvent(eventType gqlschema.SubscriptionEventType, object interf
 }
 
 func (l *Asset) notify(eventType gqlschema.SubscriptionEventType, entity *v1alpha2.Asset) {
-	gqlAssetTopic, err := l.converter.ToGQL(entity)
+	gqlAsset, err := l.converter.ToGQL(entity)
 	if err != nil {
 		glog.Error(errors.Wrapf(err, "while converting *Asset"))
 		return
 	}
-	if gqlAssetTopic == nil {
+	if gqlAsset == nil {
 		return
 	}
 
 	event := gqlschema.AssetEvent{
 		Type:         eventType,
-		Asset: 	  	  *gqlAssetTopic,
+		Asset: 	  	  *gqlAsset,
 	}
 
 	l.channel <- event
