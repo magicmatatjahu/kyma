@@ -20,7 +20,7 @@ type clusterDocsTopicResolver struct {
 	clusterDocsTopicConverter gqlClusterDocsTopicConverter
 }
 
-func newClusterDocsTopicResolver(clusterDocsTopicService *clusterDocsTopicService, assetStoreRetriever shared.AssetStoreRetriever) *clusterDocsTopicResolver {
+func newClusterDocsTopicResolver(clusterDocsTopicService clusterDocsTopicSvc, assetStoreRetriever shared.AssetStoreRetriever) *clusterDocsTopicResolver {
 	return &clusterDocsTopicResolver{
 		clusterDocsTopicSvc: clusterDocsTopicService,
 		assetStoreRetriever: assetStoreRetriever,

@@ -20,7 +20,7 @@ type docsTopicResolver struct {
 	docsTopicConverter gqlDocsTopicConverter
 }
 
-func newDocsTopicResolver(docsTopicService *docsTopicService, assetStoreRetriever shared.AssetStoreRetriever) *docsTopicResolver {
+func newDocsTopicResolver(docsTopicService docsTopicSvc, assetStoreRetriever shared.AssetStoreRetriever) *docsTopicResolver {
 	return &docsTopicResolver{
 		docsTopicSvc: docsTopicService,
 		assetStoreRetriever: assetStoreRetriever,

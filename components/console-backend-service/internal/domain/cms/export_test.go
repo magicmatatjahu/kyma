@@ -7,16 +7,24 @@ import (
 	fakeDynamic "k8s.io/client-go/dynamic/fake"
 )
 
-func NewClusterDocsTopicResolver(clusterDocsTopicService *clusterDocsTopicService, assetStoreRetriever shared.AssetStoreRetriever) *clusterDocsTopicResolver {
+func NewClusterDocsTopicResolver(clusterDocsTopicService clusterDocsTopicSvc, assetStoreRetriever shared.AssetStoreRetriever) *clusterDocsTopicResolver {
 	return newClusterDocsTopicResolver(clusterDocsTopicService, assetStoreRetriever)
+}
+
+func (r *clusterDocsTopicResolver) SetDocsTopicConverter(converter gqlClusterDocsTopicConverter) {
+	r.clusterDocsTopicConverter = converter
 }
 
 func NewClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDocsTopicService, error) {
 	return newClusterDocsTopicService(informer)
 }
 
-func NewDocsTopicResolver(docsTopicService *docsTopicService, assetStoreRetriever shared.AssetStoreRetriever) *docsTopicResolver {
+func NewDocsTopicResolver(docsTopicService docsTopicSvc, assetStoreRetriever shared.AssetStoreRetriever) *docsTopicResolver {
 	return newDocsTopicResolver(docsTopicService, assetStoreRetriever)
+}
+
+func (r *docsTopicResolver) SetDocsTopicConverter(converter gqlDocsTopicConverter) {
+	r.docsTopicConverter = converter
 }
 
 func NewDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService, error) {
