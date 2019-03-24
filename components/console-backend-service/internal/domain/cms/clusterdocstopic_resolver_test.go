@@ -3,6 +3,7 @@ package cms_test
 import (
 	"testing"
 	"time"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/automock"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -12,17 +13,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"errors"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	assetstoreMock "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared/automock"
-	"github.com/kyma-project/kyma/components/assetstore-controller-manager/pkg/apis/assetstore/v1alpha2"
 )
 
 func TestClusterDocsTopicResolver_ClusterDocsTopicsQuery(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		resource :=
 			&v1alpha1.ClusterDocsTopic{
-				ObjectMeta: v1.ObjectMeta{
+				ObjectMeta: metav1.ObjectMeta{
 					Name: "test",
 				},
 			}
@@ -88,22 +88,51 @@ func TestClusterDocsTopicResolver_ClusterDocsTopicsQuery(t *testing.T) {
 
 func TestClusterDocsTopicResolver_ClusterDocsTopicAssetsField(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		name := "name"
+		docsTopicName := "exampleDocsTopic"
 		resources := []*v1alpha2.ClusterAsset{
 			{
-
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "ExampleClusterAssetA",
+					Labels: map[string]string{
+						"docstopic.cms.kyma-project.io": docsTopicName,
+					},
+				},
+			},
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "ExampleClusterAssetB",
+					Labels: map[string]string{
+						"docstopic.cms.kyma-project.io": docsTopicName,
+					},
+				},
+			},
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "ExampleClusterAssetC",
+					Labels: map[string]string{
+						"docstopic.cms.kyma-project.io": docsTopicName,
+					},
+				},
 			},
 		}
-		expected := new(gqlschema.JSON)
-		err := expected.UnmarshalGQL(resource.Raw)
-		require.NoError(t, err)
+		expected := []gqlschema.ClusterAsset{
+			{
+				Name: "ExampleClusterAssetA",
+			},
+			{
+				Name: "ExampleClusterAssetB",
+			},
+			{
+				Name: "ExampleClusterAssetC",
+			},
+		}
 
 		resourceGetter := new(assetstoreMock.ClusterAssetGetter)
-		resourceGetter.On("ListForDocsTopicByType", "docs-topic", []string{}).Return(resources, nil).Once()
+		resourceGetter.On("ListForDocsTopicByType", docsTopicName, []string{}).Return(resources, nil).Once()
 		defer resourceGetter.AssertExpectations(t)
 
 		resourceConverter := new(assetstoreMock.GqlClusterAssetConverter)
-		resourceConverter.On("ToGQLs", "docs-topic", []string{}).Return(resource, nil).Once()
+		resourceConverter.On("ToGQLs", resources).Return(expected, nil).Once()
 		defer resourceGetter.AssertExpectations(t)
 
 		retriever := new(assetstoreMock.AssetStoreRetriever)
@@ -111,7 +140,7 @@ func TestClusterDocsTopicResolver_ClusterDocsTopicAssetsField(t *testing.T) {
 		retriever.On("ClusterAssetConverter").Return(resourceConverter)
 
 		parentObj := gqlschema.ClusterDocsTopic{
-			Name: name,
+			Name: docsTopicName,
 		}
 
 		resolver := cms.NewClusterDocsTopicResolver(nil, retriever)
@@ -120,6 +149,58 @@ func TestClusterDocsTopicResolver_ClusterDocsTopicAssetsField(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, expected, result)
+	})
+
+	t.Run("NotFound", func(t *testing.T) {
+		docsTopicName := "exampleDocsTopic"
+
+		resourceGetter := new(assetstoreMock.ClusterAssetGetter)
+		resourceGetter.On("ListForDocsTopicByType", docsTopicName, []string{}).Return(nil, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		resourceConverter := new(assetstoreMock.GqlClusterAssetConverter)
+		resourceConverter.On("ToGQLs", ([]*v1alpha2.ClusterAsset)(nil)).Return(nil, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(assetstoreMock.AssetStoreRetriever)
+		retriever.On("ClusterAsset").Return(resourceGetter)
+		retriever.On("ClusterAssetConverter").Return(resourceConverter)
+
+		parentObj := gqlschema.ClusterDocsTopic{
+			Name: docsTopicName,
+		}
+
+		resolver := cms.NewClusterDocsTopicResolver(nil, retriever)
+
+		result, err := resolver.ClusterDocsTopicAssetsField(nil, &parentObj, []string{})
+
+		require.NoError(t, err)
+		assert.Nil(t, result)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		expectedErr := errors.New("Test")
+		docsTopicName := "exampleDocsTopic"
+
+		resourceGetter := new(assetstoreMock.ClusterAssetGetter)
+		resourceGetter.On("ListForDocsTopicByType", docsTopicName, []string{}).Return(nil, expectedErr).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+
+		retriever := new(assetstoreMock.AssetStoreRetriever)
+		retriever.On("ClusterAsset").Return(resourceGetter)
+
+		parentObj := gqlschema.ClusterDocsTopic{
+			Name: docsTopicName,
+		}
+
+		resolver := cms.NewClusterDocsTopicResolver(nil, retriever)
+
+		result, err := resolver.ClusterDocsTopicAssetsField(nil, &parentObj, []string{})
+
+		assert.Error(t, err)
+		assert.True(t, gqlerror.IsInternal(err))
+		assert.Nil(t, result)
 	})
 }
 
