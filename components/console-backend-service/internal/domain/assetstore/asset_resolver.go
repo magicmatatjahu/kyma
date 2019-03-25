@@ -15,11 +15,11 @@ import (
 type assetResolver struct {
 	assetSvc assetSvc
 	assetConverter gqlAssetConverter
-	fileSvc *fileService
-	fileConverter *fileConverter
+	fileSvc fileSvc
+	fileConverter gqlFileConverter
 }
 
-func newAssetResolver(assetService *assetService) *assetResolver {
+func newAssetResolver(assetService assetSvc) *assetResolver {
 	return &assetResolver{
 		assetSvc: assetService,
 		assetConverter: &assetConverter{},

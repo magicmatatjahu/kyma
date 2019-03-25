@@ -65,31 +65,11 @@ func (svc *assetService) Find(namespace, name string) (*v1alpha2.Asset, error) {
 	return asset, nil
 }
 
-func (svc *assetService) List(namespace, groupName string) ([]*v1alpha2.Asset, error) {
-	key := fmt.Sprintf("%s", groupName)
-	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
-	if err != nil {
-		return nil, err
-	}
-
-	var assets []*v1alpha2.Asset
-	for _, item := range items {
-		asset, err := svc.extractAsset(item)
-		if err != nil {
-			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *Asset", item)
-		}
-
-		assets = append(assets, asset)
-	}
-
-	return assets, nil
-}
-
 func (svc *assetService) ListForDocsTopicByType(namespace, docsTopicName string, types []string) ([]*v1alpha2.Asset, error) {
 	var items []interface{}
 	var err error
 	if len(types) == 0 {
-		items, err = svc.informer.GetIndexer().ByIndex("docsTopicName/type", fmt.Sprintf("%s/%s", namespace, docsTopicName))
+		items, err = svc.informer.GetIndexer().ByIndex("docsTopicName", fmt.Sprintf("%s/%s", namespace, docsTopicName))
 	} else {
 		for _, typeArg := range types {
 			its, err := svc.informer.GetIndexer().ByIndex("docsTopicName/type", fmt.Sprintf("%s/%s/%s", namespace, docsTopicName, typeArg))

@@ -10,29 +10,6 @@ type ClusterAssetGetter struct {
 	mock.Mock
 }
 
-// List provides a mock function with given fields: groupName
-func (_m *ClusterAssetGetter) List(groupName string) ([]*v1alpha2.ClusterAsset, error) {
-	ret := _m.Called(groupName)
-
-	var r0 []*v1alpha2.ClusterAsset
-	if rf, ok := ret.Get(0).(func(string) []*v1alpha2.ClusterAsset); ok {
-		r0 = rf(groupName)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*v1alpha2.ClusterAsset)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(groupName)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // ListForDocsTopicByType provides a mock function with given fields: docsTopicName, types
 func (_m *ClusterAssetGetter) ListForDocsTopicByType(docsTopicName string, types []string) ([]*v1alpha2.ClusterAsset, error) {
 	ret := _m.Called(docsTopicName, types)

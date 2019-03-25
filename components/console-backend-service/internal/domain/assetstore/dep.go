@@ -15,7 +15,6 @@ type File struct {
 //go:generate failery -name=clusterAssetSvc -case=underscore -output disabled -outpkg disabled
 type clusterAssetSvc interface {
 	Find(name string) (*v1alpha2.ClusterAsset, error)
-	List(groupName string) ([]*v1alpha2.ClusterAsset, error)
 	ListForDocsTopicByType(docsTopicName string, types []string) ([]*v1alpha2.ClusterAsset, error)
 	Subscribe(listener resource.Listener)
 	Unsubscribe(listener resource.Listener)
@@ -32,7 +31,6 @@ type gqlClusterAssetConverter interface {
 //go:generate failery -name=assetSvc -case=underscore -output disabled -outpkg disabled
 type assetSvc interface {
 	Find(namespace, name string) (*v1alpha2.Asset, error)
-	List(namespace, groupName string) ([]*v1alpha2.Asset, error)
 	ListForDocsTopicByType(namespace, docsTopicName string, types []string) ([]*v1alpha2.Asset, error)
 	Subscribe(listener resource.Listener)
 	Unsubscribe(listener resource.Listener)
@@ -45,12 +43,15 @@ type gqlAssetConverter interface {
 	ToGQLs(in []*v1alpha2.Asset) ([]gqlschema.Asset, error)
 }
 
+//go:generate mockery -name=fileSvc -output=automock -outpkg=automock -case=underscore
+type fileSvc interface {
+	FilterByExtensions(statusRef *v1alpha2.AssetStatusRef, filterExtensions []string) ([]*File, error)
+}
 
 //go:generate mockery -name=gqlFileConverter -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=gqlFileConverter -case=underscore -output disabled -outpkg disabled
 type gqlFileConverter interface {
-	ToGQL(in *v1alpha2.Asset) (*gqlschema.File, error)
-	ToGQLs(in []*v1alpha2.Asset) ([]gqlschema.File, error)
+	ToGQL(file *File) (*gqlschema.File, error)
+	ToGQLs(files []*File) ([]gqlschema.File, error)
 }
 
 type notifier interface {

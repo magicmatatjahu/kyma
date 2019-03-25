@@ -63,26 +63,6 @@ func (svc *clusterAssetService) Find(name string) (*v1alpha2.ClusterAsset, error
 	return clusterAsset, nil
 }
 
-func (svc *clusterAssetService) List(groupName string) ([]*v1alpha2.ClusterAsset, error) {
-	key := fmt.Sprintf("%s", groupName)
-	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
-	if err != nil {
-		return nil, err
-	}
-
-	var clusterAssets []*v1alpha2.ClusterAsset
-	for _, item := range items {
-		clusterAsset, err := svc.extractClusterAsset(item)
-		if err != nil {
-			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterAsset", item)
-		}
-
-		clusterAssets = append(clusterAssets, clusterAsset)
-	}
-
-	return clusterAssets, nil
-}
-
 func (svc *clusterAssetService) ListForDocsTopicByType(docsTopicName string, types []string) ([]*v1alpha2.ClusterAsset, error) {
 	var items []interface{}
 	var err error

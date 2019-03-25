@@ -15,11 +15,11 @@ import (
 type clusterAssetResolver struct {
 	clusterAssetSvc clusterAssetSvc
 	clusterAssetConverter gqlClusterAssetConverter
-	fileSvc *fileService
-	fileConverter *fileConverter
+	fileSvc fileSvc
+	fileConverter gqlFileConverter
 }
 
-func newClusterAssetResolver(clusterAssetService *clusterAssetService) *clusterAssetResolver {
+func newClusterAssetResolver(clusterAssetService clusterAssetSvc) *clusterAssetResolver {
 	return &clusterAssetResolver{
 		clusterAssetSvc: clusterAssetService,
 		clusterAssetConverter: &clusterAssetConverter{},

@@ -10,29 +10,6 @@ type AssetGetter struct {
 	mock.Mock
 }
 
-// List provides a mock function with given fields: namespace, groupName
-func (_m *AssetGetter) List(namespace string, groupName string) ([]*v1alpha2.Asset, error) {
-	ret := _m.Called(namespace, groupName)
-
-	var r0 []*v1alpha2.Asset
-	if rf, ok := ret.Get(0).(func(string, string) []*v1alpha2.Asset); ok {
-		r0 = rf(namespace, groupName)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*v1alpha2.Asset)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(namespace, groupName)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // ListForDocsTopicByType provides a mock function with given fields: namespace, docsTopicName, types
 func (_m *AssetGetter) ListForDocsTopicByType(namespace string, docsTopicName string, types []string) ([]*v1alpha2.Asset, error) {
 	ret := _m.Called(namespace, docsTopicName, types)
