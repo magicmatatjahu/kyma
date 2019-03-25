@@ -46,6 +46,10 @@ func NewAssetService(informer cache.SharedIndexInformer) (*assetService, error) 
 	return newAssetService(informer)
 }
 
+func NewFileService() *fileService {
+	return &fileService{}
+}
+
 func (r *PluggableContainer) SetFakeClient() {
 	r.cfg.dynamicClient = fakeDynamic.NewSimpleDynamicClient(runtime.NewScheme())
 }

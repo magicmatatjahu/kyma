@@ -41,7 +41,7 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 		svc, err := cms.NewClusterDocsTopicService(informer)
 		require.NoError(t, err)
 
-		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
+		testingUtils.WaitForInformerStartAtMost(t, 2 * time.Second, informer)
 
 		clusterDocsTopics, err := svc.List(nil, nil)
 		require.NoError(t, err)

@@ -46,7 +46,7 @@ func TestDocsTopicService_ListForServiceClass(t *testing.T) {
 		svc, err := cms.NewDocsTopicService(informer)
 		require.NoError(t, err)
 
-		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
+		testingUtils.WaitForInformerStartAtMost(t, 2 * time.Second, informer)
 
 		docsTopics, err := svc.ListForServiceClass(DocsTopicNamespace, "exampleClassA")
 		require.NoError(t, err)
