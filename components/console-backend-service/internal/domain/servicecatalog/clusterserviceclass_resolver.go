@@ -298,26 +298,26 @@ func (r *clusterServiceClassResolver) ClusterServiceClassContentField(ctx contex
 	return &result, nil
 }
 
-func (r *clusterServiceClassResolver) ClusterServiceClassClusterDocsTopicsField(ctx context.Context, obj *gqlschema.ClusterServiceClass) ([]gqlschema.ClusterDocsTopic, error) {
+func (r *clusterServiceClassResolver) ClusterServiceClassClusterDocsTopicField(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.ClusterDocsTopic, error) {
 	if obj == nil {
-		glog.Error(errors.New("%s cannot be empty in order to resolve `clusterDocsTopics` field"), pretty.ClusterServiceClass)
+		glog.Error(errors.New("%s cannot be empty in order to resolve `clusterDocsTopic` field"), pretty.ClusterServiceClass)
 		return nil, gqlerror.NewInternal()
 	}
 
-	items, err := r.cmsRetriever.ClusterDocsTopic().ListForServiceClass(obj.ExternalName)
+	item, err := r.cmsRetriever.ClusterDocsTopic().Find(obj.ExternalName)
 	if err != nil {
 		if module.IsDisabledModuleError(err) {
 			return nil, err
 		}
-		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.ClusterDocsTopics, pretty.ClusterServiceClass, obj.ExternalName))
-		return nil, gqlerror.New(err, cmsPretty.ClusterDocsTopics)
+		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.ClusterDocsTopic, pretty.ClusterServiceClass, obj.ExternalName))
+		return nil, gqlerror.New(err, cmsPretty.ClusterDocsTopic)
 	}
 
-	clusterDocsTopics, err := r.cmsRetriever.ClusterDocsTopicConverter().ToGQLs(items)
+	clusterDocsTopic, err := r.cmsRetriever.ClusterDocsTopicConverter().ToGQL(item)
 	if err != nil {
-		glog.Error(errors.Wrapf(err, "while converting %s", cmsPretty.ClusterDocsTopics))
-		return nil, gqlerror.New(err, cmsPretty.ClusterDocsTopics)
+		glog.Error(errors.Wrapf(err, "while converting %s", cmsPretty.ClusterDocsTopic))
+		return nil, gqlerror.New(err, cmsPretty.ClusterDocsTopic)
 	}
 
-	return clusterDocsTopics, nil
+	return clusterDocsTopic, nil
 }

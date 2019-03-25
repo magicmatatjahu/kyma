@@ -69,9 +69,9 @@ func (_m *Resolver) ClusterServiceClassAsyncApiSpecField(ctx context.Context, ob
 	return r0, r1
 }
 
-// ClusterServiceClassClusterDocsTopicsField provides a failing mock function with given fields: ctx, obj
-func (_m *Resolver) ClusterServiceClassClusterDocsTopicsField(ctx context.Context, obj *gqlschema.ClusterServiceClass) ([]gqlschema.ClusterDocsTopic, error) {
-	var r0 []gqlschema.ClusterDocsTopic
+// ClusterServiceClassClusterDocsTopicField provides a failing mock function with given fields: ctx, obj
+func (_m *Resolver) ClusterServiceClassClusterDocsTopicField(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.ClusterDocsTopic, error) {
+	var r0 *gqlschema.ClusterDocsTopic
 	var r1 error
 	r1 = _m.err
 
@@ -267,9 +267,9 @@ func (_m *Resolver) ServiceClassContentField(ctx context.Context, obj *gqlschema
 	return r0, r1
 }
 
-// ServiceClassDocsTopicsField provides a failing mock function with given fields: ctx, obj
-func (_m *Resolver) ServiceClassDocsTopicsField(ctx context.Context, obj *gqlschema.ServiceClass) ([]gqlschema.DocsTopic, error) {
-	var r0 []gqlschema.DocsTopic
+// ServiceClassDocsTopicField provides a failing mock function with given fields: ctx, obj
+func (_m *Resolver) ServiceClassDocsTopicField(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.DocsTopic, error) {
+	var r0 *gqlschema.DocsTopic
 	var r1 error
 	r1 = _m.err
 

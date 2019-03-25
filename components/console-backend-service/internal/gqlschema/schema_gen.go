@@ -202,7 +202,7 @@ type ComplexityRoot struct {
 		OdataSpec           func(childComplexity int) int
 		AsyncApiSpec        func(childComplexity int) int
 		Content             func(childComplexity int) int
-		ClusterDocsTopics   func(childComplexity int) int
+		ClusterDocsTopic    func(childComplexity int) int
 	}
 
 	ClusterServicePlan struct {
@@ -635,7 +635,7 @@ type ComplexityRoot struct {
 		OdataSpec           func(childComplexity int) int
 		AsyncApiSpec        func(childComplexity int) int
 		Content             func(childComplexity int) int
-		DocsTopics          func(childComplexity int) int
+		DocsTopic           func(childComplexity int) int
 	}
 
 	ServiceEvent struct {
@@ -766,7 +766,7 @@ type ClusterServiceClassResolver interface {
 	OdataSpec(ctx context.Context, obj *ClusterServiceClass) (*string, error)
 	AsyncAPISpec(ctx context.Context, obj *ClusterServiceClass) (*JSON, error)
 	Content(ctx context.Context, obj *ClusterServiceClass) (*JSON, error)
-	ClusterDocsTopics(ctx context.Context, obj *ClusterServiceClass) ([]ClusterDocsTopic, error)
+	ClusterDocsTopic(ctx context.Context, obj *ClusterServiceClass) (*ClusterDocsTopic, error)
 }
 type DeploymentResolver interface {
 	BoundServiceInstanceNames(ctx context.Context, obj *Deployment) ([]string, error)
@@ -864,7 +864,7 @@ type ServiceClassResolver interface {
 	OdataSpec(ctx context.Context, obj *ServiceClass) (*string, error)
 	AsyncAPISpec(ctx context.Context, obj *ServiceClass) (*JSON, error)
 	Content(ctx context.Context, obj *ServiceClass) (*JSON, error)
-	DocsTopics(ctx context.Context, obj *ServiceClass) ([]DocsTopic, error)
+	DocsTopic(ctx context.Context, obj *ServiceClass) (*DocsTopic, error)
 }
 type ServiceInstanceResolver interface {
 	ServiceClass(ctx context.Context, obj *ServiceInstance) (*ServiceClass, error)
@@ -3686,12 +3686,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ClusterServiceClass.Content(childComplexity), true
 
-	case "ClusterServiceClass.clusterDocsTopics":
-		if e.complexity.ClusterServiceClass.ClusterDocsTopics == nil {
+	case "ClusterServiceClass.clusterDocsTopic":
+		if e.complexity.ClusterServiceClass.ClusterDocsTopic == nil {
 			break
 		}
 
-		return e.complexity.ClusterServiceClass.ClusterDocsTopics(childComplexity), true
+		return e.complexity.ClusterServiceClass.ClusterDocsTopic(childComplexity), true
 
 	case "ClusterServicePlan.name":
 		if e.complexity.ClusterServicePlan.Name == nil {
@@ -5887,12 +5887,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ServiceClass.Content(childComplexity), true
 
-	case "ServiceClass.docsTopics":
-		if e.complexity.ServiceClass.DocsTopics == nil {
+	case "ServiceClass.docsTopic":
+		if e.complexity.ServiceClass.DocsTopic == nil {
 			break
 		}
 
-		return e.complexity.ServiceClass.DocsTopics(childComplexity), true
+		return e.complexity.ServiceClass.DocsTopic(childComplexity), true
 
 	case "ServiceEvent.type":
 		if e.complexity.ServiceEvent.Type == nil {
@@ -9494,13 +9494,10 @@ func (ec *executionContext) _ClusterServiceClass(ctx context.Context, sel ast.Se
 				out.Values[i] = ec._ClusterServiceClass_content(ctx, field, obj)
 				wg.Done()
 			}(i, field)
-		case "clusterDocsTopics":
+		case "clusterDocsTopic":
 			wg.Add(1)
 			go func(i int, field graphql.CollectedField) {
-				out.Values[i] = ec._ClusterServiceClass_clusterDocsTopics(ctx, field, obj)
-				if out.Values[i] == graphql.Null {
-					invalid = true
-				}
+				out.Values[i] = ec._ClusterServiceClass_clusterDocsTopic(ctx, field, obj)
 				wg.Done()
 			}(i, field)
 		default:
@@ -10153,7 +10150,7 @@ func (ec *executionContext) _ClusterServiceClass_content(ctx context.Context, fi
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _ClusterServiceClass_clusterDocsTopics(ctx context.Context, field graphql.CollectedField, obj *ClusterServiceClass) graphql.Marshaler {
+func (ec *executionContext) _ClusterServiceClass_clusterDocsTopic(ctx context.Context, field graphql.CollectedField, obj *ClusterServiceClass) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -10165,51 +10162,20 @@ func (ec *executionContext) _ClusterServiceClass_clusterDocsTopics(ctx context.C
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ClusterServiceClass().ClusterDocsTopics(rctx, obj)
+		return ec.resolvers.ClusterServiceClass().ClusterDocsTopic(rctx, obj)
 	})
 	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.([]ClusterDocsTopic)
+	res := resTmp.(*ClusterDocsTopic)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	arr1 := make(graphql.Array, len(res))
-	var wg sync.WaitGroup
-
-	isLen1 := len(res) == 1
-	if !isLen1 {
-		wg.Add(len(res))
+	if res == nil {
+		return graphql.Null
 	}
 
-	for idx1 := range res {
-		idx1 := idx1
-		rctx := &graphql.ResolverContext{
-			Index:  &idx1,
-			Result: &res[idx1],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(idx1 int) {
-			if !isLen1 {
-				defer wg.Done()
-			}
-			arr1[idx1] = func() graphql.Marshaler {
-
-				return ec._ClusterDocsTopic(ctx, field.Selections, &res[idx1])
-			}()
-		}
-		if isLen1 {
-			f(idx1)
-		} else {
-			go f(idx1)
-		}
-
-	}
-	wg.Wait()
-	return arr1
+	return ec._ClusterDocsTopic(ctx, field.Selections, res)
 }
 
 var clusterServicePlanImplementors = []string{"ClusterServicePlan"}
@@ -21342,13 +21308,10 @@ func (ec *executionContext) _ServiceClass(ctx context.Context, sel ast.Selection
 				out.Values[i] = ec._ServiceClass_content(ctx, field, obj)
 				wg.Done()
 			}(i, field)
-		case "docsTopics":
+		case "docsTopic":
 			wg.Add(1)
 			go func(i int, field graphql.CollectedField) {
-				out.Values[i] = ec._ServiceClass_docsTopics(ctx, field, obj)
-				if out.Values[i] == graphql.Null {
-					invalid = true
-				}
+				out.Values[i] = ec._ServiceClass_docsTopic(ctx, field, obj)
 				wg.Done()
 			}(i, field)
 		default:
@@ -22016,7 +21979,7 @@ func (ec *executionContext) _ServiceClass_content(ctx context.Context, field gra
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _ServiceClass_docsTopics(ctx context.Context, field graphql.CollectedField, obj *ServiceClass) graphql.Marshaler {
+func (ec *executionContext) _ServiceClass_docsTopic(ctx context.Context, field graphql.CollectedField, obj *ServiceClass) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -22028,51 +21991,20 @@ func (ec *executionContext) _ServiceClass_docsTopics(ctx context.Context, field 
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ServiceClass().DocsTopics(rctx, obj)
+		return ec.resolvers.ServiceClass().DocsTopic(rctx, obj)
 	})
 	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.([]DocsTopic)
+	res := resTmp.(*DocsTopic)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	arr1 := make(graphql.Array, len(res))
-	var wg sync.WaitGroup
-
-	isLen1 := len(res) == 1
-	if !isLen1 {
-		wg.Add(len(res))
+	if res == nil {
+		return graphql.Null
 	}
 
-	for idx1 := range res {
-		idx1 := idx1
-		rctx := &graphql.ResolverContext{
-			Index:  &idx1,
-			Result: &res[idx1],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(idx1 int) {
-			if !isLen1 {
-				defer wg.Done()
-			}
-			arr1[idx1] = func() graphql.Marshaler {
-
-				return ec._DocsTopic(ctx, field.Selections, &res[idx1])
-			}()
-		}
-		if isLen1 {
-			f(idx1)
-		} else {
-			go f(idx1)
-		}
-
-	}
-	wg.Wait()
-	return arr1
+	return ec._DocsTopic(ctx, field.Selections, res)
 }
 
 var serviceEventImplementors = []string{"ServiceEvent"}
@@ -26667,7 +26599,7 @@ type ServiceClass {
     content: JSON
 
     # Depends on cms domain
-    docsTopics: [DocsTopic!]!
+    docsTopic: DocsTopic
 }
 
 type ClusterServiceClass {
@@ -26693,7 +26625,7 @@ type ClusterServiceClass {
     content: JSON
 
     # Depends on cms domain
-    clusterDocsTopics: [ClusterDocsTopic!]!
+    clusterDocsTopic: ClusterDocsTopic
 }
 
 type ServicePlan {

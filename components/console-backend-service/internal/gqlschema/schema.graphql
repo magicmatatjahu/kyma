@@ -231,7 +231,7 @@ type ServiceClass {
     content: JSON
 
     # Depends on cms domain
-    docsTopics: [DocsTopic!]!
+    docsTopic: DocsTopic
 }
 
 type ClusterServiceClass {
@@ -257,7 +257,7 @@ type ClusterServiceClass {
     content: JSON
 
     # Depends on cms domain
-    clusterDocsTopics: [ClusterDocsTopic!]!
+    clusterDocsTopic: ClusterDocsTopic
 }
 
 type ServicePlan {

@@ -78,7 +78,7 @@ models:
         resolver: true
       content:
         resolver: true
-      docsTopics:
+      docsTopic:
         resolver: true
   ClusterServiceClass:
     model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.ClusterServiceClass"
@@ -99,7 +99,7 @@ models:
         resolver: true
       content:
         resolver: true
-      clusterDocsTopics:
+      clusterDocsTopic:
         resolver: true
   Application:
     model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.Application"

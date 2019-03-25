@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 )
 
 func TestClusterServiceClassResolver_ClusterServiceClassQuery(t *testing.T) {
@@ -800,4 +801,93 @@ func TestClusterServiceClassResolver_ClusterServiceClassAsyncApiSpecField(t *tes
 	})
 }
 
-//TODO: Write tests for cms retriever!
+func TestClassResolver_ClusterServiceClassClusterDocsTopicField(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		name := "name"
+		resources := &v1alpha1.ClusterDocsTopic{
+			ObjectMeta: v1.ObjectMeta{
+				Name: name,
+			},
+		}
+		expected := &gqlschema.ClusterDocsTopic{
+			Name: name,
+		}
+
+		resourceGetter := new(contentMock.ClusterDocsTopicGetter)
+		resourceGetter.On("Find", name).Return(resources, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		converter := new(contentMock.GqlClusterDocsTopicConverter)
+		converter.On("ToGQL", resources).Return(expected, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(contentMock.CmsRetriever)
+		retriever.On("ClusterDocsTopic").Return(resourceGetter)
+		retriever.On("ClusterDocsTopicConverter").Return(converter)
+
+		parentObj := gqlschema.ClusterServiceClass{
+			Name: name,
+			ExternalName: name,
+		}
+
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, nil, retriever)
+
+		result, err := resolver.ClusterServiceClassClusterDocsTopicField(nil, &parentObj)
+
+		require.NoError(t, err)
+		assert.Equal(t, expected, result)
+	})
+
+	t.Run("NotFound", func(t *testing.T) {
+		name := "name"
+
+		resourceGetter := new(contentMock.ClusterDocsTopicGetter)
+		resourceGetter.On("Find", name).Return(nil, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		converter := new(contentMock.GqlClusterDocsTopicConverter)
+		converter.On("ToGQL", (*v1alpha1.ClusterDocsTopic)(nil)).Return(nil, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(contentMock.CmsRetriever)
+		retriever.On("ClusterDocsTopic").Return(resourceGetter)
+		retriever.On("ClusterDocsTopicConverter").Return(converter)
+
+		parentObj := gqlschema.ClusterServiceClass{
+			Name: name,
+			ExternalName: name,
+		}
+
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, nil, retriever)
+
+		result, err := resolver.ClusterServiceClassClusterDocsTopicField(nil, &parentObj)
+
+		require.NoError(t, err)
+		assert.Nil(t, result)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		expectedErr := errors.New("Test")
+		name := "name"
+
+		resourceGetter := new(contentMock.ClusterDocsTopicGetter)
+		resourceGetter.On("Find", name).Return(nil, expectedErr).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(contentMock.CmsRetriever)
+		retriever.On("ClusterDocsTopic").Return(resourceGetter)
+
+		parentObj := gqlschema.ClusterServiceClass{
+			Name: name,
+			ExternalName: name,
+		}
+
+		resolver := servicecatalog.NewClusterServiceClassResolver(nil, nil, nil, nil, retriever)
+
+		result, err := resolver.ClusterServiceClassClusterDocsTopicField(nil, &parentObj)
+
+		assert.Error(t, err)
+		assert.True(t, gqlerror.IsInternal(err))
+		assert.Nil(t, result)
+	})
+}

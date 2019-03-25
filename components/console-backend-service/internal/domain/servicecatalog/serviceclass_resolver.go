@@ -303,26 +303,26 @@ func (r *serviceClassResolver) ServiceClassContentField(ctx context.Context, obj
 	return &result, nil
 }
 
-func (r *clusterServiceClassResolver) ServiceClassDocsTopicsField(ctx context.Context, obj *gqlschema.ServiceClass) ([]gqlschema.DocsTopic, error) {
+func (r *serviceClassResolver) ServiceClassDocsTopicField(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.DocsTopic, error) {
 	if obj == nil {
 		glog.Error(errors.New("%s cannot be empty in order to resolve `docsTopics` field"), pretty.ServiceClass)
 		return nil, gqlerror.NewInternal()
 	}
 
-	items, err := r.cmsRetriever.DocsTopic().ListForServiceClass(obj.Namespace, obj.ExternalName)
+	item, err := r.cmsRetriever.DocsTopic().Find(obj.Namespace, obj.ExternalName)
 	if err != nil {
 		if module.IsDisabledModuleError(err) {
 			return nil, err
 		}
-		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.DocsTopics, pretty.ServiceClass, obj.ExternalName))
-		return nil, gqlerror.New(err, cmsPretty.DocsTopics)
+		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.DocsTopic, pretty.ServiceClass, obj.ExternalName))
+		return nil, gqlerror.New(err, cmsPretty.DocsTopic)
 	}
 
-	docsTopics, err := r.cmsRetriever.DocsTopicConverter().ToGQLs(items)
+	docsTopic, err := r.cmsRetriever.DocsTopicConverter().ToGQL(item)
 	if err != nil {
-		glog.Error(errors.Wrapf(err, "while converting %s", cmsPretty.DocsTopics))
-		return nil, gqlerror.New(err, cmsPretty.DocsTopics)
+		glog.Error(errors.Wrapf(err, "while converting %s", cmsPretty.DocsTopic))
+		return nil, gqlerror.New(err, cmsPretty.DocsTopic)
 	}
 
-	return docsTopics, nil
+	return docsTopic, nil
 }

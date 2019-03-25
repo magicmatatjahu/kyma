@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 )
 
 func TestClassResolver_ServiceClassQuery(t *testing.T) {
@@ -755,4 +756,101 @@ func TestClassResolver_ServiceClassAsyncApiSpecField(t *testing.T) {
 	})
 }
 
-//TODO: Write tests for cms retriever!
+func TestClassResolver_ServiceClassDocsTopicsField(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		name := "name"
+		namespace := "namespace"
+		resources := &v1alpha1.DocsTopic{
+			ObjectMeta: v1.ObjectMeta{
+				Name: name,
+				Namespace: namespace,
+			},
+		}
+		expected := &gqlschema.DocsTopic{
+			Name: name,
+			Namespace: namespace,
+		}
+
+		resourceGetter := new(contentMock.DocsTopicGetter)
+		resourceGetter.On("Find", namespace, name).Return(resources, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		converter := new(contentMock.GqlDocsTopicConverter)
+		converter.On("ToGQL", resources).Return(expected, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(contentMock.CmsRetriever)
+		retriever.On("DocsTopic").Return(resourceGetter)
+		retriever.On("DocsTopicConverter").Return(converter)
+
+		parentObj := gqlschema.ServiceClass{
+			Name: name,
+			ExternalName: name,
+			Namespace: namespace,
+		}
+
+		resolver := servicecatalog.NewServiceClassResolver(nil, nil, nil, nil, retriever)
+
+		result, err := resolver.ServiceClassDocsTopicField(nil, &parentObj)
+
+		require.NoError(t, err)
+		assert.Equal(t, expected, result)
+	})
+
+	t.Run("NotFound", func(t *testing.T) {
+		name := "name"
+		namespace := "namespace"
+
+		resourceGetter := new(contentMock.DocsTopicGetter)
+		resourceGetter.On("Find", namespace, name).Return(nil, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		converter := new(contentMock.GqlDocsTopicConverter)
+		converter.On("ToGQL", (*v1alpha1.DocsTopic)(nil)).Return(nil, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(contentMock.CmsRetriever)
+		retriever.On("DocsTopic").Return(resourceGetter)
+		retriever.On("DocsTopicConverter").Return(converter)
+
+		parentObj := gqlschema.ServiceClass{
+			Name: name,
+			ExternalName: name,
+			Namespace: namespace,
+		}
+
+		resolver := servicecatalog.NewServiceClassResolver(nil, nil, nil, nil, retriever)
+
+		result, err := resolver.ServiceClassDocsTopicField(nil, &parentObj)
+
+		require.NoError(t, err)
+		assert.Nil(t, result)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		expectedErr := errors.New("Test")
+		name := "name"
+		namespace := "namespace"
+
+		resourceGetter := new(contentMock.DocsTopicGetter)
+		resourceGetter.On("Find", namespace, name).Return(nil, expectedErr).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(contentMock.CmsRetriever)
+		retriever.On("DocsTopic").Return(resourceGetter)
+
+		parentObj := gqlschema.ServiceClass{
+			Name: name,
+			ExternalName: name,
+			Namespace: namespace,
+		}
+
+		resolver := servicecatalog.NewServiceClassResolver(nil, nil, nil, nil, retriever)
+
+		result, err := resolver.ServiceClassDocsTopicField(nil, &parentObj)
+
+		assert.Error(t, err)
+		assert.True(t, gqlerror.IsInternal(err))
+		assert.Nil(t, result)
+	})
+}

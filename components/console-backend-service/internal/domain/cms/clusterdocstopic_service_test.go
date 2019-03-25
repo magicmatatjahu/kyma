@@ -18,6 +18,47 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener"
 )
 
+func TestClusterDocsTopicService_Find(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		clusterDocsTopic1 := fixUnstructuredClusterDocsTopic(map[string]interface{}{
+			"name": "exampleClassA",
+		})
+		clusterDocsTopic2 := fixUnstructuredClusterDocsTopic(map[string]interface{}{
+			"name": "exampleClassB",
+		})
+		clusterDocsTopic3 := fixUnstructuredClusterDocsTopic(map[string]interface{}{
+			"name": "exampleClassC",
+		})
+
+		expected := fixClusterDocsTopic("exampleClassA", nil)
+
+		informer := fixClusterDocsTopicInformer(clusterDocsTopic1, clusterDocsTopic2, clusterDocsTopic3)
+
+		svc, err := cms.NewClusterDocsTopicService(informer)
+		require.NoError(t, err)
+
+		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
+
+		clusterDocsTopic, err := svc.Find("exampleClassA")
+		require.NoError(t, err)
+
+		assert.Equal(t, expected, clusterDocsTopic)
+	})
+
+	t.Run("NotFound", func(t *testing.T) {
+		informer := fixClusterDocsTopicInformer()
+
+		svc, err := cms.NewClusterDocsTopicService(informer)
+		require.NoError(t, err)
+
+		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
+
+		clusterDocsTopic, err := svc.Find("exampleClass")
+		require.NoError(t, err)
+		assert.Nil(t, clusterDocsTopic)
+	})
+}
+
 func TestClusterDocsTopicService_List(t *testing.T) {
 	t.Run("Success without parameters", func(t *testing.T) {
 		clusterDocsTopic1 := fixUnstructuredClusterDocsTopic(map[string]interface{}{
@@ -166,49 +207,6 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
 
 		clusterDocsTopics, err := svc.List(nil, nil)
-		require.NoError(t, err)
-		assert.Nil(t, clusterDocsTopics)
-	})
-}
-
-func TestClusterDocsTopicService_ListForServiceClass(t *testing.T) {
-	t.Run("Success", func(t *testing.T) {
-		clusterDocsTopic1 := fixUnstructuredClusterDocsTopic(map[string]interface{}{
-			"name": "exampleClassA",
-		})
-		clusterDocsTopic2 := fixUnstructuredClusterDocsTopic(map[string]interface{}{
-			"name": "exampleClassB",
-		})
-		clusterDocsTopic3 := fixUnstructuredClusterDocsTopic(map[string]interface{}{
-			"name": "exampleClassC",
-		})
-
-		expected := []*v1alpha1.ClusterDocsTopic{
-			fixClusterDocsTopic("exampleClassA", nil),
-		}
-
-		informer := fixClusterDocsTopicInformer(clusterDocsTopic1, clusterDocsTopic2, clusterDocsTopic3)
-
-		svc, err := cms.NewClusterDocsTopicService(informer)
-		require.NoError(t, err)
-
-		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
-
-		clusterDocsTopics, err := svc.ListForServiceClass("exampleClassA")
-		require.NoError(t, err)
-
-		assert.Equal(t, expected, clusterDocsTopics)
-	})
-
-	t.Run("NotFound", func(t *testing.T) {
-		informer := fixClusterDocsTopicInformer()
-
-		svc, err := cms.NewClusterDocsTopicService(informer)
-		require.NoError(t, err)
-
-		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
-
-		clusterDocsTopics, err := svc.ListForServiceClass("exampleClass")
 		require.NoError(t, err)
 		assert.Nil(t, clusterDocsTopics)
 	})

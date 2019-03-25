@@ -41,43 +41,19 @@ func newDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService,
 	return svc, nil
 }
 
-func (svc *docsTopicService) List(namespace, groupName string) ([]*v1alpha1.DocsTopic, error) {
-	key := fmt.Sprintf("%s/%s", namespace, groupName)
-	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
-	if err != nil {
+func (svc *docsTopicService) Find(namespace, name string) (*v1alpha1.DocsTopic, error) {
+	key := fmt.Sprintf("%s/%s", namespace, name)
+	item, exists, err := svc.informer.GetStore().GetByKey(key)
+	if err != nil || !exists {
 		return nil, err
 	}
 
-	var docsTopics []*v1alpha1.DocsTopic
-	for _, item := range items {
-		docsTopic, err := svc.extractDocsTopic(item)
-		if err != nil {
-			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *DocsTopic", item)
-		}
-
-		docsTopics = append(docsTopics, docsTopic)
-	}
-
-	return docsTopics, nil
-}
-
-func (svc *docsTopicService) ListForServiceClass(namespace, className string) ([]*v1alpha1.DocsTopic, error) {
-	items, err := svc.informer.GetIndexer().ByIndex("serviceClassName", fmt.Sprintf("%s/%s", namespace, className))
+	docsTopic, err := svc.extractDocsTopic(item)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *DocsTopic", item)
 	}
 
-	var docsTopics []*v1alpha1.DocsTopic
-	for _, item := range items {
-		docsTopic, err := svc.extractDocsTopic(item)
-		if err != nil {
-			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *DocsTopic", item)
-		}
-
-		docsTopics = append(docsTopics, docsTopic)
-	}
-
-	return docsTopics, nil
+	return docsTopic, nil
 }
 
 func (svc *docsTopicService) Subscribe(listener resource.Listener) {

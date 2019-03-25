@@ -9,8 +9,8 @@ import (
 //go:generate mockery -name=clusterDocsTopicSvc -output=automock -outpkg=automock -case=underscore
 //go:generate failery -name=clusterDocsTopicSvc -case=underscore -output disabled -outpkg disabled
 type clusterDocsTopicSvc interface {
+	Find(name string) (*v1alpha1.ClusterDocsTopic, error)
 	List(viewContext *string, groupName *string) ([]*v1alpha1.ClusterDocsTopic, error)
-	ListForServiceClass(className string) ([]*v1alpha1.ClusterDocsTopic, error)
 	Subscribe(listener resource.Listener)
 	Unsubscribe(listener resource.Listener)
 }
@@ -25,8 +25,7 @@ type gqlClusterDocsTopicConverter interface {
 //go:generate mockery -name=docsTopicSvc -output=automock -outpkg=automock -case=underscore
 //go:generate failery -name=docsTopicSvc -case=underscore -output disabled -outpkg disabled
 type docsTopicSvc interface {
-	List(namespace, groupName string) ([]*v1alpha1.DocsTopic, error)
-	ListForServiceClass(namespace, className string) ([]*v1alpha1.DocsTopic, error)
+	Find(namespace, name string) (*v1alpha1.DocsTopic, error)
 	Subscribe(listener resource.Listener)
 	Unsubscribe(listener resource.Listener)
 }

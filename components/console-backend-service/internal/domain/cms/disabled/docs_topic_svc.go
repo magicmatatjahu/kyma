@@ -15,18 +15,9 @@ func NewDocsTopicSvc(err error) *docsTopicSvc {
 	return &docsTopicSvc{err: err}
 }
 
-// List provides a failing mock function with given fields: namespace, groupName
-func (_m *docsTopicSvc) List(namespace string, groupName string) ([]*v1alpha1.DocsTopic, error) {
-	var r0 []*v1alpha1.DocsTopic
-	var r1 error
-	r1 = _m.err
-
-	return r0, r1
-}
-
-// ListForServiceClass provides a failing mock function with given fields: namespace, className
-func (_m *docsTopicSvc) ListForServiceClass(namespace string, className string) ([]*v1alpha1.DocsTopic, error) {
-	var r0 []*v1alpha1.DocsTopic
+// Find provides a failing mock function with given fields: namespace, name
+func (_m *docsTopicSvc) Find(namespace string, name string) (*v1alpha1.DocsTopic, error) {
+	var r0 *v1alpha1.DocsTopic
 	var r1 error
 	r1 = _m.err
 

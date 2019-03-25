@@ -15,17 +15,17 @@ func NewClusterDocsTopicSvc(err error) *clusterDocsTopicSvc {
 	return &clusterDocsTopicSvc{err: err}
 }
 
-// List provides a failing mock function with given fields: viewContext, groupName
-func (_m *clusterDocsTopicSvc) List(viewContext *string, groupName *string) ([]*v1alpha1.ClusterDocsTopic, error) {
-	var r0 []*v1alpha1.ClusterDocsTopic
+// Find provides a failing mock function with given fields: name
+func (_m *clusterDocsTopicSvc) Find(name string) (*v1alpha1.ClusterDocsTopic, error) {
+	var r0 *v1alpha1.ClusterDocsTopic
 	var r1 error
 	r1 = _m.err
 
 	return r0, r1
 }
 
-// ListForServiceClass provides a failing mock function with given fields: className
-func (_m *clusterDocsTopicSvc) ListForServiceClass(className string) ([]*v1alpha1.ClusterDocsTopic, error) {
+// List provides a failing mock function with given fields: viewContext, groupName
+func (_m *clusterDocsTopicSvc) List(viewContext *string, groupName *string) ([]*v1alpha1.ClusterDocsTopic, error) {
 	var r0 []*v1alpha1.ClusterDocsTopic
 	var r1 error
 	r1 = _m.err

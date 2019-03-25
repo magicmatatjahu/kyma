@@ -22,7 +22,7 @@ const (
 	DocsTopicNamespace = "DocsTopicNamespace"
 )
 
-func TestDocsTopicService_ListForServiceClass(t *testing.T) {
+func TestDocsTopicService_Find(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		docsTopic1 := fixUnstructuredDocsTopic(map[string]interface{}{
 			"name": "exampleClassA",
@@ -37,9 +37,7 @@ func TestDocsTopicService_ListForServiceClass(t *testing.T) {
 			"namespace": DocsTopicNamespace,
 		})
 
-		expected := []*v1alpha1.DocsTopic{
-			fixDocsTopic("exampleClassA", nil),
-		}
+		expected := fixDocsTopic("exampleClassA", nil)
 
 		informer := fixDocsTopicInformer(docsTopic1, docsTopic2, docsTopic3)
 
@@ -48,10 +46,10 @@ func TestDocsTopicService_ListForServiceClass(t *testing.T) {
 
 		testingUtils.WaitForInformerStartAtMost(t, 2 * time.Second, informer)
 
-		docsTopics, err := svc.ListForServiceClass(DocsTopicNamespace, "exampleClassA")
+		docsTopic, err := svc.Find(DocsTopicNamespace, "exampleClassA")
 		require.NoError(t, err)
 
-		assert.Equal(t, expected, docsTopics)
+		assert.Equal(t, expected, docsTopic)
 	})
 
 	t.Run("NotFound", func(t *testing.T) {
@@ -62,7 +60,7 @@ func TestDocsTopicService_ListForServiceClass(t *testing.T) {
 
 		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
 
-		docsTopics, err := svc.ListForServiceClass(DocsTopicNamespace, "exampleClass")
+		docsTopics, err := svc.Find(DocsTopicNamespace, "exampleClass")
 		require.NoError(t, err)
 		assert.Nil(t, docsTopics)
 	})

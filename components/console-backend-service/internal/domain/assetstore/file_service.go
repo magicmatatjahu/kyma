@@ -13,18 +13,26 @@ func (svc *fileService) FilterByExtensions(statusRef *v1alpha2.AssetStatusRef, f
 		return nil, nil
 	}
 
-	var files []*File
 	if len(filterExtensions) == 0 {
-		for _, asset := range statusRef.Assets {
-			files = append(files, &File{
-				URL: fmt.Sprintf("%s/%s", statusRef.BaseUrl, asset),
-				Metadata: map[string]interface{}{},
-			})
-		}
-
-		return files, nil
+		return svc.withoutExtensions(statusRef), nil
 	}
 
+	return svc.withExtensions(statusRef, filterExtensions), nil
+}
+
+func (svc *fileService) withoutExtensions(statusRef *v1alpha2.AssetStatusRef) []*File {
+	var files []*File
+	for _, asset := range statusRef.Assets {
+		files = append(files, &File{
+			URL: fmt.Sprintf("%s/%s", statusRef.BaseUrl, asset),
+			Metadata: map[string]interface{}{},
+		})
+	}
+	return files
+}
+
+func (svc *fileService) withExtensions(statusRef *v1alpha2.AssetStatusRef, filterExtensions []string) []*File {
+	var files []*File
 	for _, asset := range statusRef.Assets {
 		for _, extension := range filterExtensions {
 			var suffix string
@@ -42,6 +50,5 @@ func (svc *fileService) FilterByExtensions(statusRef *v1alpha2.AssetStatusRef, f
 			}
 		}
 	}
-
-	return files, nil
+	return files
 }

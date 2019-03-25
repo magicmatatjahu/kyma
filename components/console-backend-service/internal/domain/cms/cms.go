@@ -1,7 +1,6 @@
 package cms
 
 import (
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 	"k8s.io/client-go/rest"
 	"github.com/pkg/errors"
@@ -10,9 +9,10 @@ import (
 	"k8s.io/client-go/dynamic"
 	"time"
 	"context"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/disabled"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 )
 
 type PluggableContainer struct {

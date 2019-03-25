@@ -661,8 +661,8 @@ func (r *serviceClassResolver) Content(ctx context.Context, obj *gqlschema.Servi
 	return r.sc.Resolver.ServiceClassContentField(ctx, obj)
 }
 
-func (r *serviceClassResolver) DocsTopics(ctx context.Context, obj *gqlschema.ServiceClass) ([]gqlschema.DocsTopic, error) {
-	return r.sc.Resolver.ServiceClassDocsTopicsField(ctx, obj)
+func (r *serviceClassResolver) DocsTopic(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.DocsTopic, error) {
+	return r.sc.Resolver.ServiceClassDocsTopicField(ctx, obj)
 }
 
 // Cluster Service Class
@@ -703,8 +703,8 @@ func (r *clusterServiceClassResolver) Content(ctx context.Context, obj *gqlschem
 	return r.sc.Resolver.ClusterServiceClassContentField(ctx, obj)
 }
 
-func (r *clusterServiceClassResolver) ClusterDocsTopics(ctx context.Context, obj *gqlschema.ClusterServiceClass) ([]gqlschema.ClusterDocsTopic, error) {
-	return r.sc.Resolver.ClusterServiceClassClusterDocsTopicsField(ctx, obj)
+func (r *clusterServiceClassResolver) ClusterDocsTopic(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.ClusterDocsTopic, error) {
+	return r.sc.Resolver.ClusterServiceClassClusterDocsTopicField(ctx, obj)
 }
 
 // Namespace

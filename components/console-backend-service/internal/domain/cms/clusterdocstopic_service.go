@@ -65,6 +65,20 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 	return svc, nil
 }
 
+func (svc *clusterDocsTopicService) Find(name string) (*v1alpha1.ClusterDocsTopic, error) {
+	item, exists, err := svc.informer.GetStore().GetByKey(name)
+	if err != nil || !exists {
+		return nil, err
+	}
+
+	clusterDocsTopic, err := svc.extractClusterDocsTopic(item)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterDocsTopic", item)
+	}
+
+	return clusterDocsTopic, nil
+}
+
 func (svc *clusterDocsTopicService) List(viewContext *string, groupName *string) ([]*v1alpha1.ClusterDocsTopic, error) {
 	var items []interface{}
 	var err error
@@ -78,25 +92,6 @@ func (svc *clusterDocsTopicService) List(viewContext *string, groupName *string)
 		items = svc.informer.GetStore().List()
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
-	var clusterDocsTopics []*v1alpha1.ClusterDocsTopic
-	for _, item := range items {
-		clusterDocsTopic, err := svc.extractClusterDocsTopic(item)
-		if err != nil {
-			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterDocsTopic", item)
-		}
-
-		clusterDocsTopics = append(clusterDocsTopics, clusterDocsTopic)
-	}
-
-	return clusterDocsTopics, nil
-}
-
-func (svc *clusterDocsTopicService) ListForServiceClass(className string) ([]*v1alpha1.ClusterDocsTopic, error) {
-	items, err := svc.informer.GetIndexer().ByIndex("serviceClassName", className)
 	if err != nil {
 		return nil, err
 	}
