@@ -14,6 +14,10 @@ func (r *clusterAssetResolver) SetAssetConverter(converter gqlClusterAssetConver
 	r.clusterAssetConverter = converter
 }
 
+func (r *clusterAssetResolver) SetFileService(fileSvc fileSvc) {
+	r.fileSvc = fileSvc
+}
+
 func (r *clusterAssetResolver) SetFileConverter(converter gqlFileConverter) {
 	r.fileConverter = converter
 }
@@ -28,6 +32,10 @@ func NewAssetResolver(assetSvc assetSvc) *assetResolver {
 
 func (r *assetResolver) SetAssetConverter(converter gqlAssetConverter) {
 	r.assetConverter = converter
+}
+
+func (r *assetResolver) SetFileService(fileSvc fileSvc) {
+	r.fileSvc = fileSvc
 }
 
 func (r *assetResolver) SetFileConverter(converter gqlFileConverter) {

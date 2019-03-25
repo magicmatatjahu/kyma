@@ -43,6 +43,10 @@ func (r *clusterAssetResolver) ClusterAssetFilesField(ctx context.Context, obj *
 		return nil, gqlerror.New(err, pretty.ClusterAsset)
 	}
 
+	if asset == nil {
+		return nil, nil
+	}
+
 	items, err := r.fileSvc.FilterByExtensions(&asset.Status.AssetRef, filterExtensions)
 	if err != nil {
 		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", pretty.Files, pretty.ClusterAsset, obj.Name))

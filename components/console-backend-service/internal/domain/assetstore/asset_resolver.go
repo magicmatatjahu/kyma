@@ -43,6 +43,10 @@ func (r *assetResolver) AssetFilesField(ctx context.Context, obj *gqlschema.Asse
 		return nil, gqlerror.New(err, pretty.Asset)
 	}
 
+	if asset == nil {
+		return nil, nil
+	}
+
 	items, err := r.fileSvc.FilterByExtensions(&asset.Status.AssetRef, filterExtensions)
 	if err != nil {
 		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", pretty.Files, pretty.Asset, obj.Name))
