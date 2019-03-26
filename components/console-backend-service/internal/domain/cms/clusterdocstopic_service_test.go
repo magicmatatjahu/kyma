@@ -17,7 +17,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic/fake"
 	"k8s.io/client-go/tools/cache"
-	"fmt"
 )
 
 func TestClusterDocsTopicService_Find(t *testing.T) {
@@ -249,10 +248,6 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 
 		result, err := svc.List(nil, nil)
 		require.NoError(t, err)
-
-		fmt.Println(result[0], expected[0])
-		fmt.Println(result[1], expected[1])
-		fmt.Println(result[2], expected[2])
 
 		assert.Equal(t, expected, result)
 	})

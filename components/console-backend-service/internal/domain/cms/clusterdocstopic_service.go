@@ -3,15 +3,16 @@ package cms
 import (
 	"fmt"
 
+	"math"
+	"sort"
+	"strconv"
+
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
-	"sort"
-	"strconv"
-	"math"
 )
 
 type clusterDocsTopicService struct {
