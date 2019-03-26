@@ -879,9 +879,9 @@ type Mutation {
 
 type Subscription {
     clusterAssetEvent: ClusterAssetEvent!
-    assetEvent: AssetEvent!
+    assetEvent(namespace: String!): AssetEvent!
     clusterDocsTopicEvent: ClusterDocsTopicEvent!
-    docsTopicEvent: DocsTopicEvent!
+    docsTopicEvent(namespace: String!): DocsTopicEvent!
     serviceInstanceEvent(namespace: String!): ServiceInstanceEvent!
     serviceBindingEvent(namespace: String!): ServiceBindingEvent! @HasAccess(attributes: {resource: "servicebindings", verb: "watch", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace"})
     serviceBindingUsageEvent(namespace: String!): ServiceBindingUsageEvent!

@@ -9,6 +9,7 @@ import (
 	appsv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/dynamic"
 )
 
 func NewClientWithConfig() (*v1.CoreV1Client, *rest.Config, error) {
@@ -93,4 +94,18 @@ func NewAppsClientWithConfig() (*appsv1.AppsV1Client, *rest.Config, error) {
 	}
 
 	return appsCli, k8sConfig, nil
+}
+
+func NewCmsClientWithConfig() (dynamic.Interface, *rest.Config, error) {
+	k8sConfig, err := NewRestClientConfigFromEnv()
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "while creating new client with config")
+	}
+
+	dynamicCli, err := dynamic.NewForConfig(k8sConfig)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "while creating new dynamic client with config")
+	}
+
+	return dynamicCli, k8sConfig, nil
 }
