@@ -9,6 +9,9 @@ import (
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
+	"sort"
+	"strconv"
+	"math"
 )
 
 type clusterDocsTopicService struct {
@@ -45,14 +48,6 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 			}
 
 			return []string{entity.Labels["groupName.cms.kyma-project.io"]}, nil
-		},
-		"serviceClassName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractClusterDocsTopic(obj)
-			if err != nil {
-				return nil, errors.New("Cannot convert item")
-			}
-
-			return []string{entity.Name}, nil
 		},
 	})
 	if err != nil {
@@ -107,6 +102,11 @@ func (svc *clusterDocsTopicService) List(viewContext *string, groupName *string)
 		clusterDocsTopics = append(clusterDocsTopics, clusterDocsTopic)
 	}
 
+	err = svc.sortByOrder(clusterDocsTopics)
+	if err != nil {
+		return nil, errors.Wrap(err, "while sorting []*ClusterDocsTopic by order")
+	}
+
 	return clusterDocsTopics, nil
 }
 
@@ -116,6 +116,42 @@ func (svc *clusterDocsTopicService) Subscribe(listener resource.Listener) {
 
 func (svc *clusterDocsTopicService) Unsubscribe(listener resource.Listener) {
 	svc.notifier.DeleteListener(listener)
+}
+
+func (svc *clusterDocsTopicService) sortByOrder(docsTopics []*v1alpha1.ClusterDocsTopic) error {
+	parseString := func(str string) (uint8, error) {
+		if str == "" {
+			return math.MaxUint8, nil
+		}
+
+		i, err := strconv.ParseInt(str, 10, 16)
+		if err != nil {
+			return uint8(0), err
+		}
+		return uint8(i), nil
+	}
+
+	orderLabel := "order.cms.kyma-project.io"
+	var err error
+	sort.Slice(docsTopics, func(i, j int) bool {
+		if err != nil {
+			return false
+		}
+
+		firstItem, err := parseString(docsTopics[i].Labels[orderLabel])
+		if err != nil {
+			return false
+		}
+
+		secondItem, err := parseString(docsTopics[j].Labels[orderLabel])
+		if err != nil {
+			return false
+		}
+
+		return firstItem < secondItem
+	})
+
+	return err
 }
 
 func (svc *clusterDocsTopicService) extractClusterDocsTopic(obj interface{}) (*v1alpha1.ClusterDocsTopic, error) {

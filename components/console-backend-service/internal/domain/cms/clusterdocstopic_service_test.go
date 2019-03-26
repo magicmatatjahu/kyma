@@ -17,6 +17,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic/fake"
 	"k8s.io/client-go/tools/cache"
+	"fmt"
 )
 
 func TestClusterDocsTopicService_Find(t *testing.T) {
@@ -198,6 +199,60 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 
 		result, err := svc.List(nil, &groupName)
 		require.NoError(t, err)
+
+		assert.Equal(t, expected, result)
+	})
+
+	t.Run("Success with sorting function", func(t *testing.T) {
+		clusterDocsTopics := []runtime.Object{
+			fixUnstructuredClusterDocsTopic(map[string]interface{}{
+				"name": "2",
+				"labels": map[string]interface{}{
+					"order.cms.kyma-project.io": "2",
+				},
+			}),
+			fixUnstructuredClusterDocsTopic(map[string]interface{}{
+				"name": "4",
+			}),
+			fixUnstructuredClusterDocsTopic(map[string]interface{}{
+				"name": "3",
+				"labels": map[string]interface{}{
+					"order.cms.kyma-project.io": "3",
+				},
+			}),
+			fixUnstructuredClusterDocsTopic(map[string]interface{}{
+				"name": "1",
+				"labels": map[string]interface{}{
+					"order.cms.kyma-project.io": "1",
+				},
+			}),
+		}
+		expected := []*v1alpha1.ClusterDocsTopic{
+			fixClusterDocsTopic("1", map[string]string{
+				"order.cms.kyma-project.io": "1",
+			}),
+			fixClusterDocsTopic("2", map[string]string{
+				"order.cms.kyma-project.io": "2",
+			}),
+			fixClusterDocsTopic("3", map[string]string{
+				"order.cms.kyma-project.io": "3",
+			}),
+			fixClusterDocsTopic("4", nil),
+		}
+
+		informer := fixClusterDocsTopicInformer(clusterDocsTopics...)
+
+		svc, err := cms.NewClusterDocsTopicService(informer)
+		require.NoError(t, err)
+
+		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
+
+		result, err := svc.List(nil, nil)
+		require.NoError(t, err)
+
+		fmt.Println(result[0], expected[0])
+		fmt.Println(result[1], expected[1])
+		fmt.Println(result[2], expected[2])
 
 		assert.Equal(t, expected, result)
 	})

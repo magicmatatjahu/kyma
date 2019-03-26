@@ -21,20 +21,6 @@ func newDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService,
 		informer: informer,
 	}
 
-	err := svc.informer.AddIndexers(cache.Indexers{
-		"serviceClassName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractDocsTopic(obj)
-			if err != nil {
-				return nil, errors.New("Cannot convert item")
-			}
-
-			return []string{fmt.Sprintf("%s/%s", entity.Namespace, entity.Name)}, nil
-		},
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "while adding indexers")
-	}
-
 	notifier := resource.NewNotifier()
 	informer.AddEventHandler(notifier)
 	svc.notifier = notifier
