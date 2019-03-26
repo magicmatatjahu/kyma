@@ -157,7 +157,7 @@ func TestDocsTopicResolver_DocsTopicEventSubscription(t *testing.T) {
 		svc.On("Unsubscribe", mock.Anything).Once()
 		resolver := cms.NewDocsTopicResolver(svc, nil)
 
-		_, err := resolver.DocsTopicEventSubscription(ctx)
+		_, err := resolver.DocsTopicEventSubscription(ctx, "test")
 
 		require.NoError(t, err)
 		svc.AssertCalled(t, "Subscribe", mock.Anything)
@@ -172,7 +172,7 @@ func TestDocsTopicResolver_DocsTopicEventSubscription(t *testing.T) {
 		svc.On("Unsubscribe", mock.Anything).Once()
 		resolver := cms.NewDocsTopicResolver(svc, nil)
 
-		channel, err := resolver.DocsTopicEventSubscription(ctx)
+		channel, err := resolver.DocsTopicEventSubscription(ctx, "test")
 		<-channel
 
 		require.NoError(t, err)

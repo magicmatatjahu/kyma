@@ -53,10 +53,10 @@ func (r *docsTopicResolver) DocsTopicAssetsField(ctx context.Context, obj *gqlsc
 	return assets, nil
 }
 
-func (r *docsTopicResolver) DocsTopicEventSubscription(ctx context.Context) (<-chan gqlschema.DocsTopicEvent, error) {
+func (r *docsTopicResolver) DocsTopicEventSubscription(ctx context.Context, namespace string) (<-chan gqlschema.DocsTopicEvent, error) {
 	channel := make(chan gqlschema.DocsTopicEvent, 1)
 	filter := func(entity *v1alpha1.DocsTopic) bool {
-		return true
+		return entity != nil && entity.Namespace == namespace
 	}
 
 	docsTopicListener := listener.NewDocsTopic(channel, filter, r.docsTopicConverter)

@@ -51,8 +51,8 @@ func (_m *Resolver) DocsTopicAssetsField(ctx context.Context, obj *gqlschema.Doc
 	return r0, r1
 }
 
-// DocsTopicEventSubscription provides a failing mock function with given fields: ctx
-func (_m *Resolver) DocsTopicEventSubscription(ctx context.Context) (<-chan gqlschema.DocsTopicEvent, error) {
+// DocsTopicEventSubscription provides a failing mock function with given fields: ctx, namespace
+func (_m *Resolver) DocsTopicEventSubscription(ctx context.Context, namespace string) (<-chan gqlschema.DocsTopicEvent, error) {
 	var r0 <-chan gqlschema.DocsTopicEvent
 	var r1 error
 	r1 = _m.err

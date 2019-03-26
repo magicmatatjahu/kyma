@@ -104,7 +104,7 @@ type Resolver interface {
 	ClusterAssetFilesField(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtensions []string) ([]gqlschema.File, error)
 	AssetFilesField(ctx context.Context, obj *gqlschema.Asset, filterExtensions []string) ([]gqlschema.File, error)
 	ClusterAssetEventSubscription(ctx context.Context) (<-chan gqlschema.ClusterAssetEvent, error)
-	AssetEventSubscription(ctx context.Context) (<-chan gqlschema.AssetEvent, error)
+	AssetEventSubscription(ctx context.Context, namespace string) (<-chan gqlschema.AssetEvent, error)
 }
 
 type resolverConfig struct {

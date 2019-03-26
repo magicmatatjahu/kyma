@@ -63,10 +63,10 @@ func (r *assetResolver) AssetFilesField(ctx context.Context, obj *gqlschema.Asse
 	return files, nil
 }
 
-func (r *assetResolver) AssetEventSubscription(ctx context.Context) (<-chan gqlschema.AssetEvent, error) {
+func (r *assetResolver) AssetEventSubscription(ctx context.Context, namespace string) (<-chan gqlschema.AssetEvent, error) {
 	channel := make(chan gqlschema.AssetEvent, 1)
 	filter := func(entity *v1alpha2.Asset) bool {
-		return true
+		return entity != nil && entity.Namespace == namespace
 	}
 
 	assetListener := listener.NewAsset(channel, filter, r.assetConverter)

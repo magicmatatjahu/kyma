@@ -15,8 +15,8 @@ func NewResolver(err error) *Resolver {
 	return &Resolver{err: err}
 }
 
-// AssetEventSubscription provides a failing mock function with given fields: ctx
-func (_m *Resolver) AssetEventSubscription(ctx context.Context) (<-chan gqlschema.AssetEvent, error) {
+// AssetEventSubscription provides a failing mock function with given fields: ctx, namespace
+func (_m *Resolver) AssetEventSubscription(ctx context.Context, namespace string) (<-chan gqlschema.AssetEvent, error) {
 	var r0 <-chan gqlschema.AssetEvent
 	var r1 error
 	r1 = _m.err

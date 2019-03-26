@@ -482,16 +482,16 @@ func (r *subscriptionResolver) ClusterAssetEvent(ctx context.Context) (<-chan gq
 	return r.assetstore.Resolver.ClusterAssetEventSubscription(ctx)
 }
 
-func (r *subscriptionResolver) AssetEvent(ctx context.Context) (<-chan gqlschema.AssetEvent, error) {
-	return r.assetstore.Resolver.AssetEventSubscription(ctx)
+func (r *subscriptionResolver) AssetEvent(ctx context.Context, namespace string) (<-chan gqlschema.AssetEvent, error) {
+	return r.assetstore.Resolver.AssetEventSubscription(ctx, namespace)
 }
 
 func (r *subscriptionResolver) ClusterDocsTopicEvent(ctx context.Context) (<-chan gqlschema.ClusterDocsTopicEvent, error) {
 	return r.cms.Resolver.ClusterDocsTopicEventSubscription(ctx)
 }
 
-func (r *subscriptionResolver) DocsTopicEvent(ctx context.Context) (<-chan gqlschema.DocsTopicEvent, error) {
-	return r.cms.Resolver.DocsTopicEventSubscription(ctx)
+func (r *subscriptionResolver) DocsTopicEvent(ctx context.Context, namespace string) (<-chan gqlschema.DocsTopicEvent, error) {
+	return r.cms.Resolver.DocsTopicEventSubscription(ctx, namespace)
 }
 
 func (r *subscriptionResolver) ServiceInstanceEvent(ctx context.Context, namespace string) (<-chan gqlschema.ServiceInstanceEvent, error) {

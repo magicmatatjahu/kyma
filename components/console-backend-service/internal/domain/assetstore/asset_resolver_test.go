@@ -150,7 +150,7 @@ func TestAssetResolver_AssetEventSubscription(t *testing.T) {
 		svc.On("Unsubscribe", mock.Anything).Once()
 		resolver := assetstore.NewAssetResolver(svc)
 
-		_, err := resolver.AssetEventSubscription(ctx)
+		_, err := resolver.AssetEventSubscription(ctx, "test")
 
 		require.NoError(t, err)
 		svc.AssertCalled(t, "Subscribe", mock.Anything)
@@ -165,7 +165,7 @@ func TestAssetResolver_AssetEventSubscription(t *testing.T) {
 		svc.On("Unsubscribe", mock.Anything).Once()
 		resolver := assetstore.NewAssetResolver(svc)
 
-		channel, err := resolver.AssetEventSubscription(ctx)
+		channel, err := resolver.AssetEventSubscription(ctx, "test")
 		<-channel
 
 		require.NoError(t, err)

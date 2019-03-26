@@ -703,9 +703,9 @@ type ComplexityRoot struct {
 
 	Subscription struct {
 		ClusterAssetEvent         func(childComplexity int) int
-		AssetEvent                func(childComplexity int) int
+		AssetEvent                func(childComplexity int, namespace string) int
 		ClusterDocsTopicEvent     func(childComplexity int) int
-		DocsTopicEvent            func(childComplexity int) int
+		DocsTopicEvent            func(childComplexity int, namespace string) int
 		ServiceInstanceEvent      func(childComplexity int, namespace string) int
 		ServiceBindingEvent       func(childComplexity int, namespace string) int
 		ServiceBindingUsageEvent  func(childComplexity int, namespace string) int
@@ -877,9 +877,9 @@ type ServiceInstanceResolver interface {
 }
 type SubscriptionResolver interface {
 	ClusterAssetEvent(ctx context.Context) (<-chan ClusterAssetEvent, error)
-	AssetEvent(ctx context.Context) (<-chan AssetEvent, error)
+	AssetEvent(ctx context.Context, namespace string) (<-chan AssetEvent, error)
 	ClusterDocsTopicEvent(ctx context.Context) (<-chan ClusterDocsTopicEvent, error)
-	DocsTopicEvent(ctx context.Context) (<-chan DocsTopicEvent, error)
+	DocsTopicEvent(ctx context.Context, namespace string) (<-chan DocsTopicEvent, error)
 	ServiceInstanceEvent(ctx context.Context, namespace string) (<-chan ServiceInstanceEvent, error)
 	ServiceBindingEvent(ctx context.Context, namespace string) (<-chan ServiceBindingEvent, error)
 	ServiceBindingUsageEvent(ctx context.Context, namespace string) (<-chan ServiceBindingUsageEvent, error)
@@ -2877,6 +2877,36 @@ func field_Query___type_args(rawArgs map[string]interface{}) (map[string]interfa
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+
+}
+
+func field_Subscription_assetEvent_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		var err error
+		arg0, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg0
+	return args, nil
+
+}
+
+func field_Subscription_docsTopicEvent_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		var err error
+		arg0, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg0
 	return args, nil
 
 }
@@ -6179,7 +6209,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Subscription.AssetEvent(childComplexity), true
+		args, err := field_Subscription_assetEvent_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Subscription.AssetEvent(childComplexity, args["namespace"].(string)), true
 
 	case "Subscription.clusterDocsTopicEvent":
 		if e.complexity.Subscription.ClusterDocsTopicEvent == nil {
@@ -6193,7 +6228,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Subscription.DocsTopicEvent(childComplexity), true
+		args, err := field_Subscription_docsTopicEvent_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Subscription.DocsTopicEvent(childComplexity, args["namespace"].(string)), true
 
 	case "Subscription.serviceInstanceEvent":
 		if e.complexity.Subscription.ServiceInstanceEvent == nil {
@@ -23582,13 +23622,19 @@ func (ec *executionContext) _Subscription_clusterAssetEvent(ctx context.Context,
 }
 
 func (ec *executionContext) _Subscription_assetEvent(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Subscription_assetEvent_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
 	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
 		Field: field,
 	})
 	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
 	//          and Tracer stack
 	rctx := ctx
-	results, err := ec.resolvers.Subscription().AssetEvent(rctx)
+	results, err := ec.resolvers.Subscription().AssetEvent(rctx, args["namespace"].(string))
 	if err != nil {
 		ec.Error(ctx, err)
 		return nil
@@ -23632,13 +23678,19 @@ func (ec *executionContext) _Subscription_clusterDocsTopicEvent(ctx context.Cont
 }
 
 func (ec *executionContext) _Subscription_docsTopicEvent(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Subscription_docsTopicEvent_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
 	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
 		Field: field,
 	})
 	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
 	//          and Tracer stack
 	rctx := ctx
-	results, err := ec.resolvers.Subscription().DocsTopicEvent(rctx)
+	results, err := ec.resolvers.Subscription().DocsTopicEvent(rctx, args["namespace"].(string))
 	if err != nil {
 		ec.Error(ctx, err)
 		return nil
@@ -27247,9 +27299,9 @@ type Mutation {
 
 type Subscription {
     clusterAssetEvent: ClusterAssetEvent!
-    assetEvent: AssetEvent!
+    assetEvent(namespace: String!): AssetEvent!
     clusterDocsTopicEvent: ClusterDocsTopicEvent!
-    docsTopicEvent: DocsTopicEvent!
+    docsTopicEvent(namespace: String!): DocsTopicEvent!
     serviceInstanceEvent(namespace: String!): ServiceInstanceEvent!
     serviceBindingEvent(namespace: String!): ServiceBindingEvent! @HasAccess(attributes: {resource: "servicebindings", verb: "watch", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace"})
     serviceBindingUsageEvent(namespace: String!): ServiceBindingUsageEvent!
