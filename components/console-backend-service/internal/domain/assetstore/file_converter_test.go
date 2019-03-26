@@ -1,10 +1,11 @@
 package assetstore
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFileConverter_ToGQL(t *testing.T) {
@@ -13,7 +14,7 @@ func TestFileConverter_ToGQL(t *testing.T) {
 
 		item := fixFile()
 		expected := gqlschema.File{
-			URL: "ExampleUrl",
+			URL:      "ExampleUrl",
 			Metadata: map[string]interface{}{},
 		}
 
@@ -80,7 +81,7 @@ func TestFileConverter_ToGQLs(t *testing.T) {
 
 func fixFile() *File {
 	return &File{
-		URL: "ExampleUrl",
+		URL:      "ExampleUrl",
 		Metadata: map[string]interface{}{},
 	}
 }

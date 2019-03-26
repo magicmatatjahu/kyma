@@ -1,9 +1,9 @@
 package cms
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/status"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 )
 
 type docsTopicConverter struct {
@@ -18,12 +18,12 @@ func (c *docsTopicConverter) ToGQL(item *v1alpha1.DocsTopic) (*gqlschema.DocsTop
 	status := c.extractor.Status(item.Status.CommonDocsTopicStatus)
 
 	docsTopic := gqlschema.DocsTopic{
-		Name: item.Name,
-		Namespace: item.Namespace,
+		Name:        item.Name,
+		Namespace:   item.Namespace,
 		Description: item.Spec.Description,
 		DisplayName: item.Spec.DisplayName,
-		GroupName: item.Labels["groupName.cms.kyma-project.io"],
-		Status: status,
+		GroupName:   item.Labels["groupName.cms.kyma-project.io"],
+		Status:      status,
 	}
 
 	return &docsTopic, nil

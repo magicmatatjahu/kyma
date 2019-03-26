@@ -2,11 +2,12 @@ package listener_test
 
 import (
 	"testing"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener/automock"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener/automock"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAsset_OnAdd(t *testing.T) {
@@ -198,4 +199,3 @@ func filterDocsTopicTrue(o *v1alpha1.DocsTopic) bool {
 func filterDocsTopicFalse(o *v1alpha1.DocsTopic) bool {
 	return false
 }
-

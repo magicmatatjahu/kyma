@@ -1,13 +1,14 @@
 package assetstore_test
 
 import (
-	"time"
-	"testing"
-	"k8s.io/client-go/rest"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/assert"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
 	"context"
+	"testing"
+	"time"
+
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"k8s.io/client-go/rest"
 )
 
 const testTimes = 3

@@ -10,8 +10,8 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	contentPretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/pretty"
 	cmsPretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
+	contentPretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
@@ -42,14 +42,14 @@ type instanceListerByClusterServiceClass interface {
 }
 
 type clusterServiceClassResolver struct {
-	classLister       	clusterServiceClassListGetter
-	planLister        	clusterServicePlanLister
-	instanceLister    	instanceListerByClusterServiceClass
-	contentRetriever  	shared.ContentRetriever
-	cmsRetriever	  	shared.CmsRetriever
-	classConverter    	gqlClusterServiceClassConverter
-	instanceConverter 	gqlServiceInstanceConverter
-	planConverter     	gqlClusterServicePlanConverter
+	classLister       clusterServiceClassListGetter
+	planLister        clusterServicePlanLister
+	instanceLister    instanceListerByClusterServiceClass
+	contentRetriever  shared.ContentRetriever
+	cmsRetriever      shared.CmsRetriever
+	classConverter    gqlClusterServiceClassConverter
+	instanceConverter gqlServiceInstanceConverter
+	planConverter     gqlClusterServicePlanConverter
 }
 
 func newClusterServiceClassResolver(classLister clusterServiceClassListGetter, planLister clusterServicePlanLister, instanceLister instanceListerByClusterServiceClass, contentRetriever shared.ContentRetriever, cmsRetriever shared.CmsRetriever) *clusterServiceClassResolver {

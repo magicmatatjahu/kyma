@@ -1,29 +1,30 @@
 package cms
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"context"
+
 	"github.com/golang/glog"
-	"github.com/pkg/errors"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	assetstorePretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
-	assetstorePretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
+	"github.com/pkg/errors"
 )
 
 type clusterDocsTopicResolver struct {
-	clusterDocsTopicSvc clusterDocsTopicSvc
-	assetStoreRetriever shared.AssetStoreRetriever
+	clusterDocsTopicSvc       clusterDocsTopicSvc
+	assetStoreRetriever       shared.AssetStoreRetriever
 	clusterDocsTopicConverter gqlClusterDocsTopicConverter
 }
 
 func newClusterDocsTopicResolver(clusterDocsTopicService clusterDocsTopicSvc, assetStoreRetriever shared.AssetStoreRetriever) *clusterDocsTopicResolver {
 	return &clusterDocsTopicResolver{
-		clusterDocsTopicSvc: clusterDocsTopicService,
-		assetStoreRetriever: assetStoreRetriever,
+		clusterDocsTopicSvc:       clusterDocsTopicService,
+		assetStoreRetriever:       assetStoreRetriever,
 		clusterDocsTopicConverter: &clusterDocsTopicConverter{},
 	}
 }

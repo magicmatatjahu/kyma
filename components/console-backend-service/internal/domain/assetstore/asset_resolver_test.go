@@ -1,19 +1,20 @@
 package assetstore_test
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"time"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/automock"
-	"github.com/stretchr/testify/mock"
+
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
-	"github.com/stretchr/testify/require"
-	"context"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/automock"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/stretchr/testify/assert"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	"errors"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestAssetResolver_AssetFilesField(t *testing.T) {
@@ -22,7 +23,7 @@ func TestAssetResolver_AssetFilesField(t *testing.T) {
 		namespace := "exampleNamespace"
 		assetResource := &v1alpha2.Asset{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: assetName,
+				Name:      assetName,
 				Namespace: namespace,
 			},
 			Status: v1alpha2.AssetStatus{
@@ -40,29 +41,29 @@ func TestAssetResolver_AssetFilesField(t *testing.T) {
 		}
 		filesResource := []*assetstore.File{
 			{
-				URL: "https://example.com/markdown.md",
+				URL:      "https://example.com/markdown.md",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/apiSpec.json",
+				URL:      "https://example.com/apiSpec.json",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/odata.xml",
+				URL:      "https://example.com/odata.xml",
 				Metadata: map[string]interface{}{},
 			},
 		}
 		expected := []gqlschema.File{
 			{
-				URL: "https://example.com/markdown.md",
+				URL:      "https://example.com/markdown.md",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/apiSpec.json",
+				URL:      "https://example.com/apiSpec.json",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/odata.xml",
+				URL:      "https://example.com/odata.xml",
 				Metadata: map[string]interface{}{},
 			},
 		}
@@ -80,7 +81,7 @@ func TestAssetResolver_AssetFilesField(t *testing.T) {
 		defer converter.AssertExpectations(t)
 
 		parentObj := gqlschema.Asset{
-			Name: assetName,
+			Name:      assetName,
 			Namespace: namespace,
 		}
 
@@ -103,7 +104,7 @@ func TestAssetResolver_AssetFilesField(t *testing.T) {
 		defer assetSvc.AssertExpectations(t)
 
 		parentObj := gqlschema.Asset{
-			Name: assetName,
+			Name:      assetName,
 			Namespace: namespace,
 		}
 
@@ -125,7 +126,7 @@ func TestAssetResolver_AssetFilesField(t *testing.T) {
 		defer assetSvc.AssertExpectations(t)
 
 		parentObj := gqlschema.Asset{
-			Name: assetName,
+			Name:      assetName,
 			Namespace: namespace,
 		}
 

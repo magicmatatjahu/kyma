@@ -2,10 +2,11 @@ package cms
 
 import (
 	"testing"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -15,13 +16,13 @@ func TestClusterDocsTopicConverter_ToGQL(t *testing.T) {
 
 		item := fixClusterDocsTopic()
 		expected := gqlschema.ClusterDocsTopic{
-			Name:              "ExampleName",
-			DisplayName:       "DisplayName",
-			Description:       "Description",
-			GroupName:         "exampleGroupName",
-			Status:            gqlschema.DocsTopicStatus{
-				Phase: gqlschema.DocsTopicPhaseTypeReady,
-				Reason: "ExampleReason",
+			Name:        "ExampleName",
+			DisplayName: "DisplayName",
+			Description: "Description",
+			GroupName:   "exampleGroupName",
+			Status: gqlschema.DocsTopicStatus{
+				Phase:   gqlschema.DocsTopicPhaseTypeReady,
+				Reason:  "ExampleReason",
 				Message: "ExampleMessage",
 			},
 		}
@@ -90,8 +91,8 @@ func TestClusterDocsTopicConverter_ToGQLs(t *testing.T) {
 func fixClusterDocsTopic() *v1alpha1.ClusterDocsTopic {
 	return &v1alpha1.ClusterDocsTopic{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:              "ExampleName",
-			Labels:            map[string]string{
+			Name: "ExampleName",
+			Labels: map[string]string{
 				"groupName.cms.kyma-project.io": "exampleGroupName",
 			},
 		},
@@ -103,8 +104,8 @@ func fixClusterDocsTopic() *v1alpha1.ClusterDocsTopic {
 		},
 		Status: v1alpha1.ClusterDocsTopicStatus{
 			CommonDocsTopicStatus: v1alpha1.CommonDocsTopicStatus{
-				Phase: v1alpha1.DocsTopicReady,
-				Reason: "ExampleReason",
+				Phase:   v1alpha1.DocsTopicReady,
+				Reason:  "ExampleReason",
 				Message: "ExampleMessage",
 			},
 		},

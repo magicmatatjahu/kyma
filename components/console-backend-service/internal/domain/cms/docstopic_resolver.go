@@ -1,30 +1,31 @@
 package cms
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"context"
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener"
+
 	"github.com/golang/glog"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	assetstorePretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 	"github.com/pkg/errors"
 )
 
 type docsTopicResolver struct {
-	docsTopicSvc docsTopicSvc
+	docsTopicSvc        docsTopicSvc
 	assetStoreRetriever shared.AssetStoreRetriever
-	docsTopicConverter gqlDocsTopicConverter
+	docsTopicConverter  gqlDocsTopicConverter
 }
 
 func newDocsTopicResolver(docsTopicService docsTopicSvc, assetStoreRetriever shared.AssetStoreRetriever) *docsTopicResolver {
 	return &docsTopicResolver{
-		docsTopicSvc: docsTopicService,
+		docsTopicSvc:        docsTopicService,
 		assetStoreRetriever: assetStoreRetriever,
-		docsTopicConverter: &docsTopicConverter{},
+		docsTopicConverter:  &docsTopicConverter{},
 	}
 }
 

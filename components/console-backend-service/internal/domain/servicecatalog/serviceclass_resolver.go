@@ -10,8 +10,8 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	contentPretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/pretty"
 	cmsPretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
+	contentPretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
@@ -58,7 +58,7 @@ func newServiceClassResolver(classLister serviceClassListGetter, planLister serv
 		planLister:        planLister,
 		instanceLister:    instanceLister,
 		contentRetriever:  contentRetriever,
-		cmsRetriever:	   cmsRetriever,
+		cmsRetriever:      cmsRetriever,
 		classConverter:    &serviceClassConverter{},
 		planConverter:     &servicePlanConverter{},
 		instanceConverter: &serviceInstanceConverter{},

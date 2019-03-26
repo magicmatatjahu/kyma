@@ -13,7 +13,9 @@ import (
 
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/apicontroller"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/application"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/authentication"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/k8s"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/kubeless"
@@ -21,8 +23,6 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/rest"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
 )
 
 type RootResolver struct {
@@ -33,8 +33,8 @@ type RootResolver struct {
 	sca            *servicecatalogaddons.PluggableContainer
 	app            *application.PluggableContainer
 	content        *content.PluggableContainer
-	assetstore	   *assetstore.PluggableContainer
-	cms			   *cms.PluggableContainer
+	assetstore     *assetstore.PluggableContainer
+	cms            *cms.PluggableContainer
 	kubeless       *kubeless.PluggableResolver
 	ac             *apicontroller.PluggableResolver
 	authentication *authentication.PluggableResolver
@@ -110,8 +110,8 @@ func New(restConfig *rest.Config, contentCfg content.Config, appCfg application.
 		sca:            scaContainer,
 		app:            appContainer,
 		content:        contentContainer,
-		assetstore:		assetStoreContainer,
-		cms:			cmsContainer,
+		assetstore:     assetStoreContainer,
+		cms:            cmsContainer,
 		ac:             acResolver,
 		kubeless:       kubelessResolver,
 		authentication: authenticationResolver,

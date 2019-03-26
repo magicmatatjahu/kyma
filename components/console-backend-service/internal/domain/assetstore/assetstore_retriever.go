@@ -3,10 +3,10 @@ package assetstore
 import "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
 
 type assetStoreRetriever struct {
-	ClusterAssetGetter      	shared.ClusterAssetGetter
-	AssetGetter      			shared.AssetGetter
-	GqlClusterAssetConverter    shared.GqlClusterAssetConverter
-	GqlAssetConverter      		shared.GqlAssetConverter
+	ClusterAssetGetter       shared.ClusterAssetGetter
+	AssetGetter              shared.AssetGetter
+	GqlClusterAssetConverter shared.GqlClusterAssetConverter
+	GqlAssetConverter        shared.GqlAssetConverter
 }
 
 func (r *assetStoreRetriever) ClusterAsset() shared.ClusterAssetGetter {

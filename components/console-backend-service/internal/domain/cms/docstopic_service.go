@@ -1,13 +1,14 @@
 package cms
 
 import (
-	"k8s.io/client-go/tools/cache"
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"fmt"
-	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/cache"
 )
 
 type docsTopicService struct {

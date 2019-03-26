@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/storage"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/automock"
@@ -16,7 +17,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 )
 
 func TestClusterServiceClassResolver_ClusterServiceClassQuery(t *testing.T) {
@@ -826,7 +826,7 @@ func TestClassResolver_ClusterServiceClassClusterDocsTopicField(t *testing.T) {
 		retriever.On("ClusterDocsTopicConverter").Return(converter)
 
 		parentObj := gqlschema.ClusterServiceClass{
-			Name: name,
+			Name:         name,
 			ExternalName: name,
 		}
 
@@ -854,7 +854,7 @@ func TestClassResolver_ClusterServiceClassClusterDocsTopicField(t *testing.T) {
 		retriever.On("ClusterDocsTopicConverter").Return(converter)
 
 		parentObj := gqlschema.ClusterServiceClass{
-			Name: name,
+			Name:         name,
 			ExternalName: name,
 		}
 
@@ -878,7 +878,7 @@ func TestClassResolver_ClusterServiceClassClusterDocsTopicField(t *testing.T) {
 		retriever.On("ClusterDocsTopic").Return(resourceGetter)
 
 		parentObj := gqlschema.ClusterServiceClass{
-			Name: name,
+			Name:         name,
 			ExternalName: name,
 		}
 

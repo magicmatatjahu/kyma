@@ -2,10 +2,11 @@ package assetstore_test
 
 import (
 	"testing"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFileConverter_ToGQL(t *testing.T) {
@@ -20,15 +21,15 @@ func TestFileConverter_ToGQL(t *testing.T) {
 		}
 		expected := []*assetstore.File{
 			{
-				URL: "https://example.com/markdown.md",
+				URL:      "https://example.com/markdown.md",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/apiSpec.json",
+				URL:      "https://example.com/apiSpec.json",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/odata.xml",
+				URL:      "https://example.com/odata.xml",
 				Metadata: map[string]interface{}{},
 			},
 		}
@@ -52,7 +53,7 @@ func TestFileConverter_ToGQL(t *testing.T) {
 		}
 		expected := []*assetstore.File{
 			{
-				URL: "https://example.com/markdown.md",
+				URL:      "https://example.com/markdown.md",
 				Metadata: map[string]interface{}{},
 			},
 		}

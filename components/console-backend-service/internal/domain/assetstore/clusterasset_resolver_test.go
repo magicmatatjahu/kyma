@@ -1,19 +1,20 @@
 package assetstore_test
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"time"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/automock"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
-	"context"
+
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/automock"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/stretchr/testify/assert"
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
-	"errors"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestClusterAssetResolver_ClusterAssetFilesField(t *testing.T) {
@@ -38,29 +39,29 @@ func TestClusterAssetResolver_ClusterAssetFilesField(t *testing.T) {
 		}
 		filesResource := []*assetstore.File{
 			{
-				URL: "https://example.com/markdown.md",
+				URL:      "https://example.com/markdown.md",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/apiSpec.json",
+				URL:      "https://example.com/apiSpec.json",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/odata.xml",
+				URL:      "https://example.com/odata.xml",
 				Metadata: map[string]interface{}{},
 			},
 		}
 		expected := []gqlschema.File{
 			{
-				URL: "https://example.com/markdown.md",
+				URL:      "https://example.com/markdown.md",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/apiSpec.json",
+				URL:      "https://example.com/apiSpec.json",
 				Metadata: map[string]interface{}{},
 			},
 			{
-				URL: "https://example.com/odata.xml",
+				URL:      "https://example.com/odata.xml",
 				Metadata: map[string]interface{}{},
 			},
 		}

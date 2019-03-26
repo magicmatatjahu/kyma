@@ -2,10 +2,11 @@ package assetstore
 
 import (
 	"testing"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -15,12 +16,12 @@ func TestAssetConverter_ToGQL(t *testing.T) {
 
 		item := fixAsset()
 		expected := gqlschema.Asset{
-			Name:              "ExampleName",
-			Namespace:         "ExampleNamespace",
-			Type:         	   "ExampleType",
-			Status:            gqlschema.AssetStatus{
-				Phase: gqlschema.AssetPhaseTypeReady,
-				Reason: "ExampleReason",
+			Name:      "ExampleName",
+			Namespace: "ExampleNamespace",
+			Type:      "ExampleType",
+			Status: gqlschema.AssetStatus{
+				Phase:   gqlschema.AssetPhaseTypeReady,
+				Reason:  "ExampleReason",
 				Message: "ExampleMessage",
 			},
 		}
@@ -89,9 +90,9 @@ func TestAssetConverter_ToGQLs(t *testing.T) {
 func fixAsset() *v1alpha2.Asset {
 	return &v1alpha2.Asset{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:              "ExampleName",
-			Namespace:         "ExampleNamespace",
-			Labels:            map[string]string{
+			Name:      "ExampleName",
+			Namespace: "ExampleNamespace",
+			Labels: map[string]string{
 				"type.cms.kyma-project.io": "ExampleType",
 			},
 		},
@@ -99,7 +100,7 @@ func fixAsset() *v1alpha2.Asset {
 			CommonAssetSpec: v1alpha2.CommonAssetSpec{
 				Source: v1alpha2.AssetSource{
 					Mode: v1alpha2.AssetSingle,
-					Url: "ExampleUrl",
+					Url:  "ExampleUrl",
 				},
 				BucketRef: v1alpha2.AssetBucketRef{
 					Name: "ExampleBucketRef",
@@ -108,8 +109,8 @@ func fixAsset() *v1alpha2.Asset {
 		},
 		Status: v1alpha2.AssetStatus{
 			CommonAssetStatus: v1alpha2.CommonAssetStatus{
-				Phase: v1alpha2.AssetReady,
-				Reason: "ExampleReason",
+				Phase:   v1alpha2.AssetReady,
+				Reason:  "ExampleReason",
 				Message: "ExampleMessage",
 			},
 		},

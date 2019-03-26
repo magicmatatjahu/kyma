@@ -4,7 +4,7 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 )
 
-type fileConverter struct {}
+type fileConverter struct{}
 
 func (c *fileConverter) ToGQL(file *File) (*gqlschema.File, error) {
 	if file == nil {
@@ -14,7 +14,7 @@ func (c *fileConverter) ToGQL(file *File) (*gqlschema.File, error) {
 	metadata := c.extractMetadata(file.Metadata)
 
 	result := gqlschema.File{
-		URL: file.URL,
+		URL:      file.URL,
 		Metadata: metadata,
 	}
 	return &result, nil

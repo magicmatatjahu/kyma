@@ -1,26 +1,27 @@
 package cms
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
-	"k8s.io/client-go/rest"
-	"github.com/pkg/errors"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
-	"k8s.io/client-go/dynamic"
-	"time"
 	"context"
+	"time"
+
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/disabled"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
+	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
+	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/rest"
 )
 
 type PluggableContainer struct {
 	*module.Pluggable
 	cfg *resolverConfig
 
-	Resolver Resolver
-	CmsRetriever *cmsRetriever
+	Resolver        Resolver
+	CmsRetriever    *cmsRetriever
 	informerFactory dynamicinformer.DynamicSharedInformerFactory
 }
 
@@ -32,11 +33,11 @@ func New(restConfig *rest.Config, informerResyncPeriod time.Duration, assetStore
 
 	container := &PluggableContainer{
 		cfg: &resolverConfig{
-			dynamicClient: dynamicClient,
+			dynamicClient:        dynamicClient,
 			informerResyncPeriod: informerResyncPeriod,
-			assetStoreRetriever: assetStoreRetriever,
+			assetStoreRetriever:  assetStoreRetriever,
 		},
-		Pluggable: module.NewPluggable("content"),
+		Pluggable:    module.NewPluggable("content"),
 		CmsRetriever: &cmsRetriever{},
 	}
 
@@ -78,7 +79,7 @@ func (r *PluggableContainer) Enable() error {
 	r.Pluggable.EnableAndSyncDynamicInformerFactory(r.informerFactory, func() {
 		r.Resolver = &domainResolver{
 			clusterDocsTopicResolver: newClusterDocsTopicResolver(clusterDocsTopicService, assetStoreRetriever),
-			docsTopicResolver: newDocsTopicResolver(docsTopicService, assetStoreRetriever),
+			docsTopicResolver:        newDocsTopicResolver(docsTopicService, assetStoreRetriever),
 		}
 		r.CmsRetriever.ClusterDocsTopicGetter = clusterDocsTopicService
 		r.CmsRetriever.DocsTopicGetter = docsTopicService
@@ -103,9 +104,9 @@ func (r *PluggableContainer) Disable() error {
 }
 
 type resolverConfig struct {
-	dynamicClient             dynamic.Interface
-	informerResyncPeriod      time.Duration
-	assetStoreRetriever       shared.AssetStoreRetriever
+	dynamicClient        dynamic.Interface
+	informerResyncPeriod time.Duration
+	assetStoreRetriever  shared.AssetStoreRetriever
 }
 
 //go:generate failery -name=Resolver -case=underscore -output disabled -outpkg disabled

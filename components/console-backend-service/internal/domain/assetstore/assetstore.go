@@ -1,26 +1,27 @@
 package assetstore
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
-	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
-	"k8s.io/client-go/dynamic"
+	"context"
 	"time"
-	"k8s.io/client-go/rest"
-	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/disabled"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"context"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
+	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/rest"
 )
 
 type PluggableContainer struct {
 	*module.Pluggable
 	cfg *resolverConfig
 
-	Resolver Resolver
+	Resolver            Resolver
 	AssetStoreRetriever *assetStoreRetriever
-	informerFactory dynamicinformer.DynamicSharedInformerFactory
+	informerFactory     dynamicinformer.DynamicSharedInformerFactory
 }
 
 func New(restConfig *rest.Config, informerResyncPeriod time.Duration) (*PluggableContainer, error) {
@@ -31,10 +32,10 @@ func New(restConfig *rest.Config, informerResyncPeriod time.Duration) (*Pluggabl
 
 	container := &PluggableContainer{
 		cfg: &resolverConfig{
-			dynamicClient: dynamicClient,
+			dynamicClient:        dynamicClient,
 			informerResyncPeriod: informerResyncPeriod,
 		},
-		Pluggable: module.NewPluggable("content"),
+		Pluggable:           module.NewPluggable("content"),
 		AssetStoreRetriever: &assetStoreRetriever{},
 	}
 
@@ -74,7 +75,7 @@ func (r *PluggableContainer) Enable() error {
 	r.Pluggable.EnableAndSyncDynamicInformerFactory(r.informerFactory, func() {
 		r.Resolver = &domainResolver{
 			clusterAssetResolver: newClusterAssetResolver(clusterAssetService),
-			assetResolver: newAssetResolver(assetService),
+			assetResolver:        newAssetResolver(assetService),
 		}
 		r.AssetStoreRetriever.ClusterAssetGetter = clusterAssetService
 		r.AssetStoreRetriever.AssetGetter = assetService
@@ -107,8 +108,8 @@ type Resolver interface {
 }
 
 type resolverConfig struct {
-	dynamicClient             dynamic.Interface
-	informerResyncPeriod      time.Duration
+	dynamicClient        dynamic.Interface
+	informerResyncPeriod time.Duration
 }
 
 type domainResolver struct {

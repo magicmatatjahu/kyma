@@ -1,13 +1,14 @@
 package cms_test
 
 import (
-	"time"
+	"context"
 	"testing"
-	"k8s.io/client-go/rest"
-	"github.com/stretchr/testify/require"
+	"time"
+
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
 	"github.com/stretchr/testify/assert"
-	"context"
+	"github.com/stretchr/testify/require"
+	"k8s.io/client-go/rest"
 )
 
 const testTimes = 3

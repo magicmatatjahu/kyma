@@ -12,10 +12,10 @@ import (
 	bindingApi "github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	catalogInformers "github.com/kubernetes-incubator/service-catalog/pkg/client/informers_generated/externalversions"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/disabled"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/name"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/rest"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/disabled"
 )
 
 type PluggableContainer struct {
@@ -52,7 +52,7 @@ func New(restConfig *rest.Config, informerResyncPeriod time.Duration, contentRet
 			client:               client,
 			informerResyncPeriod: informerResyncPeriod,
 			contentRetriever:     contentRetriever,
-			cmsRetriever: 		  cmsRetriever,
+			cmsRetriever:         cmsRetriever,
 		},
 		Pluggable:               module.NewPluggable("servicecatalog"),
 		ServiceCatalogRetriever: &serviceCatalogRetriever{},
@@ -133,7 +133,7 @@ type resolverConfig struct {
 	client               clientset.Interface
 	informerResyncPeriod time.Duration
 	contentRetriever     shared.ContentRetriever
-	cmsRetriever		 shared.CmsRetriever
+	cmsRetriever         shared.CmsRetriever
 }
 
 //go:generate failery -name=Resolver -case=underscore -output disabled -outpkg disabled

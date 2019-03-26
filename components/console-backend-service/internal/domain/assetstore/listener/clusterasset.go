@@ -1,11 +1,12 @@
 package listener
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/golang/glog"
 	"fmt"
-	"github.com/pkg/errors"
+
+	"github.com/golang/glog"
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/pkg/errors"
 )
 
 //go:generate mockery -name=gqlClusterAssetConverter -output=automock -outpkg=automock -case=underscore
@@ -62,8 +63,8 @@ func (l *ClusterAsset) notify(eventType gqlschema.SubscriptionEventType, entity 
 	}
 
 	event := gqlschema.ClusterAssetEvent{
-		Type:                 eventType,
-		ClusterAsset: 	  	  *gqlClusterAsset,
+		Type:         eventType,
+		ClusterAsset: *gqlClusterAsset,
 	}
 
 	l.channel <- event

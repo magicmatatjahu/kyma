@@ -2,11 +2,12 @@ package listener_test
 
 import (
 	"testing"
+
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener/automock"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/stretchr/testify/assert"
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 )
 
 func TestClusterAsset_OnAdd(t *testing.T) {
@@ -198,4 +199,3 @@ func filterClusterAssetTrue(o *v1alpha2.ClusterAsset) bool {
 func filterClusterAssetFalse(o *v1alpha2.ClusterAsset) bool {
 	return false
 }
-

@@ -1,10 +1,11 @@
 package listener
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"github.com/golang/glog"
 	"fmt"
+
+	"github.com/golang/glog"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/pkg/errors"
 )
 
@@ -62,8 +63,8 @@ func (l *DocsTopic) notify(eventType gqlschema.SubscriptionEventType, entity *v1
 	}
 
 	event := gqlschema.DocsTopicEvent{
-		Type:         eventType,
-		DocsTopic: 	  *gqlDocsTopic,
+		Type:      eventType,
+		DocsTopic: *gqlDocsTopic,
 	}
 
 	l.channel <- event

@@ -1,12 +1,13 @@
 package assetstore
 
 import (
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	"strings"
 	"fmt"
+	"strings"
+
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 )
 
-type fileService struct {}
+type fileService struct{}
 
 func (svc *fileService) FilterByExtensions(statusRef *v1alpha2.AssetStatusRef, filterExtensions []string) ([]*File, error) {
 	if statusRef == nil {
@@ -24,7 +25,7 @@ func (svc *fileService) withoutExtensions(statusRef *v1alpha2.AssetStatusRef) []
 	var files []*File
 	for _, asset := range statusRef.Assets {
 		files = append(files, &File{
-			URL: fmt.Sprintf("%s/%s", statusRef.BaseUrl, asset),
+			URL:      fmt.Sprintf("%s/%s", statusRef.BaseUrl, asset),
 			Metadata: map[string]interface{}{},
 		})
 	}
@@ -44,7 +45,7 @@ func (svc *fileService) withExtensions(statusRef *v1alpha2.AssetStatusRef, filte
 
 			if strings.HasSuffix(asset, suffix) {
 				files = append(files, &File{
-					URL: fmt.Sprintf("%s/%s", statusRef.BaseUrl, asset),
+					URL:      fmt.Sprintf("%s/%s", statusRef.BaseUrl, asset),
 					Metadata: map[string]interface{}{},
 				})
 			}

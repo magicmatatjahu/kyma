@@ -1,16 +1,16 @@
 package status
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 )
 
 type DocsTopicExtractor struct{}
 
 func (e *DocsTopicExtractor) Status(status v1alpha1.CommonDocsTopicStatus) gqlschema.DocsTopicStatus {
 	return gqlschema.DocsTopicStatus{
-		Phase: e.Phase(status.Phase),
-		Reason: status.Reason,
+		Phase:   e.Phase(status.Phase),
+		Reason:  status.Reason,
 		Message: status.Message,
 	}
 }

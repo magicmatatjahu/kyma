@@ -1,13 +1,13 @@
 package assetstore
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 )
 
 type File struct {
-	URL string
+	URL      string
 	Metadata map[string]interface{}
 }
 

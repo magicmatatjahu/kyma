@@ -1,21 +1,22 @@
 package assetstore_test
 
 import (
+	"testing"
+	"time"
+
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener"
+	testingUtils "github.com/kyma-project/kyma/components/console-backend-service/internal/testing"
+	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/dynamic/fake"
-	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	testingUtils "github.com/kyma-project/kyma/components/console-backend-service/internal/testing"
-	"testing"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
-	"github.com/stretchr/testify/require"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener"
-	"time"
-	"github.com/stretchr/testify/assert"
+	"k8s.io/client-go/dynamic/fake"
+	"k8s.io/client-go/tools/cache"
 )
 
 const (
@@ -26,15 +27,15 @@ func TestAssetService_Find(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		assets := []runtime.Object{
 			fixUnstructuredAsset(map[string]interface{}{
-				"name": "1",
+				"name":      "1",
 				"namespace": AssetNamespace,
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
-				"name": "2",
+				"name":      "2",
 				"namespace": AssetNamespace,
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
-				"name": "3",
+				"name":      "3",
 				"namespace": AssetNamespace,
 			}),
 		}
@@ -72,21 +73,21 @@ func TestAssetService_ListForDocsTopicByType(t *testing.T) {
 	t.Run("Success with docsTopicName paramater", func(t *testing.T) {
 		assets := []runtime.Object{
 			fixUnstructuredAsset(map[string]interface{}{
-				"name": "1",
+				"name":      "1",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
 					"docstopic.cms.kyma-project.io": "exampleDocsTopicA",
 				},
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
-				"name": "2",
+				"name":      "2",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
 					"docstopic.cms.kyma-project.io": "exampleDocsTopicB",
 				},
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
-				"name": "3",
+				"name":      "3",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
 					"docstopic.cms.kyma-project.io": "exampleDocsTopicC",
@@ -116,27 +117,27 @@ func TestAssetService_ListForDocsTopicByType(t *testing.T) {
 	t.Run("Success with whole paramaters", func(t *testing.T) {
 		assets := []runtime.Object{
 			fixUnstructuredAsset(map[string]interface{}{
-				"name": "1",
+				"name":      "1",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
 					"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-					"type.cms.kyma-project.io": "markdown",
+					"type.cms.kyma-project.io":      "markdown",
 				},
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
-				"name": "2",
+				"name":      "2",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
 					"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-					"type.cms.kyma-project.io": "json",
+					"type.cms.kyma-project.io":      "json",
 				},
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
-				"name": "3",
+				"name":      "3",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
 					"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-					"type.cms.kyma-project.io": "yaml",
+					"type.cms.kyma-project.io":      "yaml",
 				},
 			}),
 		}
@@ -144,7 +145,7 @@ func TestAssetService_ListForDocsTopicByType(t *testing.T) {
 		expected := []*v1alpha2.Asset{
 			fixAsset("1", map[string]string{
 				"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-				"type.cms.kyma-project.io": "markdown",
+				"type.cms.kyma-project.io":      "markdown",
 			}),
 		}
 
@@ -261,7 +262,7 @@ func fixUnstructuredAsset(metadata map[string]interface{}) *unstructured.Unstruc
 func fixAsset(name string, labels map[string]string) *v1alpha2.Asset {
 	return &v1alpha2.Asset{
 		TypeMeta: metav1.TypeMeta{
-			Kind: "Asset",
+			Kind:       "Asset",
 			APIVersion: v1alpha2.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{

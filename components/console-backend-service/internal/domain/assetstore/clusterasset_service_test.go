@@ -1,21 +1,22 @@
 package assetstore_test
 
 import (
+	"testing"
+	"time"
+
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener"
+	testingUtils "github.com/kyma-project/kyma/components/console-backend-service/internal/testing"
+	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/dynamic/fake"
-	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	testingUtils "github.com/kyma-project/kyma/components/console-backend-service/internal/testing"
-	"testing"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
-	"github.com/stretchr/testify/require"
-	"time"
-	"github.com/stretchr/testify/assert"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener"
+	"k8s.io/client-go/dynamic/fake"
+	"k8s.io/client-go/tools/cache"
 )
 
 func TestClusterAssetService_Find(t *testing.T) {
@@ -109,21 +110,21 @@ func TestClusterAssetService_ListForDocsTopicByType(t *testing.T) {
 				"name": "1",
 				"labels": map[string]interface{}{
 					"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-					"type.cms.kyma-project.io": "markdown",
+					"type.cms.kyma-project.io":      "markdown",
 				},
 			}),
 			fixUnstructuredClusterAsset(map[string]interface{}{
 				"name": "2",
 				"labels": map[string]interface{}{
 					"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-					"type.cms.kyma-project.io": "json",
+					"type.cms.kyma-project.io":      "json",
 				},
 			}),
 			fixUnstructuredClusterAsset(map[string]interface{}{
 				"name": "3",
 				"labels": map[string]interface{}{
 					"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-					"type.cms.kyma-project.io": "yaml",
+					"type.cms.kyma-project.io":      "yaml",
 				},
 			}),
 		}
@@ -131,7 +132,7 @@ func TestClusterAssetService_ListForDocsTopicByType(t *testing.T) {
 		expected := []*v1alpha2.ClusterAsset{
 			fixClusterAsset("1", map[string]string{
 				"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-				"type.cms.kyma-project.io": "markdown",
+				"type.cms.kyma-project.io":      "markdown",
 			}),
 		}
 
@@ -248,12 +249,12 @@ func fixUnstructuredClusterAsset(metadata map[string]interface{}) *unstructured.
 func fixClusterAsset(name string, labels map[string]string) *v1alpha2.ClusterAsset {
 	return &v1alpha2.ClusterAsset{
 		TypeMeta: metav1.TypeMeta{
-			Kind: "ClusterAsset",
+			Kind:       "ClusterAsset",
 			APIVersion: v1alpha2.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Labels:    labels,
+			Name:   name,
+			Labels: labels,
 		},
 	}
 }

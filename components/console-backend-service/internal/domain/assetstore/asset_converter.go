@@ -1,9 +1,9 @@
 package assetstore
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/status"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 )
 
 type assetConverter struct {
@@ -18,10 +18,10 @@ func (c *assetConverter) ToGQL(item *v1alpha2.Asset) (*gqlschema.Asset, error) {
 	status := c.extractor.Status(item.Status.CommonAssetStatus)
 
 	asset := gqlschema.Asset{
-		Name: item.Name,
+		Name:      item.Name,
 		Namespace: item.Namespace,
-		Type: item.Labels["type.cms.kyma-project.io"],
-		Status: status,
+		Type:      item.Labels["type.cms.kyma-project.io"],
+		Status:    status,
 	}
 
 	return &asset, nil

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/storage"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/automock"
@@ -15,7 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 )
 
 func TestClassResolver_ServiceClassQuery(t *testing.T) {
@@ -762,12 +762,12 @@ func TestClassResolver_ServiceClassDocsTopicsField(t *testing.T) {
 		namespace := "namespace"
 		resources := &v1alpha1.DocsTopic{
 			ObjectMeta: v1.ObjectMeta{
-				Name: name,
+				Name:      name,
 				Namespace: namespace,
 			},
 		}
 		expected := &gqlschema.DocsTopic{
-			Name: name,
+			Name:      name,
 			Namespace: namespace,
 		}
 
@@ -784,9 +784,9 @@ func TestClassResolver_ServiceClassDocsTopicsField(t *testing.T) {
 		retriever.On("DocsTopicConverter").Return(converter)
 
 		parentObj := gqlschema.ServiceClass{
-			Name: name,
+			Name:         name,
 			ExternalName: name,
-			Namespace: namespace,
+			Namespace:    namespace,
 		}
 
 		resolver := servicecatalog.NewServiceClassResolver(nil, nil, nil, nil, retriever)
@@ -814,9 +814,9 @@ func TestClassResolver_ServiceClassDocsTopicsField(t *testing.T) {
 		retriever.On("DocsTopicConverter").Return(converter)
 
 		parentObj := gqlschema.ServiceClass{
-			Name: name,
+			Name:         name,
 			ExternalName: name,
-			Namespace: namespace,
+			Namespace:    namespace,
 		}
 
 		resolver := servicecatalog.NewServiceClassResolver(nil, nil, nil, nil, retriever)
@@ -840,9 +840,9 @@ func TestClassResolver_ServiceClassDocsTopicsField(t *testing.T) {
 		retriever.On("DocsTopic").Return(resourceGetter)
 
 		parentObj := gqlschema.ServiceClass{
-			Name: name,
+			Name:         name,
 			ExternalName: name,
-			Namespace: namespace,
+			Namespace:    namespace,
 		}
 
 		resolver := servicecatalog.NewServiceClassResolver(nil, nil, nil, nil, retriever)

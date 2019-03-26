@@ -1,30 +1,31 @@
 package assetstore
 
 import (
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"context"
+
 	"github.com/golang/glog"
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 	"github.com/pkg/errors"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/listener"
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 )
 
 type assetResolver struct {
-	assetSvc assetSvc
+	assetSvc       assetSvc
 	assetConverter gqlAssetConverter
-	fileSvc fileSvc
-	fileConverter gqlFileConverter
+	fileSvc        fileSvc
+	fileConverter  gqlFileConverter
 }
 
 func newAssetResolver(assetService assetSvc) *assetResolver {
 	return &assetResolver{
-		assetSvc: assetService,
+		assetSvc:       assetService,
 		assetConverter: &assetConverter{},
-		fileSvc: &fileService{},
-		fileConverter: &fileConverter{},
+		fileSvc:        &fileService{},
+		fileConverter:  &fileConverter{},
 	}
 }
 

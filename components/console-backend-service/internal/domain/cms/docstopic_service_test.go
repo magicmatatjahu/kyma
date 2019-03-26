@@ -2,20 +2,21 @@ package cms_test
 
 import (
 	"testing"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/tools/cache"
+	"time"
+
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"k8s.io/client-go/dynamic/fake"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener"
+	testingUtils "github.com/kyma-project/kyma/components/console-backend-service/internal/testing"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
-	testingUtils "github.com/kyma-project/kyma/components/console-backend-service/internal/testing"
-	"time"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/assert"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/listener"
+	"k8s.io/client-go/dynamic/fake"
+	"k8s.io/client-go/tools/cache"
 )
 
 const (
@@ -24,32 +25,33 @@ const (
 
 func TestDocsTopicService_Find(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		docsTopic1 := fixUnstructuredDocsTopic(map[string]interface{}{
-			"name": "exampleClassA",
-			"namespace": DocsTopicNamespace,
-		})
-		docsTopic2 := fixUnstructuredDocsTopic(map[string]interface{}{
-			"name": "exampleClassB",
-			"namespace": DocsTopicNamespace,
-		})
-		docsTopic3 := fixUnstructuredDocsTopic(map[string]interface{}{
-			"name": "exampleClassC",
-			"namespace": DocsTopicNamespace,
-		})
-
+		docsTopics := []runtime.Object{
+			fixUnstructuredDocsTopic(map[string]interface{}{
+				"name":      "exampleClassA",
+				"namespace": DocsTopicNamespace,
+			}),
+			fixUnstructuredDocsTopic(map[string]interface{}{
+				"name":      "exampleClassB",
+				"namespace": DocsTopicNamespace,
+			}),
+			fixUnstructuredDocsTopic(map[string]interface{}{
+				"name":      "exampleClassC",
+				"namespace": DocsTopicNamespace,
+			}),
+		}
 		expected := fixDocsTopic("exampleClassA", nil)
 
-		informer := fixDocsTopicInformer(docsTopic1, docsTopic2, docsTopic3)
+		informer := fixDocsTopicInformer(docsTopics...)
 
 		svc, err := cms.NewDocsTopicService(informer)
 		require.NoError(t, err)
 
-		testingUtils.WaitForInformerStartAtMost(t, 2 * time.Second, informer)
+		testingUtils.WaitForInformerStartAtMost(t, time.Second, informer)
 
-		docsTopic, err := svc.Find(DocsTopicNamespace, "exampleClassA")
+		result, err := svc.Find(DocsTopicNamespace, "exampleClassA")
 		require.NoError(t, err)
 
-		assert.Equal(t, expected, docsTopic)
+		assert.Equal(t, expected, result)
 	})
 
 	t.Run("NotFound", func(t *testing.T) {
@@ -153,7 +155,7 @@ func fixUnstructuredDocsTopic(metadata map[string]interface{}) *unstructured.Uns
 func fixDocsTopic(name string, labels map[string]string) *v1alpha1.DocsTopic {
 	return &v1alpha1.DocsTopic{
 		TypeMeta: metav1.TypeMeta{
-			Kind: "DocsTopic",
+			Kind:       "DocsTopic",
 			APIVersion: v1alpha1.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
@@ -176,4 +178,3 @@ func fixDocsTopicInformer(objects ...runtime.Object) cache.SharedIndexInformer {
 
 	return informer
 }
-

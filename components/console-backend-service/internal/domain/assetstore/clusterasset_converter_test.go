@@ -2,10 +2,11 @@ package assetstore
 
 import (
 	"testing"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -15,11 +16,11 @@ func TestClusterAssetConverter_ToGQL(t *testing.T) {
 
 		item := fixClusterAsset()
 		expected := gqlschema.ClusterAsset{
-			Name:              "ExampleName",
-			Type:         	   "ExampleType",
-			Status:            gqlschema.AssetStatus{
-				Phase: gqlschema.AssetPhaseTypeReady,
-				Reason: "ExampleReason",
+			Name: "ExampleName",
+			Type: "ExampleType",
+			Status: gqlschema.AssetStatus{
+				Phase:   gqlschema.AssetPhaseTypeReady,
+				Reason:  "ExampleReason",
 				Message: "ExampleMessage",
 			},
 		}
@@ -88,8 +89,8 @@ func TestClusterAssetConverter_ToGQLs(t *testing.T) {
 func fixClusterAsset() *v1alpha2.ClusterAsset {
 	return &v1alpha2.ClusterAsset{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:              "ExampleName",
-			Labels:            map[string]string{
+			Name: "ExampleName",
+			Labels: map[string]string{
 				"type.cms.kyma-project.io": "ExampleType",
 			},
 		},
@@ -97,7 +98,7 @@ func fixClusterAsset() *v1alpha2.ClusterAsset {
 			CommonAssetSpec: v1alpha2.CommonAssetSpec{
 				Source: v1alpha2.AssetSource{
 					Mode: v1alpha2.AssetSingle,
-					Url: "ExampleUrl",
+					Url:  "ExampleUrl",
 				},
 				BucketRef: v1alpha2.AssetBucketRef{
 					Name: "ExampleBucketRef",
@@ -106,8 +107,8 @@ func fixClusterAsset() *v1alpha2.ClusterAsset {
 		},
 		Status: v1alpha2.ClusterAssetStatus{
 			CommonAssetStatus: v1alpha2.CommonAssetStatus{
-				Phase: v1alpha2.AssetReady,
-				Reason: "ExampleReason",
+				Phase:   v1alpha2.AssetReady,
+				Reason:  "ExampleReason",
 				Message: "ExampleMessage",
 			},
 		},

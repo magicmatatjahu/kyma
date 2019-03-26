@@ -1,13 +1,14 @@
 package assetstore
 
 import (
-	"k8s.io/client-go/tools/cache"
 	"fmt"
-	"github.com/pkg/errors"
+
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	"k8s.io/apimachinery/pkg/runtime"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/cache"
 )
 
 type clusterAssetService struct {
@@ -57,7 +58,7 @@ func (svc *clusterAssetService) Find(name string) (*v1alpha2.ClusterAsset, error
 
 	clusterAsset, err := svc.extractClusterAsset(item)
 	if err != nil {
-		errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterAsset", item)
+		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterAsset", item)
 	}
 
 	return clusterAsset, nil

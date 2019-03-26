@@ -1,11 +1,12 @@
 package cms
 
 import (
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -15,14 +16,14 @@ func TestDocsTopicConverter_ToGQL(t *testing.T) {
 
 		item := fixDocsTopic()
 		expected := gqlschema.DocsTopic{
-			Name:              "ExampleName",
-			Namespace: 		   "ExampleNamespace",
-			DisplayName:       "DisplayName",
-			Description:       "Description",
-			GroupName:         "exampleGroupName",
-			Status:            gqlschema.DocsTopicStatus{
-				Phase: gqlschema.DocsTopicPhaseTypeReady,
-				Reason: "ExampleReason",
+			Name:        "ExampleName",
+			Namespace:   "ExampleNamespace",
+			DisplayName: "DisplayName",
+			Description: "Description",
+			GroupName:   "exampleGroupName",
+			Status: gqlschema.DocsTopicStatus{
+				Phase:   gqlschema.DocsTopicPhaseTypeReady,
+				Reason:  "ExampleReason",
 				Message: "ExampleMessage",
 			},
 		}
@@ -93,9 +94,9 @@ func TestDocsTopicConverter_ToGQLs(t *testing.T) {
 func fixDocsTopic() *v1alpha1.DocsTopic {
 	return &v1alpha1.DocsTopic{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:              "ExampleName",
-			Namespace:         "ExampleNamespace",
-			Labels:            map[string]string{
+			Name:      "ExampleName",
+			Namespace: "ExampleNamespace",
+			Labels: map[string]string{
 				"groupName.cms.kyma-project.io": "exampleGroupName",
 			},
 		},
@@ -107,8 +108,8 @@ func fixDocsTopic() *v1alpha1.DocsTopic {
 		},
 		Status: v1alpha1.DocsTopicStatus{
 			CommonDocsTopicStatus: v1alpha1.CommonDocsTopicStatus{
-				Phase: v1alpha1.DocsTopicReady,
-				Reason: "ExampleReason",
+				Phase:   v1alpha1.DocsTopicReady,
+				Reason:  "ExampleReason",
 				Message: "ExampleMessage",
 			},
 		},

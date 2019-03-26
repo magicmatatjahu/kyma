@@ -1,21 +1,22 @@
 package cms_test
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"time"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/automock"
+	assetstoreMock "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared/automock"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"context"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"github.com/stretchr/testify/assert"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
-	"errors"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	assetstoreMock "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared/automock"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestClusterDocsTopicResolver_ClusterDocsTopicsQuery(t *testing.T) {
@@ -185,7 +186,6 @@ func TestClusterDocsTopicResolver_ClusterDocsTopicAssetsField(t *testing.T) {
 		resourceGetter := new(assetstoreMock.ClusterAssetGetter)
 		resourceGetter.On("ListForDocsTopicByType", docsTopicName, []string{}).Return(nil, expectedErr).Once()
 		defer resourceGetter.AssertExpectations(t)
-
 
 		retriever := new(assetstoreMock.AssetStoreRetriever)
 		retriever.On("ClusterAsset").Return(resourceGetter)

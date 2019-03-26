@@ -3,10 +3,10 @@ package cms
 import "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
 
 type cmsRetriever struct {
-	ClusterDocsTopicGetter      		shared.ClusterDocsTopicGetter
-	DocsTopicGetter      				shared.DocsTopicGetter
-	GqlClusterDocsTopicConverter      	shared.GqlClusterDocsTopicConverter
-	GqlDocsTopicConverter      			shared.GqlDocsTopicConverter
+	ClusterDocsTopicGetter       shared.ClusterDocsTopicGetter
+	DocsTopicGetter              shared.DocsTopicGetter
+	GqlClusterDocsTopicConverter shared.GqlClusterDocsTopicConverter
+	GqlDocsTopicConverter        shared.GqlDocsTopicConverter
 }
 
 func (r *cmsRetriever) ClusterDocsTopic() shared.ClusterDocsTopicGetter {

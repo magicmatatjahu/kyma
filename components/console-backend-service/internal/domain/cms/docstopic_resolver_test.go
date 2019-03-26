@@ -1,20 +1,21 @@
 package cms_test
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"time"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/automock"
-	"github.com/stretchr/testify/mock"
+
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
-	"github.com/stretchr/testify/require"
-	"context"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/automock"
+	assetstoreMock "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared/automock"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/stretchr/testify/assert"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	assetstoreMock "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared/automock"
-	"errors"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
@@ -24,7 +25,7 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 		resources := []*v1alpha2.Asset{
 			{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "ExampleAssetA",
+					Name:      "ExampleAssetA",
 					Namespace: namespace,
 					Labels: map[string]string{
 						"docstopic.cms.kyma-project.io": docsTopicName,
@@ -33,7 +34,7 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 			},
 			{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "ExampleAssetB",
+					Name:      "ExampleAssetB",
 					Namespace: namespace,
 					Labels: map[string]string{
 						"docstopic.cms.kyma-project.io": docsTopicName,
@@ -42,7 +43,7 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 			},
 			{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "ExampleAssetC",
+					Name:      "ExampleAssetC",
 					Namespace: namespace,
 					Labels: map[string]string{
 						"docstopic.cms.kyma-project.io": docsTopicName,
@@ -52,15 +53,15 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 		}
 		expected := []gqlschema.Asset{
 			{
-				Name: "ExampleAssetA",
+				Name:      "ExampleAssetA",
 				Namespace: namespace,
 			},
 			{
-				Name: "ExampleAssetB",
+				Name:      "ExampleAssetB",
 				Namespace: namespace,
 			},
 			{
-				Name: "ExampleAssetC",
+				Name:      "ExampleAssetC",
 				Namespace: namespace,
 			},
 		}
@@ -78,7 +79,7 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 		retriever.On("AssetConverter").Return(resourceConverter)
 
 		parentObj := gqlschema.DocsTopic{
-			Name: docsTopicName,
+			Name:      docsTopicName,
 			Namespace: namespace,
 		}
 
@@ -107,7 +108,7 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 		retriever.On("AssetConverter").Return(resourceConverter)
 
 		parentObj := gqlschema.DocsTopic{
-			Name: docsTopicName,
+			Name:      docsTopicName,
 			Namespace: namespace,
 		}
 
@@ -128,12 +129,11 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 		resourceGetter.On("ListForDocsTopicByType", namespace, docsTopicName, []string{}).Return(nil, expectedErr).Once()
 		defer resourceGetter.AssertExpectations(t)
 
-
 		retriever := new(assetstoreMock.AssetStoreRetriever)
 		retriever.On("Asset").Return(resourceGetter)
 
 		parentObj := gqlschema.DocsTopic{
-			Name: docsTopicName,
+			Name:      docsTopicName,
 			Namespace: namespace,
 		}
 
