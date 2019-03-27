@@ -6840,11 +6840,6 @@ func (ec *executionContext) _Application(ctx context.Context, sel ast.SelectionS
 				}
 				wg.Done()
 			}(i, field)
-		case "status":
-			out.Values[i] = ec._Asset_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7776,7 +7771,7 @@ func (ec *executionContext) _Asset(ctx context.Context, sel ast.SelectionSet, ob
 				wg.Done()
 			}(i, field)
 		case "status":
-			out.Values[i] = ec._ClusterAsset_status(ctx, field, obj)
+			out.Values[i] = ec._Asset_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -7987,11 +7982,6 @@ func (ec *executionContext) _AssetEvent(ctx context.Context, sel ast.SelectionSe
 			}
 		case "asset":
 			out.Values[i] = ec._AssetEvent_asset(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "status":
-			out.Values[i] = ec._ClusterDocsTopic_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -8548,6 +8538,11 @@ func (ec *executionContext) _ClusterAsset(ctx context.Context, sel ast.Selection
 				}
 				wg.Done()
 			}(i, field)
+		case "status":
+			out.Values[i] = ec._ClusterAsset_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8728,6 +8723,11 @@ func (ec *executionContext) _ClusterAssetEvent(ctx context.Context, sel ast.Sele
 			}
 		case "clusterAsset":
 			out.Values[i] = ec._ClusterAssetEvent_clusterAsset(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "status":
+			out.Values[i] = ec._ClusterDocsTopic_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -10911,11 +10911,6 @@ func (ec *executionContext) _ContainerState(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "status":
-			out.Values[i] = ec._DocsTopic_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11908,6 +11903,11 @@ func (ec *executionContext) _DeploymentStatus(ctx context.Context, sel ast.Selec
 			}
 		case "conditions":
 			out.Values[i] = ec._DeploymentStatus_conditions(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "status":
+			out.Values[i] = ec._DocsTopic_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
