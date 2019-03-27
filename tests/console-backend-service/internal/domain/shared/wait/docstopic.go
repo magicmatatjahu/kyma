@@ -17,5 +17,5 @@ func ForDocsTopicReady(name string, get func(name string) (*v1alpha1.DocsTopic, 
 		}
 
 		return false, nil
-	}, 4 * readyTimeout)
+	}, 8 * readyTimeout)
 }

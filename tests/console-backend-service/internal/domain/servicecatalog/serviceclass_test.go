@@ -21,10 +21,6 @@ import (
 	"github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared/fixture"
 )
 
-const (
-	docsTopicName = "user-provided-service"
-)
-
 type serviceClassesQueryResponse struct {
 	ServiceClasses []shared.ServiceClass
 }

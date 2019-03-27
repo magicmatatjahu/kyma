@@ -17,5 +17,5 @@ func ForClusterDocsTopicReady(name string, get func(name string) (*v1alpha1.Clus
 		}
 
 		return false, nil
-	}, 4 * readyTimeout)
+	}, 8 * readyTimeout)
 }

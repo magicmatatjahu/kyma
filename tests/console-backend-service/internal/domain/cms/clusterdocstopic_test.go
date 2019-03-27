@@ -1,3 +1,5 @@
+// +build acceptance
+
 package cms
 
 import (
@@ -17,9 +19,9 @@ import (
 )
 
 const (
-	clusterDocsTopicName1 = "ExampleClusterDocsTopic1"
-	clusterDocsTopicName2 = "ExampleClusterDocsTopic2"
-	clusterDocsTopicName3 = "ExampleClusterDocsTopic3"
+	clusterDocsTopicName1 = "example-cluster-docs-topic-1"
+	clusterDocsTopicName2 = "example-cluster-docs-topic-2"
+	clusterDocsTopicName3 = "example-cluster-docs-topic-3"
 )
 
 type ClusterDocsTopicEvent struct {
@@ -87,8 +89,8 @@ func waitForClusterDocsTopic(t *testing.T, client *resource.ClusterDocsTopic, na
 
 func queryMultipleClusterDocsTopics(c *graphql.Client, resourceDetailsQuery string) (clusterDocsTopicsQueryResponse, error) {
 	query := fmt.Sprintf(`
-			query ($namespace: String!) {
-				serviceInstances(namespace: $namespace) {
+			query {
+				clusterDocsTopics {
 					%s
 				}
 			}	
