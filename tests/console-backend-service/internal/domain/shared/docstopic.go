@@ -20,6 +20,4 @@ type DocsTopicPhaseType string
 
 const (
 	DocsTopicPhaseTypeReady   DocsTopicPhaseType = "READY"
-	DocsTopicPhaseTypePending DocsTopicPhaseType = "PENDING"
-	DocsTopicPhaseTypeFailed  DocsTopicPhaseType = "FAILED"
 )

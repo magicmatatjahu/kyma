@@ -5,9 +5,9 @@ import (
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 )
 
-func ForDocsTopicReady(namespace, name string, get func(namespace, name string) (*v1alpha1.DocsTopic, error)) error {
+func ForDocsTopicReady(name string, get func(name string) (*v1alpha1.DocsTopic, error)) error {
 	return waiter.WaitAtMost(func() (bool, error) {
-		res, err := get(namespace, name)
+		res, err := get(name)
 		if err != nil {
 			return false, err
 		}

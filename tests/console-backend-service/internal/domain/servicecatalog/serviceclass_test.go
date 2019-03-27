@@ -13,6 +13,16 @@ import (
 	"github.com/kyma-project/kyma/tests/console-backend-service/internal/graphql"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/kyma-project/kyma/tests/console-backend-service/internal/client"
+	"github.com/kyma-project/kyma/tests/console-backend-service/internal/resource"
+	"github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared/wait"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared/fixture"
+)
+
+const (
+	docsTopicName = "user-provided-service"
 )
 
 type serviceClassesQueryResponse struct {
@@ -28,6 +38,19 @@ func TestServiceClassesQueries(t *testing.T) {
 	require.NoError(t, err)
 
 	expectedResource := serviceClass()
+
+	cmsCli, _, err := client.NewCmsClientWithConfig()
+	require.NoError(t, err)
+
+	docsTopicClient := resource.NewDocsTopic(cmsCli, expectedResource.Namespace, t.Logf)
+
+	t.Log(fmt.Sprintf("Create docsTopic %s", expectedResource.Name))
+	err = docsTopicClient.Create(fixDocsTopicMeta(expectedResource.Name), fixCommonDocsTopicSpec())
+	require.NoError(t, err)
+
+	t.Log(fmt.Sprintf("Wait for docsTopic %s Ready", expectedResource.Name))
+	err = wait.ForDocsTopicReady(expectedResource.Name, docsTopicClient.Get)
+	require.NoError(t, err)
 
 	resourceDetailsQuery := `
 		name
@@ -62,6 +85,21 @@ func TestServiceClassesQueries(t *testing.T) {
 		odataSpec
 		asyncApiSpec
 		content
+		docsTopic {
+			name
+			namespace
+    		groupName
+    		assets {
+				name
+				type
+				files {
+					url
+					metadata
+				}
+			}
+    		displayName
+    		description
+		}
 	`
 
 	t.Run("MultipleResources", func(t *testing.T) {
@@ -115,6 +153,10 @@ func checkClass(t *testing.T, expected, actual shared.ServiceClass) {
 	// Plans
 	require.NotEmpty(t, actual.Plans)
 	assertPlanExistsAndEqual(t, actual.Plans, expected.Plans[0])
+
+	// DocsTopic
+	require.NotEmpty(t, actual.DocsTopic)
+	checkDocsTopic(t, fixture.DocsTopic(expected.Namespace, expected.Name), actual.DocsTopic)
 }
 
 func checkPlan(t *testing.T, expected, actual shared.ServicePlan) {
@@ -126,6 +168,20 @@ func checkPlan(t *testing.T, expected, actual shared.ServicePlan) {
 
 	// RelatedServiceClassName
 	assert.Equal(t, expected.RelatedServiceClassName, actual.RelatedServiceClassName)
+}
+
+func checkDocsTopic(t *testing.T, expected, actual shared.DocsTopic) {
+	// Name
+	assert.Equal(t, expected.Name, actual.Name)
+
+	// Namespace
+	assert.Equal(t, expected.Namespace, actual.Namespace)
+
+	// DisplayName
+	assert.Equal(t, expected.DisplayName, actual.DisplayName)
+
+	// Description
+	assert.Equal(t, expected.Description, actual.Description)
 }
 
 func assertClassExistsAndEqual(t *testing.T, arr []shared.ServiceClass, expectedElement shared.ServiceClass) {
@@ -171,6 +227,25 @@ func serviceClass() shared.ServiceClass {
 				Name:                    fixture.TestingBundleFullPlanName,
 				ExternalName:            fixture.TestingBundleFullPlanExternalName,
 				RelatedServiceClassName: className,
+			},
+		},
+	}
+}
+
+func fixDocsTopicMeta(name string) metav1.ObjectMeta {
+	return metav1.ObjectMeta{
+		Name: name,
+	}
+}
+
+func fixCommonDocsTopicSpec() v1alpha1.CommonDocsTopicSpec {
+	return v1alpha1.CommonDocsTopicSpec{
+		DisplayName: "Docs Topic Sample",
+		Description: "Docs Topic Description",
+		Sources: map[string]v1alpha1.Source{
+			"openapi": {
+				Mode: v1alpha1.DocsTopicSingle,
+				URL:  "https://petstore.swagger.io/v2/swagger.json",
 			},
 		},
 	}

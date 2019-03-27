@@ -1,7 +1,8 @@
 package cms
 
 const (
-	ModuleName    string = "content"
-	TestNamespace string = "console-backend-service-cms"
-	OrderLabel string = "order.cms.kyma-project.io"
+	ModuleName     = "content"
+	TestNamespace  = "console-backend-service-cms"
+	GroupNameLabel = "groupName.cms.kyma-project.io"
+	OrderLabel     = "order.cms.kyma-project.io"
 )
