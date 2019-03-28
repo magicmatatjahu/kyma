@@ -90,8 +90,7 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 		result, err := svc.List(nil, nil)
 		require.NoError(t, err)
 
-		assert.Equal(t, len(expected), len(result))
-		assert.Equal(t, expected[0].Namespace, result[0].Namespace)
+		assert.Equal(t, expected, result)
 	})
 
 	t.Run("Success with all parameters", func(t *testing.T) {

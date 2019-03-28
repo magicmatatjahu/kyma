@@ -7,6 +7,7 @@ import (
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/pkg/errors"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 )
 
 //go:generate mockery -name=gqlDocsTopicConverter -output=automock -outpkg=automock -case=underscore
@@ -18,6 +19,7 @@ type DocsTopic struct {
 	channel   chan<- gqlschema.DocsTopicEvent
 	filter    func(entity *v1alpha1.DocsTopic) bool
 	converter gqlDocsTopicConverter
+	extractor extractor.DocsTopicUnstructuredExtractor
 }
 
 func NewDocsTopic(channel chan<- gqlschema.DocsTopicEvent, filter func(entity *v1alpha1.DocsTopic) bool, converter gqlDocsTopicConverter) *DocsTopic {
@@ -25,6 +27,7 @@ func NewDocsTopic(channel chan<- gqlschema.DocsTopicEvent, filter func(entity *v
 		channel:   channel,
 		filter:    filter,
 		converter: converter,
+		extractor: extractor.DocsTopicUnstructuredExtractor{},
 	}
 }
 
@@ -41,9 +44,12 @@ func (l *DocsTopic) OnDelete(object interface{}) {
 }
 
 func (l *DocsTopic) onEvent(eventType gqlschema.SubscriptionEventType, object interface{}) {
-	entity, ok := object.(*v1alpha1.DocsTopic)
-	if !ok {
+	entity, err := l.extractor.Single(object)
+	if err != nil {
 		glog.Error(fmt.Errorf("incorrect object type: %T, should be: *DocsTopic", object))
+		return
+	}
+	if entity == nil {
 		return
 	}
 

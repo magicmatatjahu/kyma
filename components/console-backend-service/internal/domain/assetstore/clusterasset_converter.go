@@ -2,12 +2,12 @@ package assetstore
 
 import (
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/status"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/extractor"
 )
 
 type clusterAssetConverter struct {
-	extractor status.AssetExtractor
+	extractor extractor.AssetStatusExtractor
 }
 
 func (c *clusterAssetConverter) ToGQL(item *v1alpha2.ClusterAsset) (*gqlschema.ClusterAsset, error) {

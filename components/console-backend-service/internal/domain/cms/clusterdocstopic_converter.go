@@ -2,12 +2,12 @@ package cms
 
 import (
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/status"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 )
 
 type clusterDocsTopicConverter struct {
-	extractor status.DocsTopicExtractor
+	extractor extractor.DocsTopicStatusExtractor
 }
 
 func (c *clusterDocsTopicConverter) ToGQL(item *v1alpha1.ClusterDocsTopic) (*gqlschema.ClusterDocsTopic, error) {

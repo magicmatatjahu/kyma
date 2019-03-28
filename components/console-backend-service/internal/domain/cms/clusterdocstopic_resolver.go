@@ -72,7 +72,7 @@ func (r *clusterDocsTopicResolver) ClusterDocsTopicAssetsField(ctx context.Conte
 func (r *clusterDocsTopicResolver) ClusterDocsTopicEventSubscription(ctx context.Context) (<-chan gqlschema.ClusterDocsTopicEvent, error) {
 	channel := make(chan gqlschema.ClusterDocsTopicEvent, 1)
 	filter := func(entity *v1alpha1.ClusterDocsTopic) bool {
-		return true
+		return entity != nil
 	}
 
 	clusterDocsTopicListener := listener.NewClusterDocsTopic(channel, filter, r.clusterDocsTopicConverter)

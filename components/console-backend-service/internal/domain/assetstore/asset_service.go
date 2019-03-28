@@ -4,26 +4,27 @@ import (
 	"fmt"
 
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/extractor"
 )
 
 type assetService struct {
 	informer cache.SharedIndexInformer
 	notifier notifier
+	extractor extractor.AssetUnstructuredExtractor
 }
 
 func newAssetService(informer cache.SharedIndexInformer) (*assetService, error) {
 	svc := &assetService{
 		informer: informer,
+		extractor: extractor.AssetUnstructuredExtractor{},
 	}
 
 	err := svc.informer.AddIndexers(cache.Indexers{
 		"docsTopicName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractAsset(obj)
+			entity, err := svc.extractor.Single(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
@@ -31,7 +32,7 @@ func newAssetService(informer cache.SharedIndexInformer) (*assetService, error) 
 			return []string{fmt.Sprintf("%s/%s", entity.Namespace, entity.Labels["docstopic.cms.kyma-project.io"])}, nil
 		},
 		"docsTopicName/type": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractAsset(obj)
+			entity, err := svc.extractor.Single(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
@@ -58,7 +59,7 @@ func (svc *assetService) Find(namespace, name string) (*v1alpha2.Asset, error) {
 		return nil, err
 	}
 
-	asset, err := svc.extractAsset(item)
+	asset, err := svc.extractor.Single(item)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *Asset", item)
 	}
@@ -87,7 +88,7 @@ func (svc *assetService) ListForDocsTopicByType(namespace, docsTopicName string,
 
 	var assets []*v1alpha2.Asset
 	for _, item := range items {
-		asset, err := svc.extractAsset(item)
+		asset, err := svc.extractor.Single(item)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *Asset", item)
 		}
@@ -104,19 +105,4 @@ func (svc *assetService) Subscribe(listener resource.Listener) {
 
 func (svc *assetService) Unsubscribe(listener resource.Listener) {
 	svc.notifier.DeleteListener(listener)
-}
-
-func (svc *assetService) extractAsset(obj interface{}) (*v1alpha2.Asset, error) {
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
-	if err != nil {
-		return nil, errors.Wrapf(err, "while converting resource %s %s to unstructured", pretty.Asset, obj)
-	}
-
-	var asset v1alpha2.Asset
-	err = runtime.DefaultUnstructuredConverter.FromUnstructured(u, &asset)
-	if err != nil {
-		return nil, errors.Wrapf(err, "while converting unstructured to resource %s %s", pretty.Asset, u)
-	}
-
-	return &asset, nil
 }

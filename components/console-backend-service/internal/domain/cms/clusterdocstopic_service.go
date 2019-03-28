@@ -8,26 +8,27 @@ import (
 	"strconv"
 
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 )
 
 type clusterDocsTopicService struct {
 	informer cache.SharedIndexInformer
 	notifier notifier
+	extractor extractor.ClusterDocsTopicUnstructuredExtractor
 }
 
 func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDocsTopicService, error) {
 	svc := &clusterDocsTopicService{
 		informer: informer,
+		extractor: extractor.ClusterDocsTopicUnstructuredExtractor{},
 	}
 
 	err := svc.informer.AddIndexers(cache.Indexers{
 		"viewContext/groupName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractClusterDocsTopic(obj)
+			entity, err := svc.extractor.Single(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
@@ -35,7 +36,7 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 			return []string{fmt.Sprintf("%s/%s", entity.Labels["viewContext.cms.kyma-project.io"], entity.Labels["groupName.cms.kyma-project.io"])}, nil
 		},
 		"viewContext": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractClusterDocsTopic(obj)
+			entity, err := svc.extractor.Single(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
@@ -43,7 +44,7 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 			return []string{entity.Labels["viewContext.cms.kyma-project.io"]}, nil
 		},
 		"groupName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractClusterDocsTopic(obj)
+			entity, err := svc.extractor.Single(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
@@ -68,7 +69,7 @@ func (svc *clusterDocsTopicService) Find(name string) (*v1alpha1.ClusterDocsTopi
 		return nil, err
 	}
 
-	clusterDocsTopic, err := svc.extractClusterDocsTopic(item)
+	clusterDocsTopic, err := svc.extractor.Single(item)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterDocsTopic", item)
 	}
@@ -95,7 +96,7 @@ func (svc *clusterDocsTopicService) List(viewContext *string, groupName *string)
 
 	var clusterDocsTopics []*v1alpha1.ClusterDocsTopic
 	for _, item := range items {
-		clusterDocsTopic, err := svc.extractClusterDocsTopic(item)
+		clusterDocsTopic, err := svc.extractor.Single(item)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterDocsTopic", item)
 		}
@@ -153,19 +154,4 @@ func (svc *clusterDocsTopicService) sortByOrder(docsTopics []*v1alpha1.ClusterDo
 	})
 
 	return err
-}
-
-func (svc *clusterDocsTopicService) extractClusterDocsTopic(obj interface{}) (*v1alpha1.ClusterDocsTopic, error) {
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
-	if err != nil {
-		return nil, errors.Wrapf(err, "while converting resource %s %s to unstructured", pretty.ClusterDocsTopic, obj)
-	}
-
-	var clusterDocsTopic v1alpha1.ClusterDocsTopic
-	err = runtime.DefaultUnstructuredConverter.FromUnstructured(u, &clusterDocsTopic)
-	if err != nil {
-		return nil, errors.Wrapf(err, "while converting unstructured to resource %s %s", pretty.ClusterDocsTopic, u)
-	}
-
-	return &clusterDocsTopic, nil
 }

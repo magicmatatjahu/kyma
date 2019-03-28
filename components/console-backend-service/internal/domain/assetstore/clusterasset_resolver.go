@@ -66,7 +66,7 @@ func (r *clusterAssetResolver) ClusterAssetFilesField(ctx context.Context, obj *
 func (r *clusterAssetResolver) ClusterAssetEventSubscription(ctx context.Context) (<-chan gqlschema.ClusterAssetEvent, error) {
 	channel := make(chan gqlschema.ClusterAssetEvent, 1)
 	filter := func(entity *v1alpha2.ClusterAsset) bool {
-		return true
+		return entity != nil
 	}
 
 	clusterAssetListener := listener.NewClusterAsset(channel, filter, r.clusterAssetConverter)

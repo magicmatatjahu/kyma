@@ -17,6 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"strings"
 )
 
 const (
@@ -71,6 +72,9 @@ func TestClusterDocsTopicsQueries(t *testing.T) {
 
 	t.Log("Query Multiple Resources")
 	multipleRes, err := queryMultipleClusterDocsTopics(c, clusterDocsTopicDetailsFields())
+	t.Log(multipleRes)
+	t.Log(multipleRes.ClusterDocsTopics)
+	t.Log(multipleRes.ClusterDocsTopics[0])
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(multipleRes.ClusterDocsTopics))
 	assertClusterDocsTopicExistsAndEqual(t, fixedClusterDocsTopic, multipleRes.ClusterDocsTopics)
@@ -120,7 +124,7 @@ func assertClusterDocsTopicExistsAndEqual(t *testing.T, expectedElement shared.C
 func assertClusterAssetsExistsAndEqual(t *testing.T, expectedElement shared.ClusterAsset, arr []shared.ClusterAsset) {
 	assert.Condition(t, func() (success bool) {
 		for _, v := range arr {
-			if v.Name == expectedElement.Name {
+			if strings.HasPrefix(v.Name, expectedElement.Name) {
 				checkClusterAsset(t, expectedElement, v)
 				return true
 			}
@@ -229,8 +233,8 @@ func fixClusterDocsTopicMeta(name, order string) metav1.ObjectMeta {
 
 func fixCommonClusterDocsTopicSpec() v1alpha1.CommonDocsTopicSpec {
 	return v1alpha1.CommonDocsTopicSpec{
-		DisplayName: "Docs Topic Sample",
-		Description: "Docs Topic Description",
+		DisplayName: fixture.DocsTopicDisplayName,
+		Description: fixture.DocsTopicDescription,
 		Sources: map[string]v1alpha1.Source{
 			"openapi": {
 				Mode: v1alpha1.DocsTopicSingle,

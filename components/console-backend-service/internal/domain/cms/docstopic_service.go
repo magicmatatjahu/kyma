@@ -9,16 +9,19 @@ import (
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 )
 
 type docsTopicService struct {
 	informer cache.SharedIndexInformer
 	notifier notifier
+	extractor extractor.DocsTopicUnstructuredExtractor
 }
 
 func newDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService, error) {
 	svc := &docsTopicService{
 		informer: informer,
+		extractor: extractor.DocsTopicUnstructuredExtractor{},
 	}
 
 	notifier := resource.NewNotifier()
@@ -35,7 +38,7 @@ func (svc *docsTopicService) Find(namespace, name string) (*v1alpha1.DocsTopic, 
 		return nil, err
 	}
 
-	docsTopic, err := svc.extractDocsTopic(item)
+	docsTopic, err := svc.extractor.Single(item)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *DocsTopic", item)
 	}

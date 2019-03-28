@@ -7,6 +7,7 @@ import (
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/pkg/errors"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/extractor"
 )
 
 //go:generate mockery -name=gqlAssetConverter -output=automock -outpkg=automock -case=underscore
@@ -18,6 +19,7 @@ type Asset struct {
 	channel   chan<- gqlschema.AssetEvent
 	filter    func(entity *v1alpha2.Asset) bool
 	converter gqlAssetConverter
+	extractor extractor.AssetUnstructuredExtractor
 }
 
 func NewAsset(channel chan<- gqlschema.AssetEvent, filter func(entity *v1alpha2.Asset) bool, converter gqlAssetConverter) *Asset {
@@ -25,6 +27,7 @@ func NewAsset(channel chan<- gqlschema.AssetEvent, filter func(entity *v1alpha2.
 		channel:   channel,
 		filter:    filter,
 		converter: converter,
+		extractor: extractor.AssetUnstructuredExtractor{},
 	}
 }
 
@@ -41,9 +44,12 @@ func (l *Asset) OnDelete(object interface{}) {
 }
 
 func (l *Asset) onEvent(eventType gqlschema.SubscriptionEventType, object interface{}) {
-	entity, ok := object.(*v1alpha2.Asset)
-	if !ok {
+	entity, err := l.extractor.Single(object)
+	if err != nil {
 		glog.Error(fmt.Errorf("incorrect object type: %T, should be: *Asset", object))
+		return
+	}
+	if entity == nil {
 		return
 	}
 

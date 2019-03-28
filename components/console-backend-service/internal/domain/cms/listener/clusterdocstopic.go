@@ -7,6 +7,7 @@ import (
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/pkg/errors"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 )
 
 //go:generate mockery -name=gqlClusterDocsTopicConverter -output=automock -outpkg=automock -case=underscore
@@ -18,6 +19,7 @@ type ClusterDocsTopic struct {
 	channel   chan<- gqlschema.ClusterDocsTopicEvent
 	filter    func(entity *v1alpha1.ClusterDocsTopic) bool
 	converter gqlClusterDocsTopicConverter
+	extractor extractor.ClusterDocsTopicUnstructuredExtractor
 }
 
 func NewClusterDocsTopic(channel chan<- gqlschema.ClusterDocsTopicEvent, filter func(entity *v1alpha1.ClusterDocsTopic) bool, converter gqlClusterDocsTopicConverter) *ClusterDocsTopic {
@@ -25,6 +27,7 @@ func NewClusterDocsTopic(channel chan<- gqlschema.ClusterDocsTopicEvent, filter 
 		channel:   channel,
 		filter:    filter,
 		converter: converter,
+		extractor: extractor.ClusterDocsTopicUnstructuredExtractor{},
 	}
 }
 
@@ -41,9 +44,12 @@ func (l *ClusterDocsTopic) OnDelete(object interface{}) {
 }
 
 func (l *ClusterDocsTopic) onEvent(eventType gqlschema.SubscriptionEventType, object interface{}) {
-	entity, ok := object.(*v1alpha1.ClusterDocsTopic)
-	if !ok {
+	entity, err := l.extractor.Single(object)
+	if err != nil {
 		glog.Error(fmt.Errorf("incorrect object type: %T, should be: *ClusterDocsTopic", object))
+		return
+	}
+	if entity == nil {
 		return
 	}
 
