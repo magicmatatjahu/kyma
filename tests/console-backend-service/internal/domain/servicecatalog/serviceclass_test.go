@@ -40,12 +40,12 @@ func TestServiceClassesQueries(t *testing.T) {
 
 	docsTopicClient := resource.NewDocsTopic(cmsCli, expectedResource.Namespace, t.Logf)
 
-	t.Log(fmt.Sprintf("Create docsTopic %s", expectedResource.Name))
-	err = docsTopicClient.Create(fixDocsTopicMeta(expectedResource.Name), fixCommonDocsTopicSpec())
+	t.Log(fmt.Sprintf("Create docsTopic %s", expectedResource.ExternalName))
+	err = docsTopicClient.Create(fixDocsTopicMeta(expectedResource.ExternalName), fixCommonDocsTopicSpec())
 	require.NoError(t, err)
 
-	t.Log(fmt.Sprintf("Wait for docsTopic %s Ready", expectedResource.Name))
-	err = wait.ForDocsTopicReady(expectedResource.Name, docsTopicClient.Get)
+	t.Log(fmt.Sprintf("Wait for docsTopic %s Ready", expectedResource.ExternalName))
+	err = wait.ForDocsTopicReady(expectedResource.ExternalName, docsTopicClient.Get)
 	require.NoError(t, err)
 
 	resourceDetailsQuery := `

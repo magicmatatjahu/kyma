@@ -40,12 +40,12 @@ func TestClusterServiceClassesQueries(t *testing.T) {
 
 	clusterDocsTopicClient := resource.NewClusterDocsTopic(cmsCli, t.Logf)
 
-	t.Log(fmt.Sprintf("Create clusterDocsTopic %s", expectedResource.Name))
-	err = clusterDocsTopicClient.Create(fixClusterDocsTopicMeta(expectedResource.Name), fixCommonClusterDocsTopicSpec())
+	t.Log(fmt.Sprintf("Create clusterDocsTopic %s", expectedResource.ExternalName))
+	err = clusterDocsTopicClient.Create(fixClusterDocsTopicMeta(expectedResource.ExternalName), fixCommonClusterDocsTopicSpec())
 	require.NoError(t, err)
 
-	t.Log(fmt.Sprintf("Wait for clusterDocsTopic %s Ready", expectedResource.Name))
-	err = wait.ForClusterDocsTopicReady(expectedResource.Name, clusterDocsTopicClient.Get)
+	t.Log(fmt.Sprintf("Wait for clusterDocsTopic %s Ready", expectedResource.ExternalName))
+	err = wait.ForClusterDocsTopicReady(expectedResource.ExternalName, clusterDocsTopicClient.Get)
 	require.NoError(t, err)
 
 	resourceDetailsQuery := `
