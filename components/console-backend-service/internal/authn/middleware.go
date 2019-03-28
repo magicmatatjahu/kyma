@@ -3,12 +3,14 @@ package authn
 import (
 	"context"
 	"net/http"
+
 	"github.com/pkg/errors"
+
+	"strings"
 
 	"github.com/golang/glog"
 	"k8s.io/apiserver/pkg/authentication/authenticator"
 	"k8s.io/apiserver/pkg/authentication/user"
-	"strings"
 )
 
 var userInfoCtxKey = &contextKey{"userInfo"}

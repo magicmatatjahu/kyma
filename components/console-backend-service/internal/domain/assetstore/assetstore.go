@@ -72,7 +72,6 @@ func (r *PluggableContainer) Enable() error {
 		return errors.Wrapf(err, "while creating asset service")
 	}
 
-
 	r.Pluggable.EnableAndSyncDynamicInformerFactory(r.informerFactory, func() {
 		r.Resolver = &domainResolver{
 			clusterAssetResolver: newClusterAssetResolver(clusterAssetService),

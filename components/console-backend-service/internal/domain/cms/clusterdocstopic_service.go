@@ -8,21 +8,21 @@ import (
 	"strconv"
 
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/tools/cache"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 )
 
 type clusterDocsTopicService struct {
-	informer cache.SharedIndexInformer
-	notifier notifier
+	informer  cache.SharedIndexInformer
+	notifier  notifier
 	extractor extractor.ClusterDocsTopicUnstructuredExtractor
 }
 
 func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDocsTopicService, error) {
 	svc := &clusterDocsTopicService{
-		informer: informer,
+		informer:  informer,
 		extractor: extractor.ClusterDocsTopicUnstructuredExtractor{},
 	}
 

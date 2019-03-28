@@ -25,4 +25,3 @@ func (e *AssetStatusExtractor) phase(phase v1alpha2.AssetPhase) gqlschema.AssetP
 		return gqlschema.AssetPhaseTypeFailed
 	}
 }
-

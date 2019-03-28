@@ -4,23 +4,23 @@ import (
 	"fmt"
 
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 )
 
 type docsTopicService struct {
-	informer cache.SharedIndexInformer
-	notifier notifier
+	informer  cache.SharedIndexInformer
+	notifier  notifier
 	extractor extractor.DocsTopicUnstructuredExtractor
 }
 
 func newDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService, error) {
 	svc := &docsTopicService{
-		informer: informer,
+		informer:  informer,
 		extractor: extractor.DocsTopicUnstructuredExtractor{},
 	}
 

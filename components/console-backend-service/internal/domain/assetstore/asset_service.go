@@ -4,21 +4,21 @@ import (
 	"fmt"
 
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/extractor"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/tools/cache"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/extractor"
 )
 
 type assetService struct {
-	informer cache.SharedIndexInformer
-	notifier notifier
+	informer  cache.SharedIndexInformer
+	notifier  notifier
 	extractor extractor.AssetUnstructuredExtractor
 }
 
 func newAssetService(informer cache.SharedIndexInformer) (*assetService, error) {
 	svc := &assetService{
-		informer: informer,
+		informer:  informer,
 		extractor: extractor.AssetUnstructuredExtractor{},
 	}
 

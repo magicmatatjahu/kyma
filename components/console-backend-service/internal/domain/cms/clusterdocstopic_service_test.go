@@ -66,18 +66,33 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 		clusterDocsTopics := []runtime.Object{
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "1",
+				"labels": map[string]interface{}{
+					"order.cms.kyma-project.io": "1",
+				},
 			}),
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "2",
+				"labels": map[string]interface{}{
+					"order.cms.kyma-project.io": "2",
+				},
 			}),
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "3",
+				"labels": map[string]interface{}{
+					"order.cms.kyma-project.io": "3",
+				},
 			}),
 		}
 		expected := []*v1alpha1.ClusterDocsTopic{
-			fixClusterDocsTopic("1", nil),
-			fixClusterDocsTopic("2", nil),
-			fixClusterDocsTopic("3", nil),
+			fixClusterDocsTopic("1", map[string]string{
+				"order.cms.kyma-project.io": "1",
+			}),
+			fixClusterDocsTopic("2", map[string]string{
+				"order.cms.kyma-project.io": "2",
+			}),
+			fixClusterDocsTopic("3", map[string]string{
+				"order.cms.kyma-project.io": "3",
+			}),
 		}
 
 		informer := fixClusterDocsTopicInformer(clusterDocsTopics...)

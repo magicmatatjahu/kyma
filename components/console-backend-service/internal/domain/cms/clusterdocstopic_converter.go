@@ -2,8 +2,8 @@ package cms
 
 import (
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 )
 
 type clusterDocsTopicConverter struct {

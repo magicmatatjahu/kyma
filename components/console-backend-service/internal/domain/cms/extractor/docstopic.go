@@ -2,9 +2,9 @@ package extractor
 
 import (
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"github.com/pkg/errors"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 type DocsTopicUnstructuredExtractor struct{}

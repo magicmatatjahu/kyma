@@ -1,10 +1,10 @@
 package extractor
 
 import (
-	"k8s.io/apimachinery/pkg/runtime"
-	"github.com/pkg/errors"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 type ClusterAssetUnstructuredExtractor struct{}

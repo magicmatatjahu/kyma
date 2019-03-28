@@ -5,9 +5,9 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/pkg/errors"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
 )
 
 //go:generate mockery -name=gqlClusterDocsTopicConverter -output=automock -outpkg=automock -case=underscore
