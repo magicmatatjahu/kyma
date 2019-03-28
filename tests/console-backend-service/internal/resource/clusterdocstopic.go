@@ -1,16 +1,16 @@
 package resource
 
 import (
-	"github.com/pkg/errors"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"github.com/pkg/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/dynamic"
 )
 
 type ClusterDocsTopic struct {
-	resCli      *Resource
+	resCli *Resource
 }
 
 func NewClusterDocsTopic(dynamicCli dynamic.Interface, logFn func(format string, args ...interface{})) *ClusterDocsTopic {

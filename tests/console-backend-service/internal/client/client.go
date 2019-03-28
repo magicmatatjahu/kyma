@@ -6,10 +6,10 @@ import (
 	uiClientset "github.com/kyma-project/kyma/components/console-backend-service/pkg/client/clientset/versioned"
 	idpClientset "github.com/kyma-project/kyma/components/idppreset/pkg/client/clientset/versioned"
 	"github.com/pkg/errors"
+	"k8s.io/client-go/dynamic"
 	appsv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/dynamic"
 )
 
 func NewClientWithConfig() (*v1.CoreV1Client, *rest.Config, error) {

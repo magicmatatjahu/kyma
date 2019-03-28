@@ -17,5 +17,5 @@ type AssetStatus struct {
 type AssetPhaseType string
 
 const (
-	AssetPhaseTypeReady   AssetPhaseType = "READY"
+	AssetPhaseTypeReady AssetPhaseType = "READY"
 )

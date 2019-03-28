@@ -19,5 +19,5 @@ type DocsTopicStatus struct {
 type DocsTopicPhaseType string
 
 const (
-	DocsTopicPhaseTypeReady   DocsTopicPhaseType = "READY"
+	DocsTopicPhaseTypeReady DocsTopicPhaseType = "READY"
 )

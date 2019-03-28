@@ -3,19 +3,20 @@
 package cms
 
 import (
-	"testing"
-	"github.com/kyma-project/kyma/tests/console-backend-service/internal/graphql"
-	"github.com/stretchr/testify/require"
-	"github.com/kyma-project/kyma/tests/console-backend-service/internal/client"
-	"github.com/kyma-project/kyma/tests/console-backend-service/internal/resource"
 	"fmt"
+	"testing"
+
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared/wait"
-	"github.com/stretchr/testify/assert"
+	tester "github.com/kyma-project/kyma/tests/console-backend-service"
+	"github.com/kyma-project/kyma/tests/console-backend-service/internal/client"
 	"github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared"
-	"github.com/kyma-project/kyma/tests/console-backend-service"
 	"github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared/fixture"
+	"github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared/wait"
+	"github.com/kyma-project/kyma/tests/console-backend-service/internal/graphql"
+	"github.com/kyma-project/kyma/tests/console-backend-service/internal/resource"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -220,7 +221,7 @@ func fixClusterDocsTopicMeta(name, order string) metav1.ObjectMeta {
 	return metav1.ObjectMeta{
 		Name: name,
 		Labels: map[string]string{
-			OrderLabel: order,
+			OrderLabel:     order,
 			GroupNameLabel: fixture.DocsTopicGroupName,
 		},
 	}

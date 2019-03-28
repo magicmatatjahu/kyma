@@ -1,12 +1,15 @@
+// +build acceptance
+
 package cms
 
 import (
+	"log"
+	"os"
 	"testing"
+
 	"github.com/kyma-project/kyma/tests/console-backend-service/internal/dex"
 	"github.com/kyma-project/kyma/tests/console-backend-service/internal/graphql"
 	"github.com/kyma-project/kyma/tests/console-backend-service/internal/module"
-	"os"
-	"log"
 	"github.com/pkg/errors"
 )
 

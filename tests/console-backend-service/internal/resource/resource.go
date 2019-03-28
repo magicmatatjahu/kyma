@@ -11,9 +11,9 @@ import (
 )
 
 type Resource struct {
-	resCli dynamic.ResourceInterface
-	namespace  string
-	kind string
+	resCli    dynamic.ResourceInterface
+	namespace string
+	kind      string
 
 	log func(format string, args ...interface{})
 }
