@@ -3,7 +3,7 @@ package fixture
 import "github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared"
 
 const (
-	DocsTopicGroupName   = "ExampleGroupName"
+	DocsTopicGroupName   = "example-group-name"
 	DocsTopicDisplayName = "Docs Topic Sample"
 	DocsTopicDescription = "Docs Topic Description"
 )
