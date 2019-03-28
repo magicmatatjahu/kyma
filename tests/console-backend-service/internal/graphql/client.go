@@ -50,7 +50,6 @@ func New() (*Client, error) {
 	client.gqlClient.Log = client.addLog
 
 	return client, nil
-
 }
 
 func (c *Client) DoQuery(q string, res interface{}) error {
@@ -106,7 +105,6 @@ func (c *Client) Subscribe(req *Request) *Subscription {
 }
 
 func (c *Client) ChangeUser(user User) error {
-
 	var token string
 
 	config, err := loadConfig(user)
