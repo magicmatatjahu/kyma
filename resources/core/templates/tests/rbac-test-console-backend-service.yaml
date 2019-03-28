@@ -47,12 +47,6 @@ rules:
   - apiGroups: ["ui.kyma-project.io"]
     resources: ["backendmodules"]
     verbs: ["create", "get", "delete"]
-  - apiGroups: ["assetstore.kyma-project.io"]
-    resources: ["clusterbuckets", "clusterassets", "buckets", "assets"]
-    verbs: ["create", "get"]
-  - apiGroups: ["cms.kyma-project.io"]
-    resources: ["docstopics", "clusterdocstopics"]
-    verbs: ["create", "get"]
 
 ---
 kind: ClusterRoleBinding
