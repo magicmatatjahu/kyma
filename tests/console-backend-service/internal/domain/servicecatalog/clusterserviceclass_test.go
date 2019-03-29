@@ -143,7 +143,7 @@ func checkClusterClass(t *testing.T, expected, actual shared.ClusterServiceClass
 
 	// ClusterDocsTopic
 	require.NotEmpty(t, actual.ClusterDocsTopic)
-	checkClusterDocsTopic(t, fixture.ClusterDocsTopic(expected.Name), actual.ClusterDocsTopic)
+	checkClusterDocsTopic(t, fixture.ClusterDocsTopic(expected.ExternalName), actual.ClusterDocsTopic)
 }
 
 func checkClusterPlan(t *testing.T, expected, actual shared.ClusterServicePlan) {
