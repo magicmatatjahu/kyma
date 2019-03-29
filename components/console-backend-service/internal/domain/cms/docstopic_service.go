@@ -5,12 +5,18 @@ import (
 
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
 	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
 )
+
+//go:generate mockery -name=docsTopicSvc -output=automock -outpkg=automock -case=underscore
+//go:generate failery -name=docsTopicSvc -case=underscore -output disabled -outpkg disabled
+type docsTopicSvc interface {
+	Find(namespace, name string) (*v1alpha1.DocsTopic, error)
+	Subscribe(listener resource.Listener)
+	Unsubscribe(listener resource.Listener)
+}
 
 type docsTopicService struct {
 	informer  cache.SharedIndexInformer
@@ -38,7 +44,7 @@ func (svc *docsTopicService) Find(namespace, name string) (*v1alpha1.DocsTopic, 
 		return nil, err
 	}
 
-	docsTopic, err := svc.extractor.Single(item)
+	docsTopic, err := svc.extractor.Do(item)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *DocsTopic", item)
 	}
@@ -52,19 +58,4 @@ func (svc *docsTopicService) Subscribe(listener resource.Listener) {
 
 func (svc *docsTopicService) Unsubscribe(listener resource.Listener) {
 	svc.notifier.DeleteListener(listener)
-}
-
-func (svc *docsTopicService) extractDocsTopic(obj interface{}) (*v1alpha1.DocsTopic, error) {
-	u, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
-	if err != nil {
-		return nil, errors.Wrapf(err, "while converting resource %s %s to unstructured", pretty.DocsTopic, obj)
-	}
-
-	var docsTopic v1alpha1.DocsTopic
-	err = runtime.DefaultUnstructuredConverter.FromUnstructured(u, &docsTopic)
-	if err != nil {
-		return nil, errors.Wrapf(err, "while converting unstructured to resource %s %s", pretty.DocsTopic, u)
-	}
-
-	return &docsTopic, nil
 }

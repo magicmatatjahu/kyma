@@ -91,7 +91,7 @@ func fixClusterAsset() *v1alpha2.ClusterAsset {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "ExampleName",
 			Labels: map[string]string{
-				"type.cms.kyma-project.io": "ExampleType",
+				CmsTypeLabel: "ExampleType",
 			},
 		},
 		Spec: v1alpha2.ClusterAssetSpec{

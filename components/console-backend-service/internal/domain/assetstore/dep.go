@@ -11,38 +11,6 @@ type File struct {
 	Metadata map[string]interface{}
 }
 
-//go:generate mockery -name=clusterAssetSvc -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=clusterAssetSvc -case=underscore -output disabled -outpkg disabled
-type clusterAssetSvc interface {
-	Find(name string) (*v1alpha2.ClusterAsset, error)
-	ListForDocsTopicByType(docsTopicName string, types []string) ([]*v1alpha2.ClusterAsset, error)
-	Subscribe(listener resource.Listener)
-	Unsubscribe(listener resource.Listener)
-}
-
-//go:generate mockery -name=gqlClusterAssetConverter -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=gqlClusterAssetConverter -case=underscore -output disabled -outpkg disabled
-type gqlClusterAssetConverter interface {
-	ToGQL(in *v1alpha2.ClusterAsset) (*gqlschema.ClusterAsset, error)
-	ToGQLs(in []*v1alpha2.ClusterAsset) ([]gqlschema.ClusterAsset, error)
-}
-
-//go:generate mockery -name=assetSvc -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=assetSvc -case=underscore -output disabled -outpkg disabled
-type assetSvc interface {
-	Find(namespace, name string) (*v1alpha2.Asset, error)
-	ListForDocsTopicByType(namespace, docsTopicName string, types []string) ([]*v1alpha2.Asset, error)
-	Subscribe(listener resource.Listener)
-	Unsubscribe(listener resource.Listener)
-}
-
-//go:generate mockery -name=gqlAssetConverter -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=gqlAssetConverter -case=underscore -output disabled -outpkg disabled
-type gqlAssetConverter interface {
-	ToGQL(in *v1alpha2.Asset) (*gqlschema.Asset, error)
-	ToGQLs(in []*v1alpha2.Asset) ([]gqlschema.Asset, error)
-}
-
 //go:generate mockery -name=fileSvc -output=automock -outpkg=automock -case=underscore
 type fileSvc interface {
 	FilterByExtensions(statusRef *v1alpha2.AssetStatusRef, filterExtensions []string) ([]*File, error)

@@ -44,7 +44,7 @@ func (l *DocsTopic) OnDelete(object interface{}) {
 }
 
 func (l *DocsTopic) onEvent(eventType gqlschema.SubscriptionEventType, object interface{}) {
-	entity, err := l.extractor.Single(object)
+	entity, err := l.extractor.Do(object)
 	if err != nil {
 		glog.Error(fmt.Errorf("incorrect object type: %T, should be: *DocsTopic", object))
 		return

@@ -35,7 +35,7 @@ func TestClusterServiceClassesQueries(t *testing.T) {
 
 	expectedResource := clusterServiceClass()
 
-	cmsCli, _, err := client.NewCmsClientWithConfig()
+	cmsCli, _, err := client.NewDynamicClientWithConfig()
 	require.NoError(t, err)
 
 	clusterDocsTopicClient := resource.NewClusterDocsTopic(cmsCli, t.Logf)

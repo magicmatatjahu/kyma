@@ -6,6 +6,13 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 )
 
+//go:generate mockery -name=gqlClusterDocsTopicConverter -output=automock -outpkg=automock -case=underscore
+//go:generate failery -name=gqlClusterDocsTopicConverter -case=underscore -output disabled -outpkg disabled
+type gqlClusterDocsTopicConverter interface {
+	ToGQL(in *v1alpha1.ClusterDocsTopic) (*gqlschema.ClusterDocsTopic, error)
+	ToGQLs(in []*v1alpha1.ClusterDocsTopic) ([]gqlschema.ClusterDocsTopic, error)
+}
+
 type clusterDocsTopicConverter struct {
 	extractor extractor.DocsTopicStatusExtractor
 }
@@ -21,7 +28,7 @@ func (c *clusterDocsTopicConverter) ToGQL(item *v1alpha1.ClusterDocsTopic) (*gql
 		Name:        item.Name,
 		Description: item.Spec.Description,
 		DisplayName: item.Spec.DisplayName,
-		GroupName:   item.Labels["groupName.cms.kyma-project.io"],
+		GroupName:   item.Labels[GroupNameLabel],
 		Status:      status,
 	}
 

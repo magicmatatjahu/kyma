@@ -15,6 +15,11 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+const (
+	CmsDocsTopicLabel = "cms.kyma-project.io/docstopic"
+	CmsTypeLabel      = "cms.kyma-project.io/type"
+)
+
 type PluggableContainer struct {
 	*module.Pluggable
 	cfg *resolverConfig
@@ -35,7 +40,7 @@ func New(restConfig *rest.Config, informerResyncPeriod time.Duration) (*Pluggabl
 			dynamicClient:        dynamicClient,
 			informerResyncPeriod: informerResyncPeriod,
 		},
-		Pluggable:           module.NewPluggable("content"),
+		Pluggable:           module.NewPluggable("assetstore"),
 		AssetStoreRetriever: &assetStoreRetriever{},
 	}
 

@@ -6,6 +6,13 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 )
 
+//go:generate mockery -name=gqlAssetConverter -output=automock -outpkg=automock -case=underscore
+//go:generate failery -name=gqlAssetConverter -case=underscore -output disabled -outpkg disabled
+type gqlAssetConverter interface {
+	ToGQL(in *v1alpha2.Asset) (*gqlschema.Asset, error)
+	ToGQLs(in []*v1alpha2.Asset) ([]gqlschema.Asset, error)
+}
+
 type assetConverter struct {
 	extractor extractor.AssetStatusExtractor
 }
@@ -20,7 +27,7 @@ func (c *assetConverter) ToGQL(item *v1alpha2.Asset) (*gqlschema.Asset, error) {
 	asset := gqlschema.Asset{
 		Name:      item.Name,
 		Namespace: item.Namespace,
-		Type:      item.Labels["type.cms.kyma-project.io"],
+		Type:      item.Labels[CmsTypeLabel],
 		Status:    status,
 	}
 

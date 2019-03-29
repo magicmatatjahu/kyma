@@ -67,31 +67,31 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "1",
 				"labels": map[string]interface{}{
-					"order.cms.kyma-project.io": "1",
+					cms.OrderLabel: "1",
 				},
 			}),
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "2",
 				"labels": map[string]interface{}{
-					"order.cms.kyma-project.io": "2",
+					cms.OrderLabel: "2",
 				},
 			}),
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "3",
 				"labels": map[string]interface{}{
-					"order.cms.kyma-project.io": "3",
+					cms.OrderLabel: "3",
 				},
 			}),
 		}
 		expected := []*v1alpha1.ClusterDocsTopic{
 			fixClusterDocsTopic("1", map[string]string{
-				"order.cms.kyma-project.io": "1",
+				cms.OrderLabel: "1",
 			}),
 			fixClusterDocsTopic("2", map[string]string{
-				"order.cms.kyma-project.io": "2",
+				cms.OrderLabel: "2",
 			}),
 			fixClusterDocsTopic("3", map[string]string{
-				"order.cms.kyma-project.io": "3",
+				cms.OrderLabel: "3",
 			}),
 		}
 
@@ -115,8 +115,8 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "1",
 				"labels": map[string]interface{}{
-					"viewContext.cms.kyma-project.io": viewContext,
-					"groupName.cms.kyma-project.io":   groupName,
+					cms.ViewContextLabel: viewContext,
+					cms.GroupNameLabel:   groupName,
 				},
 			}),
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
@@ -128,8 +128,8 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 		}
 		expected := []*v1alpha1.ClusterDocsTopic{
 			fixClusterDocsTopic("1", map[string]string{
-				"viewContext.cms.kyma-project.io": viewContext,
-				"groupName.cms.kyma-project.io":   groupName,
+				cms.ViewContextLabel: viewContext,
+				cms.GroupNameLabel:   groupName,
 			}),
 		}
 
@@ -152,7 +152,7 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "1",
 				"labels": map[string]interface{}{
-					"viewContext.cms.kyma-project.io": viewContext,
+					cms.ViewContextLabel: viewContext,
 				},
 			}),
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
@@ -164,7 +164,7 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 		}
 		expected := []*v1alpha1.ClusterDocsTopic{
 			fixClusterDocsTopic("1", map[string]string{
-				"viewContext.cms.kyma-project.io": viewContext,
+				cms.ViewContextLabel: viewContext,
 			}),
 		}
 
@@ -187,7 +187,7 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "1",
 				"labels": map[string]interface{}{
-					"groupName.cms.kyma-project.io": groupName,
+					cms.GroupNameLabel: groupName,
 				},
 			}),
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
@@ -199,7 +199,7 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 		}
 		expected := []*v1alpha1.ClusterDocsTopic{
 			fixClusterDocsTopic("1", map[string]string{
-				"groupName.cms.kyma-project.io": groupName,
+				cms.GroupNameLabel: groupName,
 			}),
 		}
 
@@ -221,7 +221,7 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "2",
 				"labels": map[string]interface{}{
-					"order.cms.kyma-project.io": "2",
+					cms.OrderLabel: "2",
 				},
 			}),
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
@@ -230,25 +230,25 @@ func TestClusterDocsTopicService_List(t *testing.T) {
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "3",
 				"labels": map[string]interface{}{
-					"order.cms.kyma-project.io": "3",
+					cms.OrderLabel: "3",
 				},
 			}),
 			fixUnstructuredClusterDocsTopic(map[string]interface{}{
 				"name": "1",
 				"labels": map[string]interface{}{
-					"order.cms.kyma-project.io": "1",
+					cms.OrderLabel: "1",
 				},
 			}),
 		}
 		expected := []*v1alpha1.ClusterDocsTopic{
 			fixClusterDocsTopic("1", map[string]string{
-				"order.cms.kyma-project.io": "1",
+				cms.OrderLabel: "1",
 			}),
 			fixClusterDocsTopic("2", map[string]string{
-				"order.cms.kyma-project.io": "2",
+				cms.OrderLabel: "2",
 			}),
 			fixClusterDocsTopic("3", map[string]string{
-				"order.cms.kyma-project.io": "3",
+				cms.OrderLabel: "3",
 			}),
 			fixClusterDocsTopic("4", nil),
 		}

@@ -9,7 +9,6 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 	"github.com/pkg/errors"
 )
 
@@ -37,9 +36,6 @@ func (r *clusterAssetResolver) ClusterAssetFilesField(ctx context.Context, obj *
 
 	asset, err := r.clusterAssetSvc.Find(obj.Name)
 	if err != nil {
-		if module.IsDisabledModuleError(err) {
-			return nil, err
-		}
 		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", pretty.ClusterAsset, pretty.ClusterAsset, obj.Name))
 		return nil, gqlerror.New(err, pretty.ClusterAsset)
 	}

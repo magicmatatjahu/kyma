@@ -93,7 +93,7 @@ func fixAsset() *v1alpha2.Asset {
 			Name:      "ExampleName",
 			Namespace: "ExampleNamespace",
 			Labels: map[string]string{
-				"type.cms.kyma-project.io": "ExampleType",
+				CmsTypeLabel: "ExampleType",
 			},
 		},
 		Spec: v1alpha2.AssetSpec{

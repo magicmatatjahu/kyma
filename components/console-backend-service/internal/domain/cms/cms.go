@@ -16,6 +16,13 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+const (
+	ViewContextLabel = "cms.kyma-project.io/viewContext"
+	GroupNameLabel   = "cms.kyma-project.io/groupName"
+	DocsTopicLabel   = "cms.kyma-project.io/docstopic"
+	OrderLabel       = "cms.kyma-project.io/order"
+)
+
 type PluggableContainer struct {
 	*module.Pluggable
 	cfg *resolverConfig
@@ -37,7 +44,7 @@ func New(restConfig *rest.Config, informerResyncPeriod time.Duration, assetStore
 			informerResyncPeriod: informerResyncPeriod,
 			assetStoreRetriever:  assetStoreRetriever,
 		},
-		Pluggable:    module.NewPluggable("content"),
+		Pluggable:    module.NewPluggable("cms"),
 		CmsRetriever: &cmsRetriever{},
 	}
 

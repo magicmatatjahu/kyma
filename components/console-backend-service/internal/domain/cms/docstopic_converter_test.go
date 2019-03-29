@@ -97,7 +97,7 @@ func fixDocsTopic() *v1alpha1.DocsTopic {
 			Name:      "ExampleName",
 			Namespace: "ExampleNamespace",
 			Labels: map[string]string{
-				"groupName.cms.kyma-project.io": "exampleGroupName",
+				GroupNameLabel: "exampleGroupName",
 			},
 		},
 		Spec: v1alpha1.DocsTopicSpec{

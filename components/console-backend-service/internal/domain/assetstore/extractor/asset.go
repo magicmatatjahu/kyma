@@ -9,7 +9,7 @@ import (
 
 type AssetUnstructuredExtractor struct{}
 
-func (ext *AssetUnstructuredExtractor) Single(obj interface{}) (*v1alpha2.Asset, error) {
+func (ext *AssetUnstructuredExtractor) Do(obj interface{}) (*v1alpha2.Asset, error) {
 	if obj == nil {
 		return nil, nil
 	}

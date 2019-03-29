@@ -44,7 +44,7 @@ func (l *Asset) OnDelete(object interface{}) {
 }
 
 func (l *Asset) onEvent(eventType gqlschema.SubscriptionEventType, object interface{}) {
-	entity, err := l.extractor.Single(object)
+	entity, err := l.extractor.Do(object)
 	if err != nil {
 		glog.Error(fmt.Errorf("incorrect object type: %T, should be: *Asset", object))
 		return

@@ -35,7 +35,7 @@ func TestServiceClassesQueries(t *testing.T) {
 
 	expectedResource := serviceClass()
 
-	cmsCli, _, err := client.NewCmsClientWithConfig()
+	cmsCli, _, err := client.NewDynamicClientWithConfig()
 	require.NoError(t, err)
 
 	docsTopicClient := resource.NewDocsTopic(cmsCli, expectedResource.Namespace, t.Logf)

@@ -9,7 +9,7 @@ import (
 
 type ClusterDocsTopicUnstructuredExtractor struct{}
 
-func (ext *ClusterDocsTopicUnstructuredExtractor) Single(obj interface{}) (*v1alpha1.ClusterDocsTopic, error) {
+func (ext *ClusterDocsTopicUnstructuredExtractor) Do(obj interface{}) (*v1alpha1.ClusterDocsTopic, error) {
 	if obj == nil {
 		return nil, nil
 	}

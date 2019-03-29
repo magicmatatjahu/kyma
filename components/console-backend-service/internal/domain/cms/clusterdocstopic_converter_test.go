@@ -93,7 +93,7 @@ func fixClusterDocsTopic() *v1alpha1.ClusterDocsTopic {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "ExampleName",
 			Labels: map[string]string{
-				"groupName.cms.kyma-project.io": "exampleGroupName",
+				GroupNameLabel: "exampleGroupName",
 			},
 		},
 		Spec: v1alpha1.ClusterDocsTopicSpec{

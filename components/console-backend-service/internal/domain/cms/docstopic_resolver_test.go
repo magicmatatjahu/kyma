@@ -28,7 +28,7 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 					Name:      "ExampleAssetA",
 					Namespace: namespace,
 					Labels: map[string]string{
-						"docstopic.cms.kyma-project.io": docsTopicName,
+						cms.DocsTopicLabel: docsTopicName,
 					},
 				},
 			},
@@ -37,7 +37,7 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 					Name:      "ExampleAssetB",
 					Namespace: namespace,
 					Labels: map[string]string{
-						"docstopic.cms.kyma-project.io": docsTopicName,
+						cms.DocsTopicLabel: docsTopicName,
 					},
 				},
 			},
@@ -46,7 +46,7 @@ func TestDocsTopicResolver_DocsTopicAssetsField(t *testing.T) {
 					Name:      "ExampleAssetC",
 					Namespace: namespace,
 					Labels: map[string]string{
-						"docstopic.cms.kyma-project.io": docsTopicName,
+						cms.DocsTopicLabel: docsTopicName,
 					},
 				},
 			},

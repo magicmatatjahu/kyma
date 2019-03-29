@@ -10,6 +10,15 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
+//go:generate mockery -name=clusterAssetSvc -output=automock -outpkg=automock -case=underscore
+//go:generate failery -name=clusterAssetSvc -case=underscore -output disabled -outpkg disabled
+type clusterAssetSvc interface {
+	Find(name string) (*v1alpha2.ClusterAsset, error)
+	ListForDocsTopicByType(docsTopicName string, types []string) ([]*v1alpha2.ClusterAsset, error)
+	Subscribe(listener resource.Listener)
+	Unsubscribe(listener resource.Listener)
+}
+
 type clusterAssetService struct {
 	informer  cache.SharedIndexInformer
 	notifier  notifier
@@ -24,20 +33,20 @@ func newClusterAssetService(informer cache.SharedIndexInformer) (*clusterAssetSe
 
 	err := svc.informer.AddIndexers(cache.Indexers{
 		"docsTopicName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractor.Single(obj)
+			entity, err := svc.extractor.Do(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
-			return []string{entity.Labels["docstopic.cms.kyma-project.io"]}, nil
+			return []string{entity.Labels[CmsDocsTopicLabel]}, nil
 		},
 		"docsTopicName/type": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractor.Single(obj)
+			entity, err := svc.extractor.Do(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
-			return []string{fmt.Sprintf("%s/%s", entity.Labels["docstopic.cms.kyma-project.io"], entity.Labels["type.cms.kyma-project.io"])}, nil
+			return []string{fmt.Sprintf("%s/%s", entity.Labels[CmsDocsTopicLabel], entity.Labels[CmsTypeLabel])}, nil
 		},
 	})
 	if err != nil {
@@ -57,7 +66,7 @@ func (svc *clusterAssetService) Find(name string) (*v1alpha2.ClusterAsset, error
 		return nil, err
 	}
 
-	clusterAsset, err := svc.extractor.Single(item)
+	clusterAsset, err := svc.extractor.Do(item)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterAsset", item)
 	}
@@ -86,7 +95,7 @@ func (svc *clusterAssetService) ListForDocsTopicByType(docsTopicName string, typ
 
 	var clusterAssets []*v1alpha2.ClusterAsset
 	for _, item := range items {
-		clusterAsset, err := svc.extractor.Single(item)
+		clusterAsset, err := svc.extractor.Do(item)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterAsset", item)
 		}

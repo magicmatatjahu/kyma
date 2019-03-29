@@ -9,7 +9,7 @@ import (
 
 type DocsTopicUnstructuredExtractor struct{}
 
-func (ext *DocsTopicUnstructuredExtractor) Single(obj interface{}) (*v1alpha1.DocsTopic, error) {
+func (ext *DocsTopicUnstructuredExtractor) Do(obj interface{}) (*v1alpha1.DocsTopic, error) {
 	if obj == nil {
 		return nil, nil
 	}

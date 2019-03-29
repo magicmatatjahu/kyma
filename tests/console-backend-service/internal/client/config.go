@@ -8,10 +8,18 @@ import (
 )
 
 func NewRestClientConfig(kubeconfigPath string) (*rest.Config, error) {
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	var config *rest.Config
+	var err error
+	if kubeconfigPath != "" {
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	} else {
+		config, err = rest.InClusterConfig()
+	}
+
 	if err != nil {
 		return nil, err
 	}
+
 	return config, nil
 }
 

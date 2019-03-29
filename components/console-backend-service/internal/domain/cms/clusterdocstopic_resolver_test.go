@@ -95,7 +95,7 @@ func TestClusterDocsTopicResolver_ClusterDocsTopicAssetsField(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "ExampleClusterAssetA",
 					Labels: map[string]string{
-						"docstopic.cms.kyma-project.io": docsTopicName,
+						cms.DocsTopicLabel: docsTopicName,
 					},
 				},
 			},
@@ -103,7 +103,7 @@ func TestClusterDocsTopicResolver_ClusterDocsTopicAssetsField(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "ExampleClusterAssetB",
 					Labels: map[string]string{
-						"docstopic.cms.kyma-project.io": docsTopicName,
+						cms.DocsTopicLabel: docsTopicName,
 					},
 				},
 			},
@@ -111,7 +111,7 @@ func TestClusterDocsTopicResolver_ClusterDocsTopicAssetsField(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "ExampleClusterAssetC",
 					Labels: map[string]string{
-						"docstopic.cms.kyma-project.io": docsTopicName,
+						cms.DocsTopicLabel: docsTopicName,
 					},
 				},
 			},

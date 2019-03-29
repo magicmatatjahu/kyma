@@ -76,28 +76,28 @@ func TestAssetService_ListForDocsTopicByType(t *testing.T) {
 				"name":      "1",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
-					"docstopic.cms.kyma-project.io": "exampleDocsTopicA",
+					assetstore.CmsDocsTopicLabel: "exampleDocsTopicA",
 				},
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
 				"name":      "2",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
-					"docstopic.cms.kyma-project.io": "exampleDocsTopicB",
+					assetstore.CmsDocsTopicLabel: "exampleDocsTopicB",
 				},
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
 				"name":      "3",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
-					"docstopic.cms.kyma-project.io": "exampleDocsTopicC",
+					assetstore.CmsDocsTopicLabel: "exampleDocsTopicC",
 				},
 			}),
 		}
 
 		expected := []*v1alpha2.Asset{
 			fixAsset("1", map[string]string{
-				"docstopic.cms.kyma-project.io": "exampleDocsTopicA",
+				assetstore.CmsDocsTopicLabel: "exampleDocsTopicA",
 			}),
 		}
 
@@ -120,32 +120,32 @@ func TestAssetService_ListForDocsTopicByType(t *testing.T) {
 				"name":      "1",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
-					"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-					"type.cms.kyma-project.io":      "markdown",
+					assetstore.CmsDocsTopicLabel: "exampleDocsTopic",
+					assetstore.CmsTypeLabel:      "markdown",
 				},
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
 				"name":      "2",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
-					"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-					"type.cms.kyma-project.io":      "json",
+					assetstore.CmsDocsTopicLabel: "exampleDocsTopic",
+					assetstore.CmsTypeLabel:      "json",
 				},
 			}),
 			fixUnstructuredAsset(map[string]interface{}{
 				"name":      "3",
 				"namespace": AssetNamespace,
 				"labels": map[string]interface{}{
-					"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-					"type.cms.kyma-project.io":      "yaml",
+					assetstore.CmsDocsTopicLabel: "exampleDocsTopic",
+					assetstore.CmsTypeLabel:      "yaml",
 				},
 			}),
 		}
 
 		expected := []*v1alpha2.Asset{
 			fixAsset("1", map[string]string{
-				"docstopic.cms.kyma-project.io": "exampleDocsTopic",
-				"type.cms.kyma-project.io":      "markdown",
+				assetstore.CmsDocsTopicLabel: "exampleDocsTopic",
+				assetstore.CmsTypeLabel:      "markdown",
 			}),
 		}
 

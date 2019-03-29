@@ -96,7 +96,7 @@ func NewAppsClientWithConfig() (*appsv1.AppsV1Client, *rest.Config, error) {
 	return appsCli, k8sConfig, nil
 }
 
-func NewCmsClientWithConfig() (dynamic.Interface, *rest.Config, error) {
+func NewDynamicClientWithConfig() (dynamic.Interface, *rest.Config, error) {
 	k8sConfig, err := NewRestClientConfigFromEnv()
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "while creating new client with config")

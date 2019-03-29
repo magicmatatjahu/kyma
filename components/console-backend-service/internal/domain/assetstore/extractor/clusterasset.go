@@ -9,7 +9,7 @@ import (
 
 type ClusterAssetUnstructuredExtractor struct{}
 
-func (ext *ClusterAssetUnstructuredExtractor) Single(obj interface{}) (*v1alpha2.ClusterAsset, error) {
+func (ext *ClusterAssetUnstructuredExtractor) Do(obj interface{}) (*v1alpha2.ClusterAsset, error) {
 	if obj == nil {
 		return nil, nil
 	}

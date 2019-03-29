@@ -40,7 +40,7 @@ func TestClusterDocsTopicsQueries(t *testing.T) {
 	c, err := graphql.New()
 	require.NoError(t, err)
 
-	cmsCli, _, err := client.NewCmsClientWithConfig()
+	cmsCli, _, err := client.NewDynamicClientWithConfig()
 	require.NoError(t, err)
 
 	subscription := subscribeClusterDocsTopic(c, clusterDocsTopicEventDetailsFields())

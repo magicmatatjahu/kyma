@@ -14,6 +14,15 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
+//go:generate mockery -name=clusterDocsTopicSvc -output=automock -outpkg=automock -case=underscore
+//go:generate failery -name=clusterDocsTopicSvc -case=underscore -output disabled -outpkg disabled
+type clusterDocsTopicSvc interface {
+	Find(name string) (*v1alpha1.ClusterDocsTopic, error)
+	List(viewContext *string, groupName *string) ([]*v1alpha1.ClusterDocsTopic, error)
+	Subscribe(listener resource.Listener)
+	Unsubscribe(listener resource.Listener)
+}
+
 type clusterDocsTopicService struct {
 	informer  cache.SharedIndexInformer
 	notifier  notifier
@@ -28,28 +37,28 @@ func newClusterDocsTopicService(informer cache.SharedIndexInformer) (*clusterDoc
 
 	err := svc.informer.AddIndexers(cache.Indexers{
 		"viewContext/groupName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractor.Single(obj)
+			entity, err := svc.extractor.Do(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
-			return []string{fmt.Sprintf("%s/%s", entity.Labels["viewContext.cms.kyma-project.io"], entity.Labels["groupName.cms.kyma-project.io"])}, nil
+			return []string{fmt.Sprintf("%s/%s", entity.Labels[ViewContextLabel], entity.Labels[GroupNameLabel])}, nil
 		},
 		"viewContext": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractor.Single(obj)
+			entity, err := svc.extractor.Do(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
-			return []string{entity.Labels["viewContext.cms.kyma-project.io"]}, nil
+			return []string{entity.Labels[ViewContextLabel]}, nil
 		},
 		"groupName": func(obj interface{}) ([]string, error) {
-			entity, err := svc.extractor.Single(obj)
+			entity, err := svc.extractor.Do(obj)
 			if err != nil {
 				return nil, errors.New("Cannot convert item")
 			}
 
-			return []string{entity.Labels["groupName.cms.kyma-project.io"]}, nil
+			return []string{entity.Labels[GroupNameLabel]}, nil
 		},
 	})
 	if err != nil {
@@ -69,7 +78,7 @@ func (svc *clusterDocsTopicService) Find(name string) (*v1alpha1.ClusterDocsTopi
 		return nil, err
 	}
 
-	clusterDocsTopic, err := svc.extractor.Single(item)
+	clusterDocsTopic, err := svc.extractor.Do(item)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterDocsTopic", item)
 	}
@@ -96,7 +105,7 @@ func (svc *clusterDocsTopicService) List(viewContext *string, groupName *string)
 
 	var clusterDocsTopics []*v1alpha1.ClusterDocsTopic
 	for _, item := range items {
-		clusterDocsTopic, err := svc.extractor.Single(item)
+		clusterDocsTopic, err := svc.extractor.Do(item)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *ClusterDocsTopic", item)
 		}
@@ -133,19 +142,18 @@ func (svc *clusterDocsTopicService) sortByOrder(docsTopics []*v1alpha1.ClusterDo
 		return uint8(i), nil
 	}
 
-	orderLabel := "order.cms.kyma-project.io"
 	var err error
 	sort.Slice(docsTopics, func(i, j int) bool {
 		if err != nil {
 			return false
 		}
 
-		firstItem, err := parseString(docsTopics[i].Labels[orderLabel])
+		firstItem, err := parseString(docsTopics[i].Labels[OrderLabel])
 		if err != nil {
 			return false
 		}
 
-		secondItem, err := parseString(docsTopics[j].Labels[orderLabel])
+		secondItem, err := parseString(docsTopics[j].Labels[OrderLabel])
 		if err != nil {
 			return false
 		}
