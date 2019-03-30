@@ -139,9 +139,6 @@ func checkClusterDocsTopic(t *testing.T, expected, actual shared.ClusterDocsTopi
 	// Description
 	assert.Equal(t, expected.Description, actual.Description)
 
-	fmt.Println(actual)
-	fmt.Println(actual.Assets)
-
 	// Assets
 	assertClusterAssetsExistsAndEqual(t, fixture.ClusterAsset("openapi"), actual.Assets)
 }
