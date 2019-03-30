@@ -61,13 +61,6 @@ func TestClusterDocsTopicsQueries(t *testing.T) {
 	createClusterDocsTopic(t, clusterDocsTopicClient, clusterDocsTopicName2, "2")
 
 	waitForClusterDocsTopic(t, clusterDocsTopicClient, clusterDocsTopicName1)
-
-	t.Log(fmt.Sprintf("Check subscription event of clusterDocsTopic %s updated", clusterDocsTopicName1))
-	expectedEvent = clusterDocsTopicEvent("UPDATE", fixedClusterDocsTopic)
-	event, err = readClusterDocsTopicEvent(subscription)
-	assert.NoError(t, err)
-	checkClusterDocsTopicEvent(t, expectedEvent, event)
-
 	waitForClusterDocsTopic(t, clusterDocsTopicClient, clusterDocsTopicName3)
 	waitForClusterDocsTopic(t, clusterDocsTopicClient, clusterDocsTopicName2)
 
@@ -117,14 +110,12 @@ func assertClusterDocsTopicExistsAndEqual(t *testing.T, expectedElement shared.C
 		}
 
 		return false
-	}, "Resource does not exist")
+	}, "ClusterDocsTopic does not exist")
 }
 
 func assertClusterAssetsExistsAndEqual(t *testing.T, expectedElement shared.ClusterAsset, arr []shared.ClusterAsset) {
 	assert.Condition(t, func() (success bool) {
 		for _, v := range arr {
-			fmt.Println(expectedElement.Name)
-			fmt.Println(v.Name)
 			if strings.HasPrefix(v.Name, expectedElement.Name) {
 				checkClusterAsset(t, expectedElement, v)
 				return true
@@ -132,7 +123,7 @@ func assertClusterAssetsExistsAndEqual(t *testing.T, expectedElement shared.Clus
 		}
 
 		return false
-	}, "Resource does not exist")
+	}, "ClusterAsset does not exist")
 }
 
 func checkClusterDocsTopic(t *testing.T, expected, actual shared.ClusterDocsTopic) {
@@ -147,6 +138,9 @@ func checkClusterDocsTopic(t *testing.T, expected, actual shared.ClusterDocsTopi
 
 	// Description
 	assert.Equal(t, expected.Description, actual.Description)
+
+	fmt.Println(actual)
+	fmt.Println(actual.Assets)
 
 	// Assets
 	assertClusterAssetsExistsAndEqual(t, fixture.ClusterAsset("openapi"), actual.Assets)
