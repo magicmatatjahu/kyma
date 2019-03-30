@@ -61,13 +61,6 @@ func TestClusterDocsTopicsQueries(t *testing.T) {
 	createClusterDocsTopic(t, clusterDocsTopicClient, clusterDocsTopicName2, "2")
 
 	waitForClusterDocsTopic(t, clusterDocsTopicClient, clusterDocsTopicName1)
-
-	t.Log(fmt.Sprintf("Check subscription event of clusterDocsTopic %s updated", clusterDocsTopicName1))
-	expectedEvent = clusterDocsTopicEvent("UPDATE", fixedClusterDocsTopic)
-	event, err = readClusterDocsTopicEvent(subscription)
-	assert.NoError(t, err)
-	checkClusterDocsTopicEvent(t, expectedEvent, event)
-
 	waitForClusterDocsTopic(t, clusterDocsTopicClient, clusterDocsTopicName3)
 	waitForClusterDocsTopic(t, clusterDocsTopicClient, clusterDocsTopicName2)
 
