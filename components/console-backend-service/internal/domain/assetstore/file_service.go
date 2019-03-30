@@ -9,19 +9,11 @@ import (
 
 type fileService struct{}
 
-func (svc *fileService) FilterByExtensions(statusRef *v1alpha2.AssetStatusRef, filterExtensions []string) ([]*File, error) {
+func (svc *fileService) Extract(statusRef *v1alpha2.AssetStatusRef) ([]*File, error) {
 	if statusRef == nil {
 		return nil, nil
 	}
 
-	if len(filterExtensions) == 0 {
-		return svc.withoutExtensions(statusRef), nil
-	}
-
-	return svc.withExtensions(statusRef, filterExtensions), nil
-}
-
-func (svc *fileService) withoutExtensions(statusRef *v1alpha2.AssetStatusRef) []*File {
 	var files []*File
 	for _, asset := range statusRef.Assets {
 		files = append(files, &File{
@@ -29,10 +21,14 @@ func (svc *fileService) withoutExtensions(statusRef *v1alpha2.AssetStatusRef) []
 			Metadata: map[string]interface{}{},
 		})
 	}
-	return files
+	return files, nil
 }
 
-func (svc *fileService) withExtensions(statusRef *v1alpha2.AssetStatusRef, filterExtensions []string) []*File {
+func (svc *fileService) FilterByExtensionsAndExtract(statusRef *v1alpha2.AssetStatusRef, filterExtensions []string) ([]*File, error) {
+	if statusRef == nil {
+		return nil, nil
+	}
+
 	var files []*File
 	for _, asset := range statusRef.Assets {
 		for _, extension := range filterExtensions {
@@ -51,5 +47,5 @@ func (svc *fileService) withExtensions(statusRef *v1alpha2.AssetStatusRef, filte
 			}
 		}
 	}
-	return files
+	return files, nil
 }

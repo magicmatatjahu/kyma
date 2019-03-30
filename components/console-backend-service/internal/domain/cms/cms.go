@@ -23,6 +23,29 @@ const (
 	OrderLabel       = "cms.kyma-project.io/order"
 )
 
+type cmsRetriever struct {
+	ClusterDocsTopicGetter       shared.ClusterDocsTopicGetter
+	DocsTopicGetter              shared.DocsTopicGetter
+	GqlClusterDocsTopicConverter shared.GqlClusterDocsTopicConverter
+	GqlDocsTopicConverter        shared.GqlDocsTopicConverter
+}
+
+func (r *cmsRetriever) ClusterDocsTopic() shared.ClusterDocsTopicGetter {
+	return r.ClusterDocsTopicGetter
+}
+
+func (r *cmsRetriever) DocsTopic() shared.DocsTopicGetter {
+	return r.DocsTopicGetter
+}
+
+func (r *cmsRetriever) ClusterDocsTopicConverter() shared.GqlClusterDocsTopicConverter {
+	return r.GqlClusterDocsTopicConverter
+}
+
+func (r *cmsRetriever) DocsTopicConverter() shared.GqlDocsTopicConverter {
+	return r.GqlDocsTopicConverter
+}
+
 type PluggableContainer struct {
 	*module.Pluggable
 	cfg *resolverConfig

@@ -73,7 +73,7 @@ func TestAssetResolver_AssetFilesField(t *testing.T) {
 		defer assetSvc.AssertExpectations(t)
 
 		fileSvc := automock.NewFileService()
-		fileSvc.On("FilterByExtensions", &assetResource.Status.AssetRef, []string{}).Return(filesResource, nil).Once()
+		fileSvc.On("Extract", &assetResource.Status.AssetRef).Return(filesResource, nil).Once()
 		defer fileSvc.AssertExpectations(t)
 
 		converter := automock.NewGQLFileConverter()

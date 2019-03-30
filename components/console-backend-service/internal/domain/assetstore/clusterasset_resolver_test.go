@@ -71,7 +71,7 @@ func TestClusterAssetResolver_ClusterAssetFilesField(t *testing.T) {
 		defer assetSvc.AssertExpectations(t)
 
 		fileSvc := automock.NewFileService()
-		fileSvc.On("FilterByExtensions", &clusterAssetResource.Status.AssetRef, []string{}).Return(filesResource, nil).Once()
+		fileSvc.On("Extract", &clusterAssetResource.Status.AssetRef).Return(filesResource, nil).Once()
 		defer fileSvc.AssertExpectations(t)
 
 		converter := automock.NewGQLFileConverter()

@@ -36,7 +36,7 @@ func TestFileConverter_ToGQL(t *testing.T) {
 
 		svc := assetstore.NewFileService()
 
-		result, err := svc.FilterByExtensions(assetRef, []string{})
+		result, err := svc.Extract(assetRef)
 		require.NoError(t, err)
 
 		assert.Equal(t, expected, result)
@@ -60,7 +60,7 @@ func TestFileConverter_ToGQL(t *testing.T) {
 
 		svc := assetstore.NewFileService()
 
-		result, err := svc.FilterByExtensions(assetRef, []string{"md"})
+		result, err := svc.FilterByExtensionsAndExtract(assetRef, []string{"md"})
 		require.NoError(t, err)
 
 		assert.Equal(t, expected, result)
@@ -69,7 +69,7 @@ func TestFileConverter_ToGQL(t *testing.T) {
 	t.Run("NotFound", func(t *testing.T) {
 		svc := assetstore.NewFileService()
 
-		result, err := svc.FilterByExtensions(nil, []string{})
+		result, err := svc.Extract(nil)
 		require.NoError(t, err)
 		assert.Nil(t, result)
 	})

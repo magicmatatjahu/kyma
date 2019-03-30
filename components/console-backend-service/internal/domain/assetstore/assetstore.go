@@ -6,6 +6,7 @@ import (
 
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/disabled"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/shared"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
@@ -19,6 +20,29 @@ const (
 	CmsDocsTopicLabel = "cms.kyma-project.io/docstopic"
 	CmsTypeLabel      = "cms.kyma-project.io/type"
 )
+
+type assetStoreRetriever struct {
+	ClusterAssetGetter       shared.ClusterAssetGetter
+	AssetGetter              shared.AssetGetter
+	GqlClusterAssetConverter shared.GqlClusterAssetConverter
+	GqlAssetConverter        shared.GqlAssetConverter
+}
+
+func (r *assetStoreRetriever) ClusterAsset() shared.ClusterAssetGetter {
+	return r.ClusterAssetGetter
+}
+
+func (r *assetStoreRetriever) Asset() shared.AssetGetter {
+	return r.AssetGetter
+}
+
+func (r *assetStoreRetriever) ClusterAssetConverter() shared.GqlClusterAssetConverter {
+	return r.GqlClusterAssetConverter
+}
+
+func (r *assetStoreRetriever) AssetConverter() shared.GqlAssetConverter {
+	return r.GqlAssetConverter
+}
 
 type PluggableContainer struct {
 	*module.Pluggable
