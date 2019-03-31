@@ -225,10 +225,10 @@ type ServiceClass {
     activated: Boolean! @HasAccess(attributes: {resource: "serviceinstances", verb: "get", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "Namespace", isChildResolver: true})
     instances: [ServiceInstance!]! @HasAccess(attributes: {resource: "serviceinstances", verb: "get", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "Namespace", isChildResolver: true})
     apiSpec: JSON @deprecated(reason: "No longer supported")
-    openApiSpec: JSON
-    odataSpec: String
-    asyncApiSpec: JSON
-    content: JSON
+    openApiSpec: JSON @deprecated(reason: "No longer supported")
+    odataSpec: String @deprecated(reason: "No longer supported")
+    asyncApiSpec: JSON @deprecated(reason: "No longer supported")
+    content: JSON @deprecated(reason: "No longer supported")
 
     # Depends on cms domain
     docsTopic: DocsTopic
@@ -251,10 +251,10 @@ type ClusterServiceClass {
     activated(namespace: String): Boolean! @HasAccess(attributes: {resource: "serviceinstances", verb: "get", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", isChildResolver: true})
     instances(namespace: String): [ServiceInstance!]! @HasAccess(attributes: {resource: "serviceinstances", verb: "get", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", isChildResolver: true})
     apiSpec: JSON @deprecated(reason: "No longer supported")
-    openApiSpec: JSON
-    odataSpec: String
-    asyncApiSpec: JSON
-    content: JSON
+    openApiSpec: JSON @deprecated(reason: "No longer supported")
+    odataSpec: String @deprecated(reason: "No longer supported")
+    asyncApiSpec: JSON @deprecated(reason: "No longer supported")
+    content: JSON @deprecated(reason: "No longer supported")
 
     # Depends on cms domain
     clusterDocsTopic: ClusterDocsTopic
@@ -823,8 +823,8 @@ type Query {
 
     functions(namespace: String!, first: Int, offset: Int): [Function!]!
 
-    content(contentType: String!, id: String!): JSON
-    topics(input: [InputTopic!]!, internal: Boolean): [TopicEntry!]
+    content(contentType: String!, id: String!): JSON @deprecated(reason: "No longer supported")
+    topics(input: [InputTopic!]!, internal: Boolean): [TopicEntry!] @deprecated(reason: "No longer supported")
     eventActivations(namespace: String!): [EventActivation!]!
 
     limitRanges(namespace: String!): [LimitRange!]! @HasAccess(attributes: {resource: "limitranges", verb: "list", apiGroup: "", apiVersion: "v1", namespaceArg: "namespace"})
