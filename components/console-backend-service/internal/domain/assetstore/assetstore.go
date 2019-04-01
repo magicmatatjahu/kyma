@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	CmsDocsTopicLabel = "cms.kyma-project.io/docsTopic"
+	CmsDocsTopicLabel = "docstopic.cms.kyma-project.io"
 	CmsTypeLabel      = "cms.kyma-project.io/type"
 )
 
