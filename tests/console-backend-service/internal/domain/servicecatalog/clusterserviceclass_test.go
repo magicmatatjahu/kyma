@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared/fixture"
-
 	"github.com/kyma-project/kyma/tests/console-backend-service/internal/domain/shared"
 
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
