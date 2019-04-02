@@ -17,9 +17,9 @@ import (
 )
 
 const (
-	ViewContextLabel = "cms.kyma-project.io/viewContext"
-	GroupNameLabel   = "cms.kyma-project.io/groupName"
-	DocsTopicLabel   = "docstopic.cms.kyma-project.io"
+	ViewContextLabel = "cms.kyma-project.io/view-context"
+	GroupNameLabel   = "cms.kyma-project.io/group-name"
+	DocsTopicLabel   = "cms.kyma-project.io/docs-topic"
 	OrderLabel       = "cms.kyma-project.io/order"
 )
 

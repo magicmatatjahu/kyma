@@ -85,13 +85,14 @@ func waitForClusterDocsTopic(t *testing.T, client *resource.ClusterDocsTopic, na
 
 func queryMultipleClusterDocsTopics(c *graphql.Client, resourceDetailsQuery string) (clusterDocsTopicsQueryResponse, error) {
 	query := fmt.Sprintf(`
-			query ($groupName: String!) {
-				clusterDocsTopics (groupName: $groupName) {
+			query ($viewContext: String, $groupName: String) {
+				clusterDocsTopics (viewContext: $viewContext, groupName: $groupName) {
 					%s
 				}
 			}	
 		`, resourceDetailsQuery)
 	req := graphql.NewRequest(query)
+	req.SetVar("viewContext", fixture.DocsTopicViewContext)
 	req.SetVar("groupName", fixture.DocsTopicGroupName)
 
 	var res clusterDocsTopicsQueryResponse
@@ -217,8 +218,9 @@ func fixClusterDocsTopicMeta(name, order string) metav1.ObjectMeta {
 	return metav1.ObjectMeta{
 		Name: name,
 		Labels: map[string]string{
-			OrderLabel:     order,
-			GroupNameLabel: fixture.DocsTopicGroupName,
+			ViewContextLabel: fixture.DocsTopicViewContext,
+			GroupNameLabel:   fixture.DocsTopicGroupName,
+			OrderLabel:       order,
 		},
 	}
 }

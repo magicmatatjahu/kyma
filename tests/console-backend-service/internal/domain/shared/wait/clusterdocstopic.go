@@ -2,6 +2,7 @@ package wait
 
 import (
 	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	tester "github.com/kyma-project/kyma/tests/console-backend-service"
 	"github.com/kyma-project/kyma/tests/console-backend-service/internal/waiter"
 )
 
@@ -17,5 +18,5 @@ func ForClusterDocsTopicReady(name string, get func(name string) (*v1alpha1.Clus
 		}
 
 		return false, nil
-	}, 4*readyTimeout)
+	}, 2*tester.DefaultReadyTimeout)
 }
