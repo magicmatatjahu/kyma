@@ -309,12 +309,12 @@ func (r *serviceClassResolver) ServiceClassClusterDocsTopicField(ctx context.Con
 		return nil, gqlerror.NewInternal()
 	}
 
-	item, err := r.cmsRetriever.ClusterDocsTopic().Find(obj.ExternalName)
+	item, err := r.cmsRetriever.ClusterDocsTopic().Find(obj.Name)
 	if err != nil {
 		if module.IsDisabledModuleError(err) {
 			return nil, err
 		}
-		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.ClusterDocsTopic, pretty.ServiceClass, obj.ExternalName))
+		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.ClusterDocsTopic, pretty.ServiceClass, obj.Name))
 		return nil, gqlerror.New(err, cmsPretty.ClusterDocsTopic)
 	}
 
@@ -333,12 +333,12 @@ func (r *serviceClassResolver) ServiceClassDocsTopicField(ctx context.Context, o
 		return nil, gqlerror.NewInternal()
 	}
 
-	item, err := r.cmsRetriever.DocsTopic().Find(obj.Namespace, obj.ExternalName)
+	item, err := r.cmsRetriever.DocsTopic().Find(obj.Namespace, obj.Name)
 	if err != nil {
 		if module.IsDisabledModuleError(err) {
 			return nil, err
 		}
-		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.DocsTopic, pretty.ServiceClass, obj.ExternalName))
+		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.DocsTopic, pretty.ServiceClass, obj.Name))
 		return nil, gqlerror.New(err, cmsPretty.DocsTopic)
 	}
 

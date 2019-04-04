@@ -304,12 +304,12 @@ func (r *clusterServiceClassResolver) ClusterServiceClassClusterDocsTopicField(c
 		return nil, gqlerror.NewInternal()
 	}
 
-	item, err := r.cmsRetriever.ClusterDocsTopic().Find(obj.ExternalName)
+	item, err := r.cmsRetriever.ClusterDocsTopic().Find(obj.Name)
 	if err != nil {
 		if module.IsDisabledModuleError(err) {
 			return nil, err
 		}
-		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.ClusterDocsTopic, pretty.ClusterServiceClass, obj.ExternalName))
+		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.ClusterDocsTopic, pretty.ClusterServiceClass, obj.Name))
 		return nil, gqlerror.New(err, cmsPretty.ClusterDocsTopic)
 	}
 
