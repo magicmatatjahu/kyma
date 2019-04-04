@@ -635,6 +635,7 @@ type ComplexityRoot struct {
 		OdataSpec           func(childComplexity int) int
 		AsyncApiSpec        func(childComplexity int) int
 		Content             func(childComplexity int) int
+		ClusterDocsTopic    func(childComplexity int) int
 		DocsTopic           func(childComplexity int) int
 	}
 
@@ -864,6 +865,7 @@ type ServiceClassResolver interface {
 	OdataSpec(ctx context.Context, obj *ServiceClass) (*string, error)
 	AsyncAPISpec(ctx context.Context, obj *ServiceClass) (*JSON, error)
 	Content(ctx context.Context, obj *ServiceClass) (*JSON, error)
+	ClusterDocsTopic(ctx context.Context, obj *ServiceClass) (*ClusterDocsTopic, error)
 	DocsTopic(ctx context.Context, obj *ServiceClass) (*DocsTopic, error)
 }
 type ServiceInstanceResolver interface {
@@ -5916,6 +5918,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ServiceClass.Content(childComplexity), true
+
+	case "ServiceClass.clusterDocsTopic":
+		if e.complexity.ServiceClass.ClusterDocsTopic == nil {
+			break
+		}
+
+		return e.complexity.ServiceClass.ClusterDocsTopic(childComplexity), true
 
 	case "ServiceClass.docsTopic":
 		if e.complexity.ServiceClass.DocsTopic == nil {
@@ -21348,6 +21357,12 @@ func (ec *executionContext) _ServiceClass(ctx context.Context, sel ast.Selection
 				out.Values[i] = ec._ServiceClass_content(ctx, field, obj)
 				wg.Done()
 			}(i, field)
+		case "clusterDocsTopic":
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._ServiceClass_clusterDocsTopic(ctx, field, obj)
+				wg.Done()
+			}(i, field)
 		case "docsTopic":
 			wg.Add(1)
 			go func(i int, field graphql.CollectedField) {
@@ -22016,6 +22031,35 @@ func (ec *executionContext) _ServiceClass_content(ctx context.Context, field gra
 		return graphql.Null
 	}
 	return *res
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ServiceClass_clusterDocsTopic(ctx context.Context, field graphql.CollectedField, obj *ServiceClass) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ServiceClass",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ServiceClass().ClusterDocsTopic(rctx, obj)
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ClusterDocsTopic)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._ClusterDocsTopic(ctx, field.Selections, res)
 }
 
 // nolint: vetshadow
@@ -26651,6 +26695,7 @@ type ServiceClass {
     content: JSON @deprecated(reason: "No longer supported")
 
     # Depends on cms domain
+    clusterDocsTopic: ClusterDocsTopic
     docsTopic: DocsTopic
 }
 

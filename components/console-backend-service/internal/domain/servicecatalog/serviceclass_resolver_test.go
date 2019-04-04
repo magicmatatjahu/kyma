@@ -756,6 +756,103 @@ func TestClassResolver_ServiceClassAsyncApiSpecField(t *testing.T) {
 	})
 }
 
+func TestClassResolver_ServiceClassClusterDocsTopicsField(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		name := "name"
+		namespace := "namespace"
+		resources := &v1alpha1.ClusterDocsTopic{
+			ObjectMeta: v1.ObjectMeta{
+				Name: name,
+			},
+		}
+		expected := &gqlschema.ClusterDocsTopic{
+			Name: name,
+		}
+
+		resourceGetter := new(contentMock.ClusterDocsTopicGetter)
+		resourceGetter.On("Find", name).Return(resources, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		converter := new(contentMock.GqlClusterDocsTopicConverter)
+		converter.On("ToGQL", resources).Return(expected, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(contentMock.CmsRetriever)
+		retriever.On("ClusterDocsTopic").Return(resourceGetter)
+		retriever.On("ClusterDocsTopicConverter").Return(converter)
+
+		parentObj := gqlschema.ServiceClass{
+			Name:         name,
+			ExternalName: name,
+			Namespace:    namespace,
+		}
+
+		resolver := servicecatalog.NewServiceClassResolver(nil, nil, nil, nil, retriever)
+
+		result, err := resolver.ServiceClassClusterDocsTopicField(nil, &parentObj)
+
+		require.NoError(t, err)
+		assert.Equal(t, expected, result)
+	})
+
+	t.Run("NotFound", func(t *testing.T) {
+		name := "name"
+		namespace := "namespace"
+
+		resourceGetter := new(contentMock.ClusterDocsTopicGetter)
+		resourceGetter.On("Find", name).Return(nil, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		converter := new(contentMock.GqlClusterDocsTopicConverter)
+		converter.On("ToGQL", (*v1alpha1.ClusterDocsTopic)(nil)).Return(nil, nil).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(contentMock.CmsRetriever)
+		retriever.On("ClusterDocsTopic").Return(resourceGetter)
+		retriever.On("ClusterDocsTopicConverter").Return(converter)
+
+		parentObj := gqlschema.ServiceClass{
+			Name:         name,
+			ExternalName: name,
+			Namespace:    namespace,
+		}
+
+		resolver := servicecatalog.NewServiceClassResolver(nil, nil, nil, nil, retriever)
+
+		result, err := resolver.ServiceClassClusterDocsTopicField(nil, &parentObj)
+
+		require.NoError(t, err)
+		assert.Nil(t, result)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		expectedErr := errors.New("Test")
+		name := "name"
+		namespace := "namespace"
+
+		resourceGetter := new(contentMock.ClusterDocsTopicGetter)
+		resourceGetter.On("Find", name).Return(nil, expectedErr).Once()
+		defer resourceGetter.AssertExpectations(t)
+
+		retriever := new(contentMock.CmsRetriever)
+		retriever.On("ClusterDocsTopic").Return(resourceGetter)
+
+		parentObj := gqlschema.ServiceClass{
+			Name:         name,
+			ExternalName: name,
+			Namespace:    namespace,
+		}
+
+		resolver := servicecatalog.NewServiceClassResolver(nil, nil, nil, nil, retriever)
+
+		result, err := resolver.ServiceClassClusterDocsTopicField(nil, &parentObj)
+
+		assert.Error(t, err)
+		assert.True(t, gqlerror.IsInternal(err))
+		assert.Nil(t, result)
+	})
+}
+
 func TestClassResolver_ServiceClassDocsTopicsField(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		name := "name"

@@ -231,6 +231,7 @@ type ServiceClass {
     content: JSON @deprecated(reason: "No longer supported")
 
     # Depends on cms domain
+    clusterDocsTopic: ClusterDocsTopic
     docsTopic: DocsTopic
 }
 

@@ -661,6 +661,10 @@ func (r *serviceClassResolver) Content(ctx context.Context, obj *gqlschema.Servi
 	return r.sc.Resolver.ServiceClassContentField(ctx, obj)
 }
 
+func (r *serviceClassResolver) ClusterDocsTopic(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.ClusterDocsTopic, error) {
+	return r.sc.Resolver.ServiceClassClusterDocsTopicField(ctx, obj)
+}
+
 func (r *serviceClassResolver) DocsTopic(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.DocsTopic, error) {
 	return r.sc.Resolver.ServiceClassDocsTopicField(ctx, obj)
 }
