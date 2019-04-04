@@ -100,7 +100,7 @@ func fixAsset() *v1alpha2.Asset {
 			CommonAssetSpec: v1alpha2.CommonAssetSpec{
 				Source: v1alpha2.AssetSource{
 					Mode: v1alpha2.AssetSingle,
-					Url:  "ExampleUrl",
+					URL:  "ExampleUrl",
 				},
 				BucketRef: v1alpha2.AssetBucketRef{
 					Name: "ExampleBucketRef",

@@ -4,11 +4,12 @@ import (
 	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 type File struct {
 	URL      string
-	Metadata map[string]interface{}
+	Metadata *runtime.RawExtension
 }
 
 //go:generate mockery -name=fileSvc -output=automock -outpkg=automock -case=underscore

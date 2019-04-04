@@ -70,7 +70,9 @@ required = [
 
 [[constraint]]
   name = "github.com/kyma-project/kyma"
-  revision = "07468d7da00d4eea097b945194c035df2a8127d8"
+#  branch = "master" # TODO: change before merge
+  source = "https://github.com/michal-hudy/kyma.git" # TODO: change before merge
+  revision = "aae78fc8e4fa93134e6996a103a4f34ccb1ec55e" # TODO: change before merge
 
 [[override]]
   name = "k8s.io/api"

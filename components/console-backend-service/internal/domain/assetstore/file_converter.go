@@ -2,6 +2,9 @@ package assetstore
 
 import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/resource"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 type fileConverter struct{}
@@ -11,7 +14,10 @@ func (c *fileConverter) ToGQL(file *File) (*gqlschema.File, error) {
 		return nil, nil
 	}
 
-	metadata := c.extractMetadata(file.Metadata)
+	metadata, err := c.extractMetadata(file.Metadata)
+	if err != nil {
+		return nil, errors.Wrapf(err, "while unmarshalling Metadata field of File %s", file.URL)
+	}
 
 	result := gqlschema.File{
 		URL:      file.URL,
@@ -35,13 +41,20 @@ func (c *fileConverter) ToGQLs(files []*File) ([]gqlschema.File, error) {
 	return result, nil
 }
 
-func (c *fileConverter) extractMetadata(metadata map[string]interface{}) gqlschema.JSON {
+func (c *fileConverter) extractMetadata(metadata *runtime.RawExtension) (gqlschema.JSON, error) {
 	if metadata == nil {
-		return nil
+		return nil, nil
+	}
+
+	extracted, err := resource.ExtractRawToMap("Metadata", metadata.Raw)
+	if err != nil {
+		return nil, err
 	}
 
 	result := make(gqlschema.JSON)
-	result = metadata
+	for k, v := range extracted {
+		result[k] = v
+	}
 
-	return result
+	return result, err
 }

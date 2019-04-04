@@ -15,10 +15,10 @@ func (svc *fileService) Extract(statusRef *v1alpha2.AssetStatusRef) ([]*File, er
 	}
 
 	var files []*File
-	for _, asset := range statusRef.Assets {
+	for _, file := range statusRef.Files {
 		files = append(files, &File{
-			URL:      fmt.Sprintf("%s/%s", statusRef.BaseUrl, asset),
-			Metadata: map[string]interface{}{},
+			URL:      fmt.Sprintf("%s/%s", statusRef.BaseURL, file.Name),
+			Metadata: file.Metadata,
 		})
 	}
 	return files, nil
@@ -30,7 +30,7 @@ func (svc *fileService) FilterByExtensionsAndExtract(statusRef *v1alpha2.AssetSt
 	}
 
 	var files []*File
-	for _, asset := range statusRef.Assets {
+	for _, file := range statusRef.Files {
 		for _, extension := range filterExtensions {
 			var suffix string
 			if strings.HasPrefix(extension, ".") {
@@ -39,10 +39,10 @@ func (svc *fileService) FilterByExtensionsAndExtract(statusRef *v1alpha2.AssetSt
 				suffix = fmt.Sprintf(".%s", extension)
 			}
 
-			if strings.HasSuffix(asset, suffix) {
+			if strings.HasSuffix(file.Name, suffix) {
 				files = append(files, &File{
-					URL:      fmt.Sprintf("%s/%s", statusRef.BaseUrl, asset),
-					Metadata: map[string]interface{}{},
+					URL:      fmt.Sprintf("%s/%s", statusRef.BaseURL, file.Name),
+					Metadata: file.Metadata,
 				})
 			}
 		}

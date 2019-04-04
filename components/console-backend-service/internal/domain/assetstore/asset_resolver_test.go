@@ -21,6 +21,8 @@ func TestAssetResolver_AssetFilesField(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		assetName := "exampleAsset"
 		namespace := "exampleNamespace"
+		rawMap := fixRawMap(t)
+
 		assetResource := &v1alpha2.Asset{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      assetName,
@@ -29,11 +31,20 @@ func TestAssetResolver_AssetFilesField(t *testing.T) {
 			Status: v1alpha2.AssetStatus{
 				CommonAssetStatus: v1alpha2.CommonAssetStatus{
 					AssetRef: v1alpha2.AssetStatusRef{
-						BaseUrl: "https://example.com",
-						Assets: []string{
-							"markdown.md",
-							"apiSpec.json",
-							"odata.xml",
+						BaseURL: "https://example.com",
+						Files: []v1alpha2.AssetFile{
+							{
+								Name:     "markdown.md",
+								Metadata: rawMap,
+							},
+							{
+								Name:     "apiSpec.json",
+								Metadata: rawMap,
+							},
+							{
+								Name:     "odata.xml",
+								Metadata: rawMap,
+							},
 						},
 					},
 				},
@@ -42,29 +53,35 @@ func TestAssetResolver_AssetFilesField(t *testing.T) {
 		filesResource := []*assetstore.File{
 			{
 				URL:      "https://example.com/markdown.md",
-				Metadata: map[string]interface{}{},
+				Metadata: rawMap,
 			},
 			{
 				URL:      "https://example.com/apiSpec.json",
-				Metadata: map[string]interface{}{},
+				Metadata: rawMap,
 			},
 			{
 				URL:      "https://example.com/odata.xml",
-				Metadata: map[string]interface{}{},
+				Metadata: rawMap,
 			},
 		}
 		expected := []gqlschema.File{
 			{
-				URL:      "https://example.com/markdown.md",
-				Metadata: map[string]interface{}{},
+				URL: "https://example.com/markdown.md",
+				Metadata: gqlschema.JSON{
+					"labels": []interface{}{"test1", "test2"},
+				},
 			},
 			{
-				URL:      "https://example.com/apiSpec.json",
-				Metadata: map[string]interface{}{},
+				URL: "https://example.com/apiSpec.json",
+				Metadata: gqlschema.JSON{
+					"labels": []interface{}{"test1", "test2"},
+				},
 			},
 			{
-				URL:      "https://example.com/odata.xml",
-				Metadata: map[string]interface{}{},
+				URL: "https://example.com/odata.xml",
+				Metadata: gqlschema.JSON{
+					"labels": []interface{}{"test1", "test2"},
+				},
 			},
 		}
 

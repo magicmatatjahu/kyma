@@ -328,7 +328,7 @@
   version = "v0.1.36"
 
 [[projects]]
-  digest = "1:a2f701eee71432bb658ea2ed01ea7bf02e645289c06f1cad12adeab767c88f2e"
+  digest = "1:de90611cd93300011c5fce8b63ff875c1a3b07b12467617764e98f2dd239fe71"
   name = "github.com/kyma-project/kyma"
   packages = [
     "components/api-controller/pkg/apis/gateway.kyma-project.io/meta/v1",
@@ -398,7 +398,8 @@
     "tools/failery",
   ]
   pruneopts = "NUT"
-  revision = "07468d7da00d4eea097b945194c035df2a8127d8"
+  revision = "aae78fc8e4fa93134e6996a103a4f34ccb1ec55e"
+  source = "https://github.com/michal-hudy/kyma.git"
 
 [[projects]]
   branch = "master"
