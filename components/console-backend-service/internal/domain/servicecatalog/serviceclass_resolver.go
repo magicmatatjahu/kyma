@@ -19,6 +19,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	kymaIntegrationNamespace = "kyma-integration"
+)
+
 //go:generate mockery -name=serviceClassListGetter -output=automock -outpkg=automock -case=underscore
 type serviceClassListGetter interface {
 	serviceClassGetter
@@ -340,6 +344,14 @@ func (r *serviceClassResolver) ServiceClassDocsTopicField(ctx context.Context, o
 		}
 		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.DocsTopic, pretty.ServiceClass, obj.Name))
 		return nil, gqlerror.New(err, cmsPretty.DocsTopic)
+	}
+
+	if item == nil {
+		item, err = r.cmsRetriever.DocsTopic().Find(kymaIntegrationNamespace, obj.Name)
+		if err != nil {
+			glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.DocsTopic, pretty.ServiceClass, obj.Name))
+			return nil, gqlerror.New(err, cmsPretty.DocsTopic)
+		}
 	}
 
 	docsTopic, err := r.cmsRetriever.DocsTopicConverter().ToGQL(item)
