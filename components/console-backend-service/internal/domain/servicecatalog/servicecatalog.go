@@ -12,10 +12,10 @@ import (
 	bindingApi "github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	catalogInformers "github.com/kubernetes-incubator/service-catalog/pkg/client/informers_generated/externalversions"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/disabled"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/name"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/rest"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/servicecatalog/disabled"
 )
 
 type PluggableContainer struct {
@@ -41,7 +41,7 @@ type ServiceBindingFinderLister interface {
 	ListForServiceInstance(namespace string, instanceName string) ([]*bindingApi.ServiceBinding, error)
 }
 
-func New(restConfig *rest.Config, informerResyncPeriod time.Duration, contentRetriever shared.ContentRetriever, cmsRetriever shared.CmsRetriever) (*PluggableContainer, error) {
+func New(restConfig *rest.Config, informerResyncPeriod time.Duration, contentRetriever shared.ContentRetriever) (*PluggableContainer, error) {
 	client, err := clientset.NewForConfig(restConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "while initializing Clientset")
@@ -52,7 +52,6 @@ func New(restConfig *rest.Config, informerResyncPeriod time.Duration, contentRet
 			client:               client,
 			informerResyncPeriod: informerResyncPeriod,
 			contentRetriever:     contentRetriever,
-			cmsRetriever:         cmsRetriever,
 		},
 		Pluggable:               module.NewPluggable("servicecatalog"),
 		ServiceCatalogRetriever: &serviceCatalogRetriever{},
@@ -70,7 +69,6 @@ func (r *PluggableContainer) Enable() error {
 	client := r.cfg.client
 
 	contentRetriever := r.cfg.contentRetriever
-	cmsRetriever := r.cfg.cmsRetriever
 
 	informerFactory := catalogInformers.NewSharedInformerFactory(client, informerResyncPeriod)
 	r.informerFactory = informerFactory
@@ -107,8 +105,8 @@ func (r *PluggableContainer) Enable() error {
 	r.Pluggable.EnableAndSyncInformerFactory(r.informerFactory, func() {
 		r.Resolver = &domainResolver{
 			serviceInstanceResolver:      newServiceInstanceResolver(serviceInstanceService, clusterServicePlanService, clusterServiceClassService, servicePlanService, serviceClassService),
-			clusterServiceClassResolver:  newClusterServiceClassResolver(clusterServiceClassService, clusterServicePlanService, serviceInstanceService, contentRetriever, cmsRetriever),
-			serviceClassResolver:         newServiceClassResolver(serviceClassService, servicePlanService, serviceInstanceService, contentRetriever, cmsRetriever),
+			clusterServiceClassResolver:  newClusterServiceClassResolver(clusterServiceClassService, clusterServicePlanService, serviceInstanceService, contentRetriever),
+			serviceClassResolver:         newServiceClassResolver(serviceClassService, servicePlanService, serviceInstanceService, contentRetriever),
 			clusterServiceBrokerResolver: newClusterServiceBrokerResolver(clusterServiceBrokerService),
 			serviceBrokerResolver:        newServiceBrokerResolver(serviceBrokerService),
 			serviceBindingResolver:       newServiceBindingResolver(serviceBindingService),
@@ -133,7 +131,6 @@ type resolverConfig struct {
 	client               clientset.Interface
 	informerResyncPeriod time.Duration
 	contentRetriever     shared.ContentRetriever
-	cmsRetriever         shared.CmsRetriever
 }
 
 //go:generate failery -name=Resolver -case=underscore -output disabled -outpkg disabled
@@ -148,7 +145,7 @@ type Resolver interface {
 	ClusterServiceClassODataSpecField(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*string, error)
 	ClusterServiceClassAsyncApiSpecField(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.JSON, error)
 	ClusterServiceClassContentField(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.JSON, error)
-	ClusterServiceClassClusterDocsTopicField(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.ClusterDocsTopic, error)
+	ClusterServiceClassClusterDocsTopicsField(ctx context.Context, obj *gqlschema.ClusterServiceClass) ([]gqlschema.ClusterDocsTopic, error)
 
 	ServiceClassQuery(ctx context.Context, name, namespace string) (*gqlschema.ServiceClass, error)
 	ServiceClassesQuery(ctx context.Context, namespace string, first *int, offset *int) ([]gqlschema.ServiceClass, error)
@@ -160,8 +157,7 @@ type Resolver interface {
 	ServiceClassODataSpecField(ctx context.Context, obj *gqlschema.ServiceClass) (*string, error)
 	ServiceClassAsyncApiSpecField(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.JSON, error)
 	ServiceClassContentField(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.JSON, error)
-	ServiceClassClusterDocsTopicField(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.ClusterDocsTopic, error)
-	ServiceClassDocsTopicField(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.DocsTopic, error)
+	ServiceClassDocsTopicsField(ctx context.Context, obj *gqlschema.ServiceClass) ([]gqlschema.DocsTopic, error)
 
 	CreateServiceInstanceMutation(ctx context.Context, params gqlschema.ServiceInstanceCreateInput) (*gqlschema.ServiceInstance, error)
 	DeleteServiceInstanceMutation(ctx context.Context, name, namespace string) (*gqlschema.ServiceInstance, error)

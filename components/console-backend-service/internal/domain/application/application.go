@@ -59,7 +59,7 @@ type PluggableContainer struct {
 	gatewayService         *gateway.Service
 }
 
-func New(restConfig *rest.Config, reCfg Config, informerResyncPeriod time.Duration, contentRetriever shared.ContentRetriever, assetStoreRetriever shared.AssetStoreRetriever) (*PluggableContainer, error) {
+func New(restConfig *rest.Config, reCfg Config, informerResyncPeriod time.Duration, contentRetriever shared.ContentRetriever) (*PluggableContainer, error) {
 	mCli, err := mappingClient.NewForConfig(restConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "while initializing application broker Clientset")
@@ -83,7 +83,6 @@ func New(restConfig *rest.Config, reCfg Config, informerResyncPeriod time.Durati
 			cfg:                  reCfg,
 			informerResyncPeriod: informerResyncPeriod,
 			contentRetriever:     contentRetriever,
-			assetStoreRetriever:  assetStoreRetriever,
 		},
 		Pluggable:            module.NewPluggable("application"),
 		ApplicationRetriever: &applicationRetriever{},
@@ -138,7 +137,7 @@ func (r *PluggableContainer) Enable() error {
 
 		r.Resolver = &domainResolver{
 			applicationResolver:     NewApplicationResolver(appService, gatewayService),
-			eventActivationResolver: newEventActivationResolver(eventActivationService, r.cfg.contentRetriever, r.cfg.assetStoreRetriever),
+			eventActivationResolver: newEventActivationResolver(eventActivationService, r.cfg.contentRetriever),
 		}
 		r.ApplicationRetriever.ApplicationLister = appService
 	})
@@ -165,7 +164,6 @@ type resolverConfig struct {
 	k8sCli               k8sClient.Interface
 	informerResyncPeriod time.Duration
 	contentRetriever     shared.ContentRetriever
-	assetStoreRetriever  shared.AssetStoreRetriever
 }
 
 //go:generate failery -name=Resolver -case=underscore -output disabled -outpkg disabled

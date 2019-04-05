@@ -1,61 +1,52 @@
 package cms
 
 import (
-	"fmt"
-
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
-	"github.com/kyma-project/kyma/components/console-backend-service/pkg/resource"
-	"github.com/pkg/errors"
 	"k8s.io/client-go/tools/cache"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
+	"fmt"
+	"github.com/pkg/errors"
 )
 
-//go:generate mockery -name=docsTopicSvc -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=docsTopicSvc -case=underscore -output disabled -outpkg disabled
-type docsTopicSvc interface {
-	Find(namespace, name string) (*v1alpha1.DocsTopic, error)
-	Subscribe(listener resource.Listener)
-	Unsubscribe(listener resource.Listener)
-}
-
 type docsTopicService struct {
-	informer  cache.SharedIndexInformer
-	notifier  notifier
-	extractor extractor.DocsTopicUnstructuredExtractor
+	informer cache.SharedIndexInformer
 }
 
 func newDocsTopicService(informer cache.SharedIndexInformer) (*docsTopicService, error) {
-	svc := &docsTopicService{
-		informer:  informer,
-		extractor: extractor.DocsTopicUnstructuredExtractor{},
+	err := informer.AddIndexers(cache.Indexers{
+		"groupName": func(obj interface{}) ([]string, error) {
+			entity, ok := obj.(*v1alpha1.DocsTopic)
+			if !ok {
+				return nil, errors.New("Cannot convert item")
+			}
+
+			return []string{fmt.Sprintf("%s/%s", entity.Namespace, entity.Name)}, nil
+		},
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "while adding indexers")
 	}
 
-	notifier := resource.NewNotifier()
-	informer.AddEventHandler(notifier)
-	svc.notifier = notifier
-
-	return svc, nil
+	return &docsTopicService{
+		informer: informer,
+	}, nil
 }
 
-func (svc *docsTopicService) Find(namespace, name string) (*v1alpha1.DocsTopic, error) {
-	key := fmt.Sprintf("%s/%s", namespace, name)
-	item, exists, err := svc.informer.GetStore().GetByKey(key)
-	if err != nil || !exists {
+func (svc *docsTopicService) List(namespace, groupName string) ([]*v1alpha1.DocsTopic, error) {
+	key := fmt.Sprintf("%s/%s", namespace, groupName)
+	items, err := svc.informer.GetIndexer().ByIndex("groupName", key)
+	if err != nil {
 		return nil, err
 	}
 
-	docsTopic, err := svc.extractor.Do(item)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Incorrect item type: %T, should be: *DocsTopic", item)
+	var docsTopics []*v1alpha1.DocsTopic
+	for _, item := range items {
+		docsTopic, ok := item.(*v1alpha1.DocsTopic)
+		if !ok {
+			return nil, fmt.Errorf("Incorrect item type: %T, should be: *DocsTopic", item)
+		}
+
+		docsTopics = append(docsTopics, docsTopic)
 	}
 
-	return docsTopic, nil
-}
-
-func (svc *docsTopicService) Subscribe(listener resource.Listener) {
-	svc.notifier.AddListener(listener)
-}
-
-func (svc *docsTopicService) Unsubscribe(listener resource.Listener) {
-	svc.notifier.DeleteListener(listener)
+	return docsTopics, nil
 }

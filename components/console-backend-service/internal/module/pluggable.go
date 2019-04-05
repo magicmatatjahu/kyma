@@ -2,7 +2,6 @@ package module
 
 import (
 	"reflect"
-
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/informers"
 )

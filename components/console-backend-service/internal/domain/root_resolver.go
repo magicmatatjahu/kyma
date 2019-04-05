@@ -13,9 +13,7 @@ import (
 
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/apicontroller"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/application"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/authentication"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/k8s"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/kubeless"
@@ -23,6 +21,8 @@ import (
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/rest"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore"
 )
 
 type RootResolver struct {
@@ -33,8 +33,8 @@ type RootResolver struct {
 	sca            *servicecatalogaddons.PluggableContainer
 	app            *application.PluggableContainer
 	content        *content.PluggableContainer
-	assetstore     *assetstore.PluggableContainer
-	cms            *cms.PluggableContainer
+	assetstore	   *assetstore.PluggableContainer
+	cms			   *cms.PluggableContainer
 	kubeless       *kubeless.PluggableResolver
 	ac             *apicontroller.PluggableResolver
 	authentication *authentication.PluggableResolver
@@ -52,7 +52,7 @@ func New(restConfig *rest.Config, contentCfg content.Config, appCfg application.
 
 	assetStoreContainer, err := assetstore.New(restConfig, informerResyncPeriod)
 	if err != nil {
-		return nil, errors.Wrap(err, "while initializing AssetStore resolver")
+		return nil, errors.Wrap(err, "while initializing CMS resolver")
 	}
 	makePluggable(assetStoreContainer)
 
@@ -62,7 +62,7 @@ func New(restConfig *rest.Config, contentCfg content.Config, appCfg application.
 	}
 	makePluggable(cmsContainer)
 
-	scContainer, err := servicecatalog.New(restConfig, informerResyncPeriod, contentContainer.ContentRetriever, cmsContainer.CmsRetriever)
+	scContainer, err := servicecatalog.New(restConfig, informerResyncPeriod, contentContainer.ContentRetriever)
 	if err != nil {
 		return nil, errors.Wrap(err, "while initializing ServiceCatalog container")
 	}
@@ -74,7 +74,7 @@ func New(restConfig *rest.Config, contentCfg content.Config, appCfg application.
 	}
 	makePluggable(scaContainer)
 
-	appContainer, err := application.New(restConfig, appCfg, informerResyncPeriod, contentContainer.ContentRetriever, assetStoreContainer.AssetStoreRetriever)
+	appContainer, err := application.New(restConfig, appCfg, informerResyncPeriod, contentContainer.ContentRetriever)
 	if err != nil {
 		return nil, errors.Wrap(err, "while initializing Application resolver")
 	}
@@ -110,8 +110,8 @@ func New(restConfig *rest.Config, contentCfg content.Config, appCfg application.
 		sca:            scaContainer,
 		app:            appContainer,
 		content:        contentContainer,
-		assetstore:     assetStoreContainer,
-		cms:            cmsContainer,
+		assetstore:		assetStoreContainer,
+		cms:			cmsContainer,
 		ac:             acResolver,
 		kubeless:       kubelessResolver,
 		authentication: authenticationResolver,
@@ -142,22 +142,6 @@ func (r *RootResolver) Deployment() gqlschema.DeploymentResolver {
 
 func (r *RootResolver) EventActivation() gqlschema.EventActivationResolver {
 	return &eventActivationResolver{r.app}
-}
-
-func (r *RootResolver) ClusterDocsTopic() gqlschema.ClusterDocsTopicResolver {
-	return &clusterDocsTopicResolver{r.cms}
-}
-
-func (r *RootResolver) DocsTopic() gqlschema.DocsTopicResolver {
-	return &docsTopicResolver{r.cms}
-}
-
-func (r *RootResolver) ClusterAsset() gqlschema.ClusterAssetResolver {
-	return &clusterAssetResolver{r.assetstore}
-}
-
-func (r *RootResolver) Asset() gqlschema.AssetResolver {
-	return &assetResolver{r.assetstore}
 }
 
 func (r *RootResolver) Application() gqlschema.ApplicationResolver {
@@ -420,7 +404,7 @@ func (r *queryResolver) ServiceBindingUsage(ctx context.Context, name, namespace
 	return r.sca.Resolver.ServiceBindingUsageQuery(ctx, name, namespace)
 }
 
-func (r *queryResolver) ClusterDocsTopics(ctx context.Context, viewContext *string, groupName *string) ([]gqlschema.ClusterDocsTopic, error) {
+func (r *queryResolver) ClusterDocsTopics(ctx context.Context, viewContext *string, groupName string) ([]gqlschema.ClusterDocsTopic, error) {
 	return r.cms.Resolver.ClusterDocsTopicsQuery(ctx, viewContext, groupName)
 }
 
@@ -476,22 +460,6 @@ func (r *queryResolver) Secrets(ctx context.Context, namespace string, first *in
 
 type subscriptionResolver struct {
 	*RootResolver
-}
-
-func (r *subscriptionResolver) ClusterAssetEvent(ctx context.Context) (<-chan gqlschema.ClusterAssetEvent, error) {
-	return r.assetstore.Resolver.ClusterAssetEventSubscription(ctx)
-}
-
-func (r *subscriptionResolver) AssetEvent(ctx context.Context, namespace string) (<-chan gqlschema.AssetEvent, error) {
-	return r.assetstore.Resolver.AssetEventSubscription(ctx, namespace)
-}
-
-func (r *subscriptionResolver) ClusterDocsTopicEvent(ctx context.Context) (<-chan gqlschema.ClusterDocsTopicEvent, error) {
-	return r.cms.Resolver.ClusterDocsTopicEventSubscription(ctx)
-}
-
-func (r *subscriptionResolver) DocsTopicEvent(ctx context.Context, namespace string) (<-chan gqlschema.DocsTopicEvent, error) {
-	return r.cms.Resolver.DocsTopicEventSubscription(ctx, namespace)
 }
 
 func (r *subscriptionResolver) ServiceInstanceEvent(ctx context.Context, namespace string) (<-chan gqlschema.ServiceInstanceEvent, error) {
@@ -661,12 +629,8 @@ func (r *serviceClassResolver) Content(ctx context.Context, obj *gqlschema.Servi
 	return r.sc.Resolver.ServiceClassContentField(ctx, obj)
 }
 
-func (r *serviceClassResolver) ClusterDocsTopic(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.ClusterDocsTopic, error) {
-	return r.sc.Resolver.ServiceClassClusterDocsTopicField(ctx, obj)
-}
-
-func (r *serviceClassResolver) DocsTopic(ctx context.Context, obj *gqlschema.ServiceClass) (*gqlschema.DocsTopic, error) {
-	return r.sc.Resolver.ServiceClassDocsTopicField(ctx, obj)
+func (r *serviceClassResolver) DocsTopics(ctx context.Context, obj *gqlschema.ServiceClass) ([]gqlschema.DocsTopic, error) {
+	return r.sc.Resolver.ServiceClassDocsTopicsField(ctx, obj)
 }
 
 // Cluster Service Class
@@ -707,11 +671,9 @@ func (r *clusterServiceClassResolver) Content(ctx context.Context, obj *gqlschem
 	return r.sc.Resolver.ClusterServiceClassContentField(ctx, obj)
 }
 
-func (r *clusterServiceClassResolver) ClusterDocsTopic(ctx context.Context, obj *gqlschema.ClusterServiceClass) (*gqlschema.ClusterDocsTopic, error) {
-	return r.sc.Resolver.ClusterServiceClassClusterDocsTopicField(ctx, obj)
+func (r *clusterServiceClassResolver) ClusterDocsTopics(ctx context.Context, obj *gqlschema.ClusterServiceClass) ([]gqlschema.ClusterDocsTopic, error) {
+	return r.sc.Resolver.ClusterServiceClassClusterDocsTopicsField(ctx, obj)
 }
-
-// Namespace
 
 type namespaceResolver struct {
 	k8s *k8s.Resolver
@@ -719,40 +681,4 @@ type namespaceResolver struct {
 
 func (r *namespaceResolver) Applications(ctx context.Context, obj *gqlschema.Namespace) ([]string, error) {
 	return r.k8s.ApplicationsField(ctx, obj)
-}
-
-// CMS
-
-type clusterDocsTopicResolver struct {
-	cms *cms.PluggableContainer
-}
-
-func (r *clusterDocsTopicResolver) Assets(ctx context.Context, obj *gqlschema.ClusterDocsTopic, types []string) ([]gqlschema.ClusterAsset, error) {
-	return r.cms.Resolver.ClusterDocsTopicAssetsField(ctx, obj, types)
-}
-
-type docsTopicResolver struct {
-	cms *cms.PluggableContainer
-}
-
-func (r *docsTopicResolver) Assets(ctx context.Context, obj *gqlschema.DocsTopic, types []string) ([]gqlschema.Asset, error) {
-	return r.cms.Resolver.DocsTopicAssetsField(ctx, obj, types)
-}
-
-// Asset Store
-
-type clusterAssetResolver struct {
-	assetstore *assetstore.PluggableContainer
-}
-
-func (r *clusterAssetResolver) Files(ctx context.Context, obj *gqlschema.ClusterAsset, filterExtensions []string) ([]gqlschema.File, error) {
-	return r.assetstore.Resolver.ClusterAssetFilesField(ctx, obj, filterExtensions)
-}
-
-type assetResolver struct {
-	assetstore *assetstore.PluggableContainer
-}
-
-func (r *assetResolver) Files(ctx context.Context, obj *gqlschema.Asset, filterExtensions []string) ([]gqlschema.File, error) {
-	return r.assetstore.Resolver.AssetFilesField(ctx, obj, filterExtensions)
 }

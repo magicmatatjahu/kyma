@@ -1,34 +1,19 @@
 package assetstore
 
 import (
-	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/extractor"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/kyma-project/kyma/components/asset-store-controller-manager/pkg/apis/assetstore/v1alpha2"
 )
 
-//go:generate mockery -name=gqlAssetConverter -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=gqlAssetConverter -case=underscore -output disabled -outpkg disabled
-type gqlAssetConverter interface {
-	ToGQL(in *v1alpha2.Asset) (*gqlschema.Asset, error)
-	ToGQLs(in []*v1alpha2.Asset) ([]gqlschema.Asset, error)
-}
-
-type assetConverter struct {
-	extractor extractor.AssetStatusExtractor
-}
+type assetConverter struct {}
 
 func (c *assetConverter) ToGQL(item *v1alpha2.Asset) (*gqlschema.Asset, error) {
 	if item == nil {
 		return nil, nil
 	}
 
-	status := c.extractor.Status(item.Status.CommonAssetStatus)
-
 	asset := gqlschema.Asset{
-		Name:      item.Name,
-		Namespace: item.Namespace,
-		Type:      item.Labels[CmsTypeLabel],
-		Status:    status,
+		Name: item.Name,
 	}
 
 	return &asset, nil

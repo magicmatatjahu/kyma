@@ -25,22 +25,6 @@ func (_m *AssetStoreRetriever) Asset() shared.AssetGetter {
 	return r0
 }
 
-// AssetConverter provides a mock function with given fields:
-func (_m *AssetStoreRetriever) AssetConverter() shared.GqlAssetConverter {
-	ret := _m.Called()
-
-	var r0 shared.GqlAssetConverter
-	if rf, ok := ret.Get(0).(func() shared.GqlAssetConverter); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(shared.GqlAssetConverter)
-		}
-	}
-
-	return r0
-}
-
 // ClusterAsset provides a mock function with given fields:
 func (_m *AssetStoreRetriever) ClusterAsset() shared.ClusterAssetGetter {
 	ret := _m.Called()
@@ -51,22 +35,6 @@ func (_m *AssetStoreRetriever) ClusterAsset() shared.ClusterAssetGetter {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(shared.ClusterAssetGetter)
-		}
-	}
-
-	return r0
-}
-
-// ClusterAssetConverter provides a mock function with given fields:
-func (_m *AssetStoreRetriever) ClusterAssetConverter() shared.GqlClusterAssetConverter {
-	ret := _m.Called()
-
-	var r0 shared.GqlClusterAssetConverter
-	if rf, ok := ret.Get(0).(func() shared.GqlClusterAssetConverter); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(shared.GqlClusterAssetConverter)
 		}
 	}
 

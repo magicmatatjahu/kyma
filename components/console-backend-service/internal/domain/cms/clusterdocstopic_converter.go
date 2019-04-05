@@ -1,20 +1,13 @@
 package cms
 
 import (
-	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/extractor"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/cms/status"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
+	"github.com/kyma-project/kyma/components/cms-controller-manager/pkg/apis/cms/v1alpha1"
 )
 
-//go:generate mockery -name=gqlClusterDocsTopicConverter -output=automock -outpkg=automock -case=underscore
-//go:generate failery -name=gqlClusterDocsTopicConverter -case=underscore -output disabled -outpkg disabled
-type gqlClusterDocsTopicConverter interface {
-	ToGQL(in *v1alpha1.ClusterDocsTopic) (*gqlschema.ClusterDocsTopic, error)
-	ToGQLs(in []*v1alpha1.ClusterDocsTopic) ([]gqlschema.ClusterDocsTopic, error)
-}
-
 type clusterDocsTopicConverter struct {
-	extractor extractor.DocsTopicStatusExtractor
+	extractor status.ClusterDocsTopicExtractor
 }
 
 func (c *clusterDocsTopicConverter) ToGQL(item *v1alpha1.ClusterDocsTopic) (*gqlschema.ClusterDocsTopic, error) {
@@ -22,14 +15,10 @@ func (c *clusterDocsTopicConverter) ToGQL(item *v1alpha1.ClusterDocsTopic) (*gql
 		return nil, nil
 	}
 
-	status := c.extractor.Status(item.Status.CommonDocsTopicStatus)
-
 	clusterDocsTopic := gqlschema.ClusterDocsTopic{
-		Name:        item.Name,
+		Name: item.Name,
 		Description: item.Spec.Description,
 		DisplayName: item.Spec.DisplayName,
-		GroupName:   item.Labels[GroupNameLabel],
-		Status:      status,
 	}
 
 	return &clusterDocsTopic, nil

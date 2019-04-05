@@ -32,16 +32,6 @@ models:
     fields:
       assets:
         resolver: true
-  Asset:
-    model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.Asset"
-    fields:
-      files:
-        resolver: true
-  ClusterAsset:
-    model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.ClusterAsset"
-    fields:
-      files:
-        resolver: true
   ServiceInstance:
     model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.ServiceInstance"
     fields:
@@ -78,7 +68,7 @@ models:
         resolver: true
       content:
         resolver: true
-      docsTopic:
+      docsTopics:
         resolver: true
   ClusterServiceClass:
     model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.ClusterServiceClass"
@@ -99,7 +89,7 @@ models:
         resolver: true
       content:
         resolver: true
-      clusterDocsTopic:
+      clusterDocsTopics:
         resolver: true
   Application:
     model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.Application"
