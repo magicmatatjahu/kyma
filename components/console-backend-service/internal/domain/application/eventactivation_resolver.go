@@ -9,16 +9,17 @@ import (
 
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 
+	"io/ioutil"
+	"net/http"
+
 	"github.com/golang/glog"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/application/pretty"
-	contentPretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/pretty"
 	assetstorePretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/assetstore/pretty"
+	contentPretty "github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/pretty"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/storage"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlerror"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/pkg/errors"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/content/storage"
-	"net/http"
-	"io/ioutil"
 )
 
 const (
@@ -26,9 +27,9 @@ const (
 )
 
 type eventActivationResolver struct {
-	service          	eventActivationLister
-	converter        	*eventActivationConverter
-	contentRetriever	shared.ContentRetriever
+	service             eventActivationLister
+	converter           *eventActivationConverter
+	contentRetriever    shared.ContentRetriever
 	assetStoreRetriever shared.AssetStoreRetriever
 }
 
@@ -39,10 +40,10 @@ type eventActivationLister interface {
 
 func newEventActivationResolver(service eventActivationLister, contentRetriever shared.ContentRetriever, assetStoreRetriever shared.AssetStoreRetriever) *eventActivationResolver {
 	return &eventActivationResolver{
-		service:          		service,
-		converter:        		&eventActivationConverter{},
-		contentRetriever: 		contentRetriever,
-		assetStoreRetriever: 	assetStoreRetriever,
+		service:             service,
+		converter:           &eventActivationConverter{},
+		contentRetriever:    contentRetriever,
+		assetStoreRetriever: assetStoreRetriever,
 	}
 }
 
@@ -92,37 +93,42 @@ func (r *eventActivationResolver) EventActivationEventsField(ctx context.Context
 	return r.converter.ToGQLEvents(asyncApiSpec), nil
 }
 
+// TODO: Remove this temporary function after removing content domain
 func (r *eventActivationResolver) getAsyncApi(eventActivationName string) (*storage.AsyncApiSpec, error) {
 	types := []string{"asyncapi", "asyncApi", "asyncapispec", "asyncApiSpec", "events"}
 
-	items, err := r.assetStoreRetriever.Asset().ListForDocsTopicByType(kymaIntegrationNamespace, eventActivationName, types)
+	items, err := r.assetStoreRetriever.ClusterAsset().ListForDocsTopicByType(eventActivationName, types)
 	if err != nil {
 		if module.IsDisabledModuleError(err) {
 			return nil, err
 		}
-		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", assetstorePretty.Assets, pretty.EventActivation, eventActivationName))
-		return nil, gqlerror.New(err, assetstorePretty.Assets)
+		glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", assetstorePretty.ClusterAssets, pretty.EventActivation, eventActivationName))
+		return nil, gqlerror.New(err, assetstorePretty.ClusterAssets)
+	}
+
+	if len(items) == 0 {
+		return nil, nil
+	}
+
+	assetRef := items[0].Status.AssetRef
+	asyncApiFilePath := fmt.Sprintf("%s/%s", assetRef.BaseURL, assetRef.Files[0].Name)
+
+	raw, err := r.fetchAsyncApi(asyncApiFilePath)
+	if err != nil {
+		glog.Error(errors.Wrapf(err, "while fetching `AsyncApiSpec` for %s %s", pretty.EventActivation, eventActivationName))
+		return nil, gqlerror.New(err, assetstorePretty.ClusterAsset)
 	}
 
 	asyncApi := new(storage.AsyncApiSpec)
-	if len(items) > 0 {
-		assetRef := items[0].Status.AssetRef
-		asyncApiFilePath := fmt.Sprintf("%s/%s", assetRef.BaseURL, assetRef.Files[0].Name)
-
-		raw, err := r.fetchAsyncApi(asyncApiFilePath)
-		if err != nil {
-			return nil, err
-		}
-
-		err = asyncApi.Decode(raw)
-		if err != nil {
-			return nil, err
-		}
+	err = asyncApi.Decode(raw)
+	if err != nil {
+		return nil, err
 	}
 
 	return asyncApi, nil
 }
 
+// TODO: Remove this temporary function after removing content domain
 func (r *eventActivationResolver) fetchAsyncApi(path string) ([]byte, error) {
 	resp, err := http.Get(path)
 	if err != nil {

@@ -346,14 +346,6 @@ func (r *serviceClassResolver) ServiceClassDocsTopicField(ctx context.Context, o
 		return nil, gqlerror.New(err, cmsPretty.DocsTopic)
 	}
 
-	if item == nil {
-		item, err = r.cmsRetriever.DocsTopic().Find(kymaIntegrationNamespace, obj.Name)
-		if err != nil {
-			glog.Error(errors.Wrapf(err, "while gathering %s for %s %s", cmsPretty.DocsTopic, pretty.ServiceClass, obj.Name))
-			return nil, gqlerror.New(err, cmsPretty.DocsTopic)
-		}
-	}
-
 	docsTopic, err := r.cmsRetriever.DocsTopicConverter().ToGQL(item)
 	if err != nil {
 		glog.Error(errors.Wrapf(err, "while converting %s", cmsPretty.DocsTopic))
