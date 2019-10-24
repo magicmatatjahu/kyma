@@ -1,0 +1,78 @@
+{{- if .Values.rbac.clusterScope.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "rafter.rbacClusterRoleName" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "rafter.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "rafter.chart" . }}
+  {{- if .Values.rbac.clusterScope.role.labels }}
+    {{ toYaml .Values.rbac.clusterScope.role.labels | indent 4 }}
+  {{- end }}
+  {{- if .Values.rbac.clusterScope.role.annotations }}
+  annotations:
+    {{ toYaml .Values.rbac.clusterScope.role.annotations | indent 4 }}
+  {{- end }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - assetstore.kyma-project.io
+  resources:
+  - assets
+  - clusterassets
+  - buckets
+  - clusterbuckets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - assetstore.kyma-project.io
+  resources:
+  - assets/status
+  - clusterassets/status
+  - buckets/status
+  - clusterbuckets/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - cms.kyma-project.io
+  resources:
+  - clusterdocstopics
+  - clusterdocstopics/status
+  - docstopics
+  - docstopics/status
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+{{- if .Values.rbac.clusterScope.role.extraRules }}
+{{ toYaml .Values.rbac.clusterScope.role.extraRules | indent 0 }}
+{{- end }}
+{{- end }}
