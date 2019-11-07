@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Rafter Helm Chart
+name: rafter
+version: 1.0.0

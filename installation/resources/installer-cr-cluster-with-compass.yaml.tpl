@@ -53,6 +53,8 @@ spec:
       namespace: "kyma-system"
     - name: "cms"
       namespace: "kyma-system"
+    - name: "rafter"
+      namespace: "kyma-system"
     - name: "core"
       namespace: "kyma-system"
     - name: "knative-provisioner-natss"

@@ -1,0 +1,11 @@
+dependencies:
+  - name: minio
+    condition: minio.enabled
+  - name: rafter-controller-manager
+    condition: rafter-controller-manager.enabled
+  - name: rafter-upload-service
+    condition: rafter-upload-service.enabled
+  - name: rafter-frontmatter-service
+    condition: rafter-frontmatter-service.enabled
+  - name: rafter-asyncapi-service
+    condition: rafter-asyncapi-service.enabled
