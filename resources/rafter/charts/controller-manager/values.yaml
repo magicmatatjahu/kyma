@@ -121,7 +121,8 @@ envs:
   store:
     endpoint: 
       value: '{{ include "rafter.fullname" . }}-minio.{{ .Release.Namespace }}.svc.cluster.local:9000'
-    externalEndpoint: 'http://localhost:9000'
+    externalEndpoint:
+      value: 'http://localhost:9000'
     accessKey:
       valueFrom:
         secretKeyRef:

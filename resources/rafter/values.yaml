@@ -2,9 +2,9 @@ controller-manager:
   enabled: true
 
   image:
-    repository: eu.gcr.io/kyma-project/rafter-controller-manager
+    repository: rafter-controller-manager #eu.gcr.io/kyma-project/rafter-controller-manager
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never #IfNotPresent
 
   installCRDs: false
 
@@ -162,9 +162,9 @@ upload-service:
   enabled: true
 
   image:
-    repository: eu.gcr.io/kyma-project/rafter-upload-service
+    repository: rafter-upload-service #eu.gcr.io/kyma-project/rafter-upload-service
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never #IfNotPresent
 
   pod:
     annotations:
@@ -242,9 +242,9 @@ frontmatter-service:
   enabled: true
 
   image:
-    repository: eu.gcr.io/kyma-project/rafter-frontmatter-service
+    repository: rafter-frontmatter-service #eu.gcr.io/kyma-project/rafter-frontmatter-service
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never #IfNotPresent
 
   pod:
     annotations:
@@ -276,9 +276,9 @@ asyncapi-service:
   enabled: true
 
   image:
-    repository: eu.gcr.io/kyma-project/rafter-asyncapi-service
+    repository: rafter-asyncapi-service #eu.gcr.io/kyma-project/rafter-asyncapi-service
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never #IfNotPresent
 
   pod:
     annotations:
