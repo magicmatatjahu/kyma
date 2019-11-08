@@ -1,30 +1,26 @@
-{{- if .Values.installCRDs -}}
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   creationTimestamp: null
-  name: buckets.rafter.kyma-project.io
+  name: clusterassetgroups.rafter.kyma-project.io
 spec:
   additionalPrinterColumns:
   - JSONPath: .status.phase
     name: Phase
-    type: string
-  - JSONPath: .status.url
-    name: URL
     type: string
   - JSONPath: .metadata.creationTimestamp
     name: Age
     type: date
   group: rafter.kyma-project.io
   names:
-    kind: Bucket
-    plural: buckets
-  scope: ""
+    kind: ClusterAssetGroup
+    plural: clusterassetgroups
+  scope: Cluster
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: Bucket is the Schema for the buckets API
+      description: ClusterAssetGroup is the Schema for the clusterassetgroups API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -39,51 +35,62 @@ spec:
         metadata:
           type: object
         spec:
-          description: BucketSpec defines the desired state of Bucket
+          description: ClusterAssetGroupSpec defines the desired state of ClusterAssetGroup
           properties:
-            policy:
-              enum:
-              - none
-              - readonly
-              - writeonly
-              - readwrite
-              - ""
+            description:
               type: string
-            region:
-              enum:
-              - us-east-1
-              - us-west-1
-              - us-west-2
-              - eu-west-1
-              - eu-central-1
-              - ap-southeast-1
-              - ap-southeast-2
-              - ap-northeast-1
-              - sa-east-1
-              - ""
+            displayName:
               type: string
+            sources:
+              items:
+                properties:
+                  filter:
+                    type: string
+                  mode:
+                    enum:
+                    - single
+                    - package
+                    - index
+                    type: string
+                  name:
+                    pattern: ^[a-z][a-zA-Z0-9-]*[a-zA-Z0-9]$
+                    type: string
+                  parameters:
+                    type: object
+                  type:
+                    pattern: ^[a-z][a-zA-Z0-9\._-]*[a-zA-Z0-9]$
+                    type: string
+                  url:
+                    type: string
+                required:
+                - mode
+                - name
+                - type
+                - url
+                type: object
+              type: array
+          required:
+          - sources
           type: object
         status:
-          description: BucketStatus defines the observed state of Bucket
+          description: ClusterAssetGroupStatus defines the observed state of ClusterAssetGroup
           properties:
             lastHeartbeatTime:
               format: date-time
               type: string
             message:
               type: string
-            observedGeneration:
-              format: int64
-              type: integer
             phase:
+              enum:
+              - Pending
+              - Ready
+              - Failed
               type: string
             reason:
               type: string
-            remoteName:
-              type: string
-            url:
-              type: string
           required:
-          - observedGeneration
+          - lastHeartbeatTime
+          - phase
           type: object
       type: object
   versions:
@@ -96,4 +103,3 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
-{{- end }}
