@@ -42,6 +42,4 @@ serviceMonitor:
 
 envs:
   host:
-    value: "0.0.0.0"
-  verbose: 
-    value: "true"
+  verbose:

@@ -90,69 +90,38 @@ metrics:
 envs:
   clusterAssetGroup:
     relistInterval: 
-      value: 5m
   assetGroup:
     relistInterval: 
-      value: 5m
   clusterBucket:
     relistInterval: 
-      value: 30s
-    maxConcurrentReconciles: 
-      value: "1"
-    region: 
-      value: us-east-1
+    maxConcurrentReconciles:
+    region:
   bucket:
     relistInterval: 
-      value: 30s
-    maxConcurrentReconciles: 
-      value: "1"
-    region: 
-      value: us-east-1
+    maxConcurrentReconciles:
+    region:
   clusterAsset:
     relistInterval: 
-      value: 30s
-    maxConcurrentReconciles: 
-      value: "1"
+    maxConcurrentReconciles:
   asset:
     relistInterval: 
-      value: 30s
-    maxConcurrentReconciles: 
-      value: "1"
+    maxConcurrentReconciles:
   store:
     endpoint: 
-      value: '{{ include "rafter.fullname" . }}-minio.{{ .Release.Namespace }}.svc.cluster.local:9000'
     externalEndpoint:
-      value: 'http://localhost:9000'
     accessKey:
-      valueFrom:
-        secretKeyRef:
-          name: '{{ include "rafter.fullname" . }}-minio'
-          key: accesskey
     secretKey:
-      valueFrom:
-        secretKeyRef:
-          name: '{{ include "rafter.fullname" . }}-minio'
-          key: secretkey
-    useSSL: 
-      value: "false"
-    uploadWorkers: 
-      value: "10"
+    useSSL:
+    uploadWorkers:
   loader:
-    verifySSL: 
-      value: "false"
-    tempDir: 
-      value: "/tmp"
+    verifySSL:
+    tempDir:
   webhooks:
     validation:
-      timeout: 
-        value: 1m
-      workers: 
-        value: "10"
+      timeout:
+      workers:
     mutation:
-      timeout: 
-        value: 1m
-      workers: 
-        value: "10"
+      timeout:
+      workers:
     metadata:
-      timeout: 
-        value: 1m
+      timeout:
