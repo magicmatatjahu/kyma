@@ -3,15 +3,20 @@ global:
     gateway:
       name: kyma-gateway
 
-controller-manager:
+rafter-controller-manager:
   enabled: true
 
-  image:
-    repository: rafter-controller-manager #eu.gcr.io/kyma-project/rafter-controller-manager
-    tag: latest
-    pullPolicy: Never #IfNotPresent
+  fullnameOverride: "rafter-controller-manager"
 
-  installCRDs: true
+  minio:
+    enabled: false
+
+  image:
+    repository: eu.gcr.io/kyma-project/rafter-controller-manager
+    tag: 3778b2ec
+    pullPolicy: IfNotPresent
+
+  installCRDs: false
 
   pod:
     annotations:
@@ -46,7 +51,7 @@ controller-manager:
         {
           "metadataExtractors":[
             {
-              "name": "rafter-frontmatter-service",
+              "name": "rafter-front-matter-service",
               "namespace": "{{ .Release.Namespace }}",
               "endpoint": "/v1/extract",
               "filter": "\\.md$"
@@ -94,6 +99,7 @@ controller-manager:
       maxConcurrentReconciles:
         value: "1"
       region:
+        value: ""
         valueFrom:
           configMapKeyRef:
             name: rafter-minio-docs-upload
@@ -104,6 +110,7 @@ controller-manager:
       maxConcurrentReconciles:
         value: "1"
       region:
+        value: ""
         valueFrom:
           configMapKeyRef:
             name: rafter-minio-docs-upload
@@ -120,6 +127,7 @@ controller-manager:
         value: "1"
     store:
       endpoint:
+        value: ""
         valueFrom:
           configMapKeyRef:
             name: rafter-minio-docs-upload
@@ -137,6 +145,7 @@ controller-manager:
             name: rafter-minio
             key: secretkey
       useSSL:
+        value: ""
         valueFrom:
           configMapKeyRef:
             name: rafter-minio-docs-upload
@@ -163,13 +172,18 @@ controller-manager:
         timeout:
           value: 1m
 
-upload-service:
+rafter-upload-service:
   enabled: true
 
+  fullnameOverride: "rafter-upload-service"
+
+  minio:
+    enabled: false
+
   image:
-    repository: rafter-upload-service #eu.gcr.io/kyma-project/rafter-upload-service
-    tag: latest
-    pullPolicy: Never #IfNotPresent
+    repository: eu.gcr.io/kyma-project/rafter-upload-service
+    tag: 3778b2ec
+    pullPolicy: IfNotPresent
 
   pod:
     annotations:
@@ -199,6 +213,7 @@ upload-service:
       workers:
         value: "10"
       endpoint:
+        value: ""
         valueFrom:
           configMapKeyRef:
             name: rafter-minio-docs-upload
@@ -206,6 +221,7 @@ upload-service:
       externalEndpoint:
         value: 'https://minio.{{ .Values.global.ingress.domainName }}'
       port:
+        value: ""
         valueFrom:
           configMapKeyRef:
             name: rafter-minio-docs-upload
@@ -221,6 +237,7 @@ upload-service:
             name: rafter-minio
             key: secretkey
       secure:
+        value: ""
         valueFrom:
           configMapKeyRef:
             name: rafter-minio-docs-upload
@@ -231,6 +248,7 @@ upload-service:
       publicPrefix:
         value: system-public
       region:
+        value: ""
         valueFrom:
           configMapKeyRef:
             name: rafter-minio-docs-upload
@@ -243,13 +261,15 @@ upload-service:
       namespace:
         value: "{{ .Release.Namespace }}"
 
-frontmatter-service:
+rafter-front-matter-service:
   enabled: true
 
+  fullnameOverride: "rafter-front-matter-service"
+
   image:
-    repository: rafter-frontmatter-service #eu.gcr.io/kyma-project/rafter-frontmatter-service
-    tag: latest
-    pullPolicy: Never #IfNotPresent
+    repository: eu.gcr.io/kyma-project/rafter-front-matter-service
+    tag: 3778b2ec
+    pullPolicy: IfNotPresent
 
   pod:
     annotations:
@@ -277,13 +297,15 @@ frontmatter-service:
     workers:
       value: "10"
 
-asyncapi-service:
+rafter-asyncapi-service:
   enabled: true
 
+  fullnameOverride: "rafter-asyncapi-service"
+
   image:
-    repository: rafter-asyncapi-service #eu.gcr.io/kyma-project/rafter-asyncapi-service
-    tag: latest
-    pullPolicy: Never #IfNotPresent
+    repository: eu.gcr.io/kyma-project/rafter-asyncapi-service
+    tag: 3778b2ec
+    pullPolicy: IfNotPresent
 
   pod:
     annotations:
