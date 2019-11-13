@@ -5,12 +5,12 @@ metadata:
   name: assetgroups.rafter.kyma-project.io
 spec:
   additionalPrinterColumns:
-  - JSONPath: .status.phase
-    name: Phase
-    type: string
-  - JSONPath: .metadata.creationTimestamp
-    name: Age
-    type: date
+    - JSONPath: .status.phase
+      name: Phase
+      type: string
+    - JSONPath: .metadata.creationTimestamp
+      name: Age
+      type: date
   group: rafter.kyma-project.io
   names:
     kind: AssetGroup
@@ -37,6 +37,13 @@ spec:
         spec:
           description: AssetGroupSpec defines the desired state of AssetGroup
           properties:
+            bucketRef:
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+              type: object
             description:
               type: string
             displayName:
@@ -48,9 +55,9 @@ spec:
                     type: string
                   mode:
                     enum:
-                    - single
-                    - package
-                    - index
+                      - single
+                      - package
+                      - index
                     type: string
                   name:
                     pattern: ^[a-z][a-zA-Z0-9-]*[a-zA-Z0-9]$
@@ -63,14 +70,15 @@ spec:
                   url:
                     type: string
                 required:
-                - mode
-                - name
-                - type
-                - url
+                  - mode
+                  - name
+                  - type
+                  - url
                 type: object
+              minItems: 1
               type: array
           required:
-          - sources
+            - sources
           type: object
         status:
           description: AssetGroupStatus defines the observed state of AssetGroup
@@ -82,21 +90,22 @@ spec:
               type: string
             phase:
               enum:
-              - Pending
-              - Ready
-              - Failed
+                - Pending
+                - Ready
+                - Failed
               type: string
             reason:
               type: string
           required:
-          - lastHeartbeatTime
-          - phase
+            - lastHeartbeatTime
+            - phase
           type: object
       type: object
+  version: v1beta1
   versions:
-  - name: v1beta1
-    served: true
-    storage: true
+    - name: v1beta1
+      served: true
+      storage: true
 status:
   acceptedNames:
     kind: ""
