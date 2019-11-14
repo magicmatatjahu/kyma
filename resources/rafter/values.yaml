@@ -180,6 +180,9 @@ rafter-upload-service:
   minio:
     enabled: false
     refName: rafter-minio
+    persistence:
+      enabled: true
+      size: 10Gi
 
   image:
     repository: eu.gcr.io/kyma-project/rafter-upload-service
