@@ -37,10 +37,6 @@ rafter-controller-manager:
         name: tmp-empty-dir
     extraProperties:
       terminationGracePeriodSeconds: 10
-      hostAliases:
-        - ip: "{{ .Values.global.minikubeIP }}"
-          hostnames:
-            - "minio.{{ .Values.global.ingress.domainName }}"
 
   webhooksConfigMap:
     create: true
