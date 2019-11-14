@@ -179,6 +179,7 @@ rafter-upload-service:
 
   minio:
     enabled: false
+    refName: rafter-minio
 
   image:
     repository: eu.gcr.io/kyma-project/rafter-upload-service

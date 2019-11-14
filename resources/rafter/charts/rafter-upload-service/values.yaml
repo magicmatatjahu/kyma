@@ -7,6 +7,7 @@ fullnameOverride:
 
 minio:
   enabled: true
+  refName:
   persistence:
     enabled: true
     size: 10Gi
