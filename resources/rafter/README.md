@@ -20,4 +20,8 @@ Rafter comes with the following set of services and extensions compatible with R
 - [Front Matter Service](./charts/rafter-front-matter-service) (extension)
 - [AsyncAPI Service](./charts/rafter-asyncapi-service) (extension)
 
+To learn more about the Rafter, see the [Rafter repository](https://github.com/kyma-project/rafter).
+
+<!-- Add this comment after consolidation rafter in Kyma 
 To learn more about the Rafter, see the [Rafter documentation](https://kyma-project.io/docs/components/rafter).
+-->
