@@ -203,8 +203,6 @@ rafter-upload-service:
     create: true
 
   envs:
-    host:
-      value: "0.0.0.0"
     verbose:
       value: "true"
     upload:
@@ -288,8 +286,6 @@ rafter-front-matter-service:
     create: true
 
   envs:
-    host:
-      value: "0.0.0.0"
     verbose:
       value: "true"
     timeout:
@@ -324,8 +320,6 @@ rafter-asyncapi-service:
     create: true
 
   envs:
-    host:
-      value: "0.0.0.0"
     verbose:
       value: "true"
 
