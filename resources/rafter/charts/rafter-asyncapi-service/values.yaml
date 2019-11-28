@@ -41,5 +41,5 @@ serviceMonitor:
   annotations: {}
 
 envs:
-  verbose: 
-    value: "true"
+  verbose:
+    value: "false"

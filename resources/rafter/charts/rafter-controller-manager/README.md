@@ -2,6 +2,6 @@
 
 ## Overview
 
-The Rafter Controller Manager runs the AssetGroup, Asset, and Bucket Controllers that manage AssetGroup, Asset, and Bucket custom resources (CR).
+The Controller Manager runs the AssetGroup, Asset, and Bucket Controllers that manage AssetGroup, Asset, and Bucket custom resources (CR).
 
-To learn more about the Rafter Controller Manager, see the [documentation](https://kyma-project.io/docs/components/rafter).
+To learn more about the Controller Manager, go to the [Rafter repository](https://github.com/kyma-project/rafter).

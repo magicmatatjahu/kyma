@@ -8,9 +8,6 @@ rafter-controller-manager:
 
   fullnameOverride: "rafter-controller-manager"
 
-  minio:
-    enabled: false
-
   image:
     repository: eu.gcr.io/kyma-project/rafter-controller-manager
     tag: 3778b2ec
@@ -168,6 +165,43 @@ rafter-controller-manager:
         timeout:
           value: 1m
 
+  minio:
+    enabled: true
+
+    image:
+      tag: RELEASE.2019-06-04T01-15-58Z
+
+    persistence:
+      enabled: true
+      size: 10Gi
+
+    DeploymentUpdate:
+      type: Recreate
+
+    podAnnotations:
+      sidecar.istio.io/inject: "false"
+
+    service:
+      annotations:
+        auth.istio.io/9000: NONE
+
+    environment:
+      MINIO_BROWSER: "off"
+
+    defaultBucket:
+      enabled: false
+
+    resources:
+      requests:
+        memory: 32Mi
+        cpu: 10m
+      limits:
+        memory: 128Mi
+        cpu: 100m
+
+    gcsgateway:
+      replicas: 2
+
 rafter-upload-service:
   enabled: true
 
@@ -259,6 +293,22 @@ rafter-upload-service:
       namespace:
         value: "{{ .Release.Namespace }}"
 
+  migrator:
+    images:
+      alpine_kubectl:
+        repository: eu.gcr.io/kyma-project/test-infra/alpine-kubectl
+        tag: 'v20190325-ff66a3a'
+        pullPolicy: IfNotPresent
+      minio_client:
+        repository: 'minio/mc'
+        tag: 'RELEASE.2019-04-03T17-59-57Z'
+        pullPolicy: IfNotPresent
+    pre:
+      minioDeploymentRefName:
+      minioSecretRefName:
+    post:
+      minioSecretRefName:
+
 rafter-front-matter-service:
   enabled: true
 
@@ -322,40 +372,3 @@ rafter-asyncapi-service:
   envs:
     verbose:
       value: "true"
-
-minio:
-  enabled: true
-
-  image:
-    tag: RELEASE.2019-06-04T01-15-58Z
-
-  persistence:
-    enabled: true
-    size: 10Gi
-
-  DeploymentUpdate:
-    type: Recreate
-
-  podAnnotations:
-    sidecar.istio.io/inject: "false"
-
-  service:
-    annotations:
-      auth.istio.io/9000: NONE
-
-  environment:
-    MINIO_BROWSER: "off"
-
-  defaultBucket:
-    enabled: false
-
-  resources:
-    requests:
-      memory: 32Mi
-      cpu: 10m
-    limits:
-      memory: 128Mi
-      cpu: 100m
-
-  gcsgateway:
-    replicas: 2

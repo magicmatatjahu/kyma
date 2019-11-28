@@ -7,6 +7,8 @@ fullnameOverride:
 
 minio:
   enabled: true
+  accessKey: ""
+  secretKey: ""
 
 image:
   repository: eu.gcr.io/kyma-project/rafter-controller-manager
@@ -79,7 +81,7 @@ webhooksConfigMap:
       {
         "metadataExtractors":[
           {
-            "name": "rafter-frontmatter-service",
+            "name": "rafter-front-matter-service",
             "namespace": "{{ .Release.Namespace }}",
             "endpoint": "/v1/extract",
             "filter": "\\.md$"
@@ -136,33 +138,34 @@ envs:
     relistInterval:
       value: 5m
   clusterBucket:
-    relistInterval: 
+    relistInterval:
       value: 30s
-    maxConcurrentReconciles: 
+    maxConcurrentReconciles:
       value: "1"
-    region: 
+    region:
       value: us-east-1
   bucket:
-    relistInterval: 
+    relistInterval:
       value: 30s
-    maxConcurrentReconciles: 
+    maxConcurrentReconciles:
       value: "1"
-    region: 
+    region:
       value: us-east-1
   clusterAsset:
-    relistInterval: 
+    relistInterval:
       value: 30s
-    maxConcurrentReconciles: 
+    maxConcurrentReconciles:
       value: "1"
   asset:
-    relistInterval: 
+    relistInterval:
       value: 30s
-    maxConcurrentReconciles: 
+    maxConcurrentReconciles:
       value: "1"
   store:
-    endpoint: 
+    endpoint:
       value: "{{ .Release.Name }}-minio.{{ .Release.Namespace }}.svc.cluster.local:9000"
     externalEndpoint:
+      value: "http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}.svc.cluster.local:9000"
     accessKey:
       valueFrom:
         secretKeyRef:
@@ -173,26 +176,26 @@ envs:
         secretKeyRef:
           name: "{{ .Release.Name }}-minio"
           key: secretkey
-    useSSL: 
+    useSSL:
       value: "false"
-    uploadWorkers: 
+    uploadWorkers:
       value: "10"
   loader:
-    verifySSL: 
+    verifySSL:
       value: "false"
-    tempDir: 
+    tempDir:
       value: "/tmp"
   webhooks:
     validation:
-      timeout: 
+      timeout:
         value: 1m
-      workers: 
+      workers:
         value: "10"
     mutation:
-      timeout: 
+      timeout:
         value: 1m
-      workers: 
+      workers:
         value: "10"
     metadata:
-      timeout: 
+      timeout:
         value: 1m

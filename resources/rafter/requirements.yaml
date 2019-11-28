@@ -1,6 +1,4 @@
 dependencies:
-  - name: minio
-    condition: minio.enabled
   - name: rafter-controller-manager
     condition: rafter-controller-manager.enabled
   - name: rafter-upload-service

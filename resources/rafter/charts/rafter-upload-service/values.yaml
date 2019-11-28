@@ -7,10 +7,13 @@ fullnameOverride:
 
 minio:
   enabled: true
-  refName:
   persistence:
     enabled: true
     size: 10Gi
+  accessKey: ""
+  secretKey: ""
+  podAnnotations:
+    persistence: "true"
 
 image:
   repository: eu.gcr.io/kyma-project/rafter-upload-service
@@ -67,8 +70,8 @@ serviceMonitor:
   annotations: {}
 
 envs:
-  verbose: 
-    value: "true"
+  verbose:
+    value: "false"
   kubeconfigPath:
   upload:
     timeout:
@@ -78,6 +81,7 @@ envs:
     endpoint:
       value: "{{ .Release.Name }}-minio.{{ .Release.Namespace }}.svc.cluster.local"
     externalEndpoint:
+      value: "http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}.svc.cluster.local:9000"
     port:
       value: "9000"
     accessKey:
@@ -90,7 +94,7 @@ envs:
         secretKeyRef:
           name: "{{ .Release.Name }}-minio"
           key: secretkey
-    secure: 
+    secure:
       value: "false"
   bucket:
     privatePrefix:
@@ -117,3 +121,8 @@ migrator:
       repository: 'minio/mc'
       tag: 'RELEASE.2019-04-03T17-59-57Z'
       pullPolicy: IfNotPresent
+  pre:
+    minioDeploymentRefName:
+    minioSecretRefName:
+  post:
+    minioSecretRefName: dupa

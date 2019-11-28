@@ -31,7 +31,7 @@ service:
     external: 80
     protocol: TCP
   labels: {}
-  annotations: {} 
+  annotations: {}
 
 serviceMonitor:
   create: false
@@ -41,8 +41,8 @@ serviceMonitor:
   annotations: {}
 
 envs:
-  verbose: 
-    value: "true"
+  verbose:
+    value: "false"
   timeout:
     value: "1m"
   workers:
