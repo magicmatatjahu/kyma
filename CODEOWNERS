@@ -47,13 +47,13 @@
 /resources/core/charts/iam-kubeconfig-service @piotrmsc @kubadz @strekm @jakkab @Tomasz-Smelcerz-SAP @Demonsthere
 
 # The `assetstore` chart
-/resources/assetstore/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/resources/assetstore/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # The `cms` chart
-/resources/cms/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/resources/cms/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # The `rafter` chart
-/resources/rafter/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/resources/rafter/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # The `application-connector` chart
 /resources/application-connector/ @akgalwas @janmedrek @Szymongib @franpog859 @Maladie @crabtree
@@ -137,7 +137,7 @@
 /resources/testing/ @aszecowka @PK85 @mszostok @piotrmiskiewicz @polskikiel @ksputo @jasiu001 @adamwalach
 
 # The `docs` subchart
-/resources/core/charts/docs/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu @aszecowka @PK85 @mszostok @piotrmiskiewicz @polskikiel @ksputo @jasiu001 @adamwalach
+/resources/core/charts/docs/ @michal-hudy @m00g3n @aerfio @magicmatatjahu @aszecowka @PK85 @mszostok @piotrmiskiewicz @polskikiel @ksputo @jasiu001 @adamwalach
 
 # The `console-backend-service` subchart
 /resources/core/charts/console-backend-service/ @dariadomagala @y-kkamil @parostatkiem @akucharska @Wawrzyn321 @kwiatekus @sjanota
@@ -217,22 +217,22 @@ components/etcd-tls-setup-job/ @aszecowka @PK85 @mszostok @piotrmiskiewicz @pols
 /components/api-controller/ @piotrmsc @kubadz @strekm @jakkab @Tomasz-Smelcerz-SAP @Demonsthere
 
 # Asset Store Controller Manager Component
-/components/asset-store-controller-manager/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/components/asset-store-controller-manager/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # Asset Upload Service
-/components/asset-upload-service/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/components/asset-upload-service/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # Asset Metadata Service
-/components/asset-metadata-service/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/components/asset-metadata-service/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # Backup Plugins
 /components/backup-plugins/ @a-thaler @hisarbalik @lilitgh @suleymanakbas91 @clebs
 
 # CMS Controller Manager Component
-/components/cms-controller-manager/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/components/cms-controller-manager/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # CMS Services	
-/components/cms-services/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/components/cms-services/ @michal-hudy @m00g3n @aerfio @magicmatatjahu	
 
 # Binding usage controller Component
 /components/service-binding-usage-controller/ @aszecowka @PK85 @mszostok @piotrmiskiewicz @polskikiel @ksputo @jasiu001 @adamwalach
@@ -335,7 +335,7 @@ components/etcd-tls-setup-job/ @aszecowka @PK85 @mszostok @piotrmiskiewicz @pols
 /tests/console-backend-service/ @dariadomagala @y-kkamil @parostatkiem @akucharska @Wawrzyn321 @kwiatekus @sjanota
 
 # Asset Store tests
-/tests/asset-store/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/tests/asset-store/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # Connector Service Tests
 /tests/connector-service-tests/ @akgalwas @janmedrek @Szymongib @franpog859 @Maladie @crabtree
@@ -403,10 +403,10 @@ tests/knative-build @rakesh-garimella @lilitgh @k15r @nachtmaar @montaro @marcob
 /docs/ @kazydek @klaudiagrz @tomekpapiernik @bszwarc @mmitoraj @majakurcius @alexandra-simeonova
 
 # Owners of the .kyma-project-io folder
-/.kyma-project-io/ @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+/.kyma-project-io/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # Config file for MILV - milv.config.yaml
-milv.config.yaml @michal-hudy @m00g3n @aerfio @pPrecel @magicmatatjahu
+milv.config.yaml @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
 # performance tests
 /tests/perf/ @a-thaler @hisarbalik @lilitgh @suleymanakbas91 @clebs
