@@ -95,7 +95,7 @@ rafter-controller-manager:
         value: ""
         valueFrom:
           configMapKeyRef:
-            name: rafter-minio-docs-upload
+            name: rafter-minio-envs
             key: APP_BUCKET_REGION
     bucket:
       relistInterval:
@@ -106,7 +106,7 @@ rafter-controller-manager:
         value: ""
         valueFrom:
           configMapKeyRef:
-            name: rafter-minio-docs-upload
+            name: rafter-minio-envs
             key: APP_BUCKET_REGION
     clusterAsset:
       relistInterval:
@@ -123,7 +123,7 @@ rafter-controller-manager:
         value: ""
         valueFrom:
           configMapKeyRef:
-            name: rafter-minio-docs-upload
+            name: rafter-minio-envs
             key: APP_UPLOAD_ENDPOINT_WITH_PORT
       externalEndpoint:
         value: 'https://minio.{{ .Values.global.ingress.domainName }}'
@@ -141,7 +141,7 @@ rafter-controller-manager:
         value: ""
         valueFrom:
           configMapKeyRef:
-            name: rafter-minio-docs-upload
+            name: rafter-minio-envs
             key: APP_UPLOAD_SECURE
       uploadWorkers:
         value: "10"
@@ -169,7 +169,7 @@ rafter-controller-manager:
     enabled: true
 
     image:
-      tag: RELEASE.2019-06-04T01-15-58Z
+      tag: RELEASE.2019-10-12T01-39-57Z
 
     persistence:
       enabled: true
@@ -248,7 +248,7 @@ rafter-upload-service:
         value: ""
         valueFrom:
           configMapKeyRef:
-            name: rafter-minio-docs-upload
+            name: rafter-minio-envs
             key: APP_UPLOAD_ENDPOINT
       externalEndpoint:
         value: 'https://minio.{{ .Values.global.ingress.domainName }}'
@@ -256,7 +256,7 @@ rafter-upload-service:
         value: ""
         valueFrom:
           configMapKeyRef:
-            name: rafter-minio-docs-upload
+            name: rafter-minio-envs
             key: APP_UPLOAD_PORT
       accessKey:
         valueFrom:
@@ -272,7 +272,7 @@ rafter-upload-service:
         value: ""
         valueFrom:
           configMapKeyRef:
-            name: rafter-minio-docs-upload
+            name: rafter-minio-envs
             key: APP_UPLOAD_SECURE
     bucket:
       privatePrefix:
@@ -283,7 +283,7 @@ rafter-upload-service:
         value: ""
         valueFrom:
           configMapKeyRef:
-            name: rafter-minio-docs-upload
+            name: rafter-minio-envs
             key: APP_BUCKET_REGION
     configMap:
       enabled:
@@ -301,7 +301,7 @@ rafter-upload-service:
         pullPolicy: IfNotPresent
       minioClient:
         repository: 'minio/mc'
-        tag: 'RELEASE.2019-04-03T17-59-57Z'
+        tag: 'RELEASE.2019-10-09T22-54-57Z'
         pullPolicy: IfNotPresent
     pre:
       minioDeploymentRefName:
