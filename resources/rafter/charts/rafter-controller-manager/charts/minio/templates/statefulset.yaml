@@ -3,7 +3,7 @@
 {{ $nodeCount := .Values.replicas | int }}
 {{ $scheme := "http" }}
 {{- if .Values.tls.enabled }}
-{{ $scheme = "https" }}
+{{ $scheme := "https" }}
 {{ end }}
 apiVersion: v1
 kind: Service
