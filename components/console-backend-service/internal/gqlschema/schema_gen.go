@@ -614,6 +614,7 @@ type ComplexityRoot struct {
 		ClusterServiceBroker        func(childComplexity int, name string) int
 		ServiceBrokers              func(childComplexity int, namespace string, first *int, offset *int) int
 		ServiceBroker               func(childComplexity int, name string, namespace string) int
+		ServiceBindingUsages        func(childComplexity int, namespace string, options *ServiceBindingUsagesQueryOptions) int
 		ServiceBindingUsage         func(childComplexity int, name string, namespace string) int
 		ServiceBinding              func(childComplexity int, name string, namespace string) int
 		UsageKinds                  func(childComplexity int, first *int, offset *int) int
@@ -1044,6 +1045,7 @@ type QueryResolver interface {
 	ClusterServiceBroker(ctx context.Context, name string) (*ClusterServiceBroker, error)
 	ServiceBrokers(ctx context.Context, namespace string, first *int, offset *int) ([]ServiceBroker, error)
 	ServiceBroker(ctx context.Context, name string, namespace string) (*ServiceBroker, error)
+	ServiceBindingUsages(ctx context.Context, namespace string, options *ServiceBindingUsagesQueryOptions) ([]ServiceBindingUsage, error)
 	ServiceBindingUsage(ctx context.Context, name string, namespace string) (*ServiceBindingUsage, error)
 	ServiceBinding(ctx context.Context, name string, namespace string) (*ServiceBinding, error)
 	UsageKinds(ctx context.Context, first *int, offset *int) ([]UsageKind, error)
@@ -3507,6 +3509,35 @@ func field_Query_serviceBroker_args(rawArgs map[string]interface{}) (map[string]
 		}
 	}
 	args["namespace"] = arg1
+	return args, nil
+
+}
+
+func field_Query_serviceBindingUsages_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		var err error
+		arg0, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg0
+	var arg1 *ServiceBindingUsagesQueryOptions
+	if tmp, ok := rawArgs["options"]; ok {
+		var err error
+		var ptr1 ServiceBindingUsagesQueryOptions
+		if tmp != nil {
+			ptr1, err = UnmarshalServiceBindingUsagesQueryOptions(tmp)
+			arg1 = &ptr1
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["options"] = arg1
 	return args, nil
 
 }
@@ -7525,6 +7556,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.ServiceBroker(childComplexity, args["name"].(string), args["namespace"].(string)), true
+
+	case "Query.serviceBindingUsages":
+		if e.complexity.Query.ServiceBindingUsages == nil {
+			break
+		}
+
+		args, err := field_Query_serviceBindingUsages_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ServiceBindingUsages(childComplexity, args["namespace"].(string), args["options"].(*ServiceBindingUsagesQueryOptions)), true
 
 	case "Query.serviceBindingUsage":
 		if e.complexity.Query.ServiceBindingUsage == nil {
@@ -22911,6 +22954,15 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				out.Values[i] = ec._Query_serviceBroker(ctx, field)
 				wg.Done()
 			}(i, field)
+		case "serviceBindingUsages":
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Query_serviceBindingUsages(ctx, field)
+				if out.Values[i] == graphql.Null {
+					invalid = true
+				}
+				wg.Done()
+			}(i, field)
 		case "serviceBindingUsage":
 			wg.Add(1)
 			go func(i int, field graphql.CollectedField) {
@@ -23807,6 +23859,72 @@ func (ec *executionContext) _Query_serviceBroker(ctx context.Context, field grap
 	}
 
 	return ec._ServiceBroker(ctx, field.Selections, res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Query_serviceBindingUsages(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Query_serviceBindingUsages_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx := &graphql.ResolverContext{
+		Object: "Query",
+		Args:   args,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ServiceBindingUsages(rctx, args["namespace"].(string), args["options"].(*ServiceBindingUsagesQueryOptions))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]ServiceBindingUsage)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._ServiceBindingUsage(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
 }
 
 // nolint: vetshadow
@@ -34799,6 +34917,58 @@ func UnmarshalServiceBindingUsageParametersInput(v interface{}) (ServiceBindingU
 	return it, nil
 }
 
+func UnmarshalServiceBindingUsagesQueryOptions(v interface{}) (ServiceBindingUsagesQueryOptions, error) {
+	var it ServiceBindingUsagesQueryOptions
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "usedBy":
+			var err error
+			var ptr1 ServiceBindingUsagesQueryOptionsUsedBy
+			if v != nil {
+				ptr1, err = UnmarshalServiceBindingUsagesQueryOptionsUsedBy(v)
+				it.UsedBy = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func UnmarshalServiceBindingUsagesQueryOptionsUsedBy(v interface{}) (ServiceBindingUsagesQueryOptionsUsedBy, error) {
+	var it ServiceBindingUsagesQueryOptionsUsedBy
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "kind":
+			var err error
+			it.Kind, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalString(v)
+				it.Name = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func UnmarshalServiceInstanceCreateInput(v interface{}) (ServiceInstanceCreateInput, error) {
 	var it ServiceInstanceCreateInput
 	var asMap = v.(map[string]interface{})
@@ -35342,6 +35512,15 @@ type ServiceBindingUsage {
     usedBy: LocalObjectReference!
     parameters: ServiceBindingUsageParameters
     status: ServiceBindingUsageStatus!
+}
+
+input ServiceBindingUsagesQueryOptions {
+    usedBy: ServiceBindingUsagesQueryOptionsUsedBy
+}
+
+input ServiceBindingUsagesQueryOptionsUsedBy {
+    kind: String!
+    name: String
 }
 
 type ServiceBindingUsageEvent {
@@ -35948,6 +36127,7 @@ type Query {
     serviceBrokers(namespace: String!, first: Int, offset: Int): [ServiceBroker!]! @HasAccess(attributes: {resource: "servicebrokers", verb: "list", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace"})
     serviceBroker(name: String!, namespace: String!): ServiceBroker @HasAccess(attributes: {resource: "servicebrokers", verb: "get", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace", nameArg: "name"})
 
+    serviceBindingUsages(namespace: String!, options: ServiceBindingUsagesQueryOptions): [ServiceBindingUsage!]! @HasAccess(attributes: {resource: "servicebindingusages", verb: "list", apiGroup: "servicecatalog.kyma-project.io", apiVersion: "v1alpha1", namespaceArg: "namespace", nameArg: "name"})
     serviceBindingUsage(name: String!, namespace: String!): ServiceBindingUsage @HasAccess(attributes: {resource: "servicebindingusages", verb: "get", apiGroup: "servicecatalog.kyma-project.io", apiVersion: "v1alpha1", namespaceArg: "namespace", nameArg: "name"})
     serviceBinding(name: String!, namespace: String!): ServiceBinding @HasAccess(attributes: {resource: "servicebindings", verb: "get", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace", nameArg: "name"})
     usageKinds(first: Int, offset: Int): [UsageKind!]! @HasAccess(attributes: {resource: "usagekinds", verb: "list", apiGroup: "servicecatalog.kyma-project.io", apiVersion: "v1alpha1"})

@@ -18,6 +18,7 @@ import (
 type serviceBindingUsageOperations interface {
 	Create(namespace string, sb *api.ServiceBindingUsage) (*api.ServiceBindingUsage, error)
 	Delete(namespace string, name string) error
+	List(namespace string, options *gqlschema.ServiceBindingUsagesQueryOptions) ([]*api.ServiceBindingUsage, error)
 	Find(namespace string, name string) (*api.ServiceBindingUsage, error)
 	ListForServiceInstance(namespace string, instanceName string) ([]*api.ServiceBindingUsage, error)
 	Subscribe(listener resource.Listener)
@@ -68,6 +69,24 @@ func (r *serviceBindingUsageResolver) DeleteServiceBindingUsageMutation(ctx cont
 		Namespace: namespace,
 		Name:      serviceBindingUsageName,
 	}, nil
+}
+
+func (r *serviceBindingUsageResolver) ServiceBindingUsagesQuery(ctx context.Context, namespace string, options *gqlschema.ServiceBindingUsagesQueryOptions) ([]gqlschema.ServiceBindingUsage, error) {
+	usages, err := r.operations.List(namespace, options)
+	if err != nil {
+		glog.Error(errors.Wrapf(err, "while getting single %s [name: %s, namespace: %s]", pretty.ServiceBindingUsage, name, namespace))
+		return nil, gqlerror.New(err, pretty.ServiceBindingUsage, gqlerror.WithName(name), gqlerror.WithNamespace(namespace))
+	}
+
+	out, err := r.converter.ToGQLs(usages)
+	if err != nil {
+		glog.Error(
+			errors.Wrapf(err,
+				"while getting single %s [name: %s, namespace: %s]: while converting %s to QL representation", pretty.ServiceBindingUsage,
+				name, namespace, pretty.ServiceBindingUsage))
+		return nil, gqlerror.New(err, pretty.ServiceBindingUsage, gqlerror.WithName(name), gqlerror.WithNamespace(namespace))
+	}
+	return out, nil
 }
 
 func (r *serviceBindingUsageResolver) ServiceBindingUsageQuery(ctx context.Context, name, namespace string) (*gqlschema.ServiceBindingUsage, error) {

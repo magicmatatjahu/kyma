@@ -626,6 +626,15 @@ type ServiceBindingUsageStatus struct {
 	Message string                        `json:"message"`
 }
 
+type ServiceBindingUsagesQueryOptions struct {
+	UsedBy *ServiceBindingUsagesQueryOptionsUsedBy `json:"usedBy"`
+}
+
+type ServiceBindingUsagesQueryOptionsUsedBy struct {
+	Kind string  `json:"kind"`
+	Name *string `json:"name"`
+}
+
 type ServiceBindings struct {
 	Items []ServiceBinding     `json:"items"`
 	Stats ServiceBindingsStats `json:"stats"`

@@ -562,6 +562,10 @@ func (r *queryResolver) ServiceBindingUsage(ctx context.Context, name, namespace
 	return r.sca.Resolver.ServiceBindingUsageQuery(ctx, name, namespace)
 }
 
+func (r *queryResolver) ServiceBindingUsages(ctx context.Context, namespace string, options *gqlschema.ServiceBindingUsagesQueryOptions) ([]gqlschema.ServiceBindingUsage, error) {
+	return r.sca.Resolver.ServiceBindingUsagesQuery(ctx, namespace, options)
+}
+
 func (r *queryResolver) ClusterAssetGroups(ctx context.Context, viewContext *string, groupName *string) ([]gqlschema.ClusterAssetGroup, error) {
 	return r.rafter.Resolver.ClusterAssetGroupsQuery(ctx, viewContext, groupName)
 }

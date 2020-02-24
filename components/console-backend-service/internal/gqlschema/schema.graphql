@@ -413,6 +413,15 @@ type ServiceBindingUsage {
     status: ServiceBindingUsageStatus!
 }
 
+input ServiceBindingUsagesQueryOptions {
+    usedBy: ServiceBindingUsagesQueryOptionsUsedBy
+}
+
+input ServiceBindingUsagesQueryOptionsUsedBy {
+    kind: String!
+    name: String
+}
+
 type ServiceBindingUsageEvent {
     type: SubscriptionEventType!
     serviceBindingUsage: ServiceBindingUsage!
@@ -1017,6 +1026,7 @@ type Query {
     serviceBrokers(namespace: String!, first: Int, offset: Int): [ServiceBroker!]! @HasAccess(attributes: {resource: "servicebrokers", verb: "list", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace"})
     serviceBroker(name: String!, namespace: String!): ServiceBroker @HasAccess(attributes: {resource: "servicebrokers", verb: "get", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace", nameArg: "name"})
 
+    serviceBindingUsages(namespace: String!, options: ServiceBindingUsagesQueryOptions): [ServiceBindingUsage!]! @HasAccess(attributes: {resource: "servicebindingusages", verb: "list", apiGroup: "servicecatalog.kyma-project.io", apiVersion: "v1alpha1", namespaceArg: "namespace", nameArg: "name"})
     serviceBindingUsage(name: String!, namespace: String!): ServiceBindingUsage @HasAccess(attributes: {resource: "servicebindingusages", verb: "get", apiGroup: "servicecatalog.kyma-project.io", apiVersion: "v1alpha1", namespaceArg: "namespace", nameArg: "name"})
     serviceBinding(name: String!, namespace: String!): ServiceBinding @HasAccess(attributes: {resource: "servicebindings", verb: "get", apiGroup: "servicecatalog.k8s.io", apiVersion: "v1beta1", namespaceArg: "namespace", nameArg: "name"})
     usageKinds(first: Int, offset: Int): [UsageKind!]! @HasAccess(attributes: {resource: "usagekinds", verb: "list", apiGroup: "servicecatalog.kyma-project.io", apiVersion: "v1alpha1"})

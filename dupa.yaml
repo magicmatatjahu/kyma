@@ -1,0 +1,16 @@
+apiVersion: serverless.kyma-project.io/v1alpha1
+kind: Function
+metadata:
+  name: test-2
+  namespace: serverless
+  labels:
+    serving.knative.dev/visibility: dupa
+spec:
+  functionContentType: plaintext
+  runtime: nodejs8
+  function: |
+    module.exports = {
+      main: function(event, context) {
+        return 'Hello World!'
+      }
+    }
