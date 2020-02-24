@@ -73,19 +73,18 @@ func (r *serviceBindingUsageResolver) DeleteServiceBindingUsageMutation(ctx cont
 
 func (r *serviceBindingUsageResolver) ServiceBindingUsagesQuery(ctx context.Context, namespace string, options *gqlschema.ServiceBindingUsagesQueryOptions) ([]gqlschema.ServiceBindingUsage, error) {
 	usages, err := r.operations.List(namespace, options)
+
 	if err != nil {
-		glog.Error(errors.Wrapf(err, "while getting single %s [name: %s, namespace: %s]", pretty.ServiceBindingUsage, name, namespace))
-		return nil, gqlerror.New(err, pretty.ServiceBindingUsage, gqlerror.WithName(name), gqlerror.WithNamespace(namespace))
+		glog.Error(errors.Wrapf(err, "while listing %s on namespace: %s", pretty.ServiceBindingUsages, namespace))
+		return nil, gqlerror.New(err, pretty.ServiceBindingUsages)
 	}
 
 	out, err := r.converter.ToGQLs(usages)
 	if err != nil {
-		glog.Error(
-			errors.Wrapf(err,
-				"while getting single %s [name: %s, namespace: %s]: while converting %s to QL representation", pretty.ServiceBindingUsage,
-				name, namespace, pretty.ServiceBindingUsage))
-		return nil, gqlerror.New(err, pretty.ServiceBindingUsage, gqlerror.WithName(name), gqlerror.WithNamespace(namespace))
+		glog.Error(errors.Wrapf(err, "while converting %s from namespace: %s", pretty.ServiceBindingUsages, namespace))
+		return nil, gqlerror.New(err, pretty.ServiceBindingUsages)
 	}
+
 	return out, nil
 }
 
