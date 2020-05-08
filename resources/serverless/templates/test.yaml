@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: serverless-bindings-migration-job
+  namespace: magic
+  annotations:
+    helm.sh/hook: post-upgrade
+    helm.sh/hook-weight: "1"
+    helm.sh/hook-delete-policy: hook-succeeded
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: serverless-bindings-migration-job
+      restartPolicy: OnFailure
+      volumes:
+        - name: migration-script
+          projected:
+            sources:
+            - configMap:
+                name: serverless-bindings-migration-job
+        - name: export
+          emptyDir: {}
+      containers:
+      - name: bindings-migration-job
+        image: "eu.gcr.io/kyma-project/test-infra/alpine-kubectl:v20200310-5f52f407"
+        imagePullPolicy: Always
+        command: 
+          - "/bin/bash"
+          - "/config/bindings-migration"
+        volumeMounts:
+          - name: migration-script
+            mountPath: /config

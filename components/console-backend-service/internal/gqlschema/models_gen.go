@@ -489,6 +489,15 @@ type OwnerReference struct {
 	UID                string `json:"UID"`
 }
 
+type OwnerReferenceType struct {
+	APIVersion         string `json:"apiVersion"`
+	Kind               string `json:"kind"`
+	Name               string `json:"name"`
+	UID                string `json:"UID"`
+	Controller         *bool  `json:"controller"`
+	BlockOwnerDeletion *bool  `json:"blockOwnerDeletion"`
+}
+
 type Pod struct {
 	Name              string           `json:"name"`
 	NodeName          string           `json:"nodeName"`
@@ -522,6 +531,14 @@ type RequiredPermission struct {
 	Resource string   `json:"resource"`
 }
 
+type Resource struct {
+	APIVersion string           `json:"apiVersion"`
+	Kind       string           `json:"kind"`
+	Metadata   ResourceMetadata `json:"metadata"`
+	Spec       JSON             `json:"spec"`
+	Status     JSON             `json:"status"`
+}
+
 type ResourceAttributes struct {
 	Verb            string  `json:"verb"`
 	APIGroup        *string `json:"apiGroup"`
@@ -532,6 +549,25 @@ type ResourceAttributes struct {
 	NameArg         *string `json:"nameArg"`
 	NamespaceArg    *string `json:"namespaceArg"`
 	IsChildResolver bool    `json:"isChildResolver"`
+}
+
+type ResourceEvent struct {
+	Type     SubscriptionEventType `json:"type"`
+	Resource Resource              `json:"resource"`
+}
+
+type ResourceListOutput struct {
+	Items      []Resource `json:"items"`
+	ItemsCount int        `json:"itemsCount"`
+}
+
+type ResourceMetadata struct {
+	Name            string               `json:"name"`
+	Namespace       string               `json:"namespace"`
+	GenerateName    string               `json:"generateName"`
+	Labels          Labels               `json:"labels"`
+	Annotations     Labels               `json:"annotations"`
+	OwnerReferences []OwnerReferenceType `json:"ownerReferences"`
 }
 
 type ResourceQuota struct {
@@ -594,6 +630,12 @@ type RuleInput struct {
 	Methods          []string             `json:"methods"`
 	AccessStrategies []APIRuleConfigInput `json:"accessStrategies"`
 	Mutators         []APIRuleConfigInput `json:"mutators"`
+}
+
+type SchemaResourceInput struct {
+	Version  string `json:"version"`
+	Group    string `json:"group"`
+	Resource string `json:"resource"`
 }
 
 type Secret struct {

@@ -1134,6 +1134,51 @@ type VersionInfo {
     kymaVersion: String
 }
 
+# Generic
+
+input SchemaResourceInput {
+    version: String!
+    group: String!
+    resource: String!
+}
+
+# Remove old OwnerReferenceType type and change below type name
+type OwnerReferenceType {
+    apiVersion: String!
+    kind: String!
+    name: String!
+    UID: String!
+    controller: Boolean
+    blockOwnerDeletion: Boolean
+}
+
+type ResourceMetadata {
+    name: String!
+    namespace: String!
+    generateName: String!
+    labels: Labels!
+    annotations: Labels!
+    ownerReferences: [OwnerReferenceType!]!
+}
+
+type Resource {
+    apiVersion: String!
+    kind: String!
+    metadata: ResourceMetadata!
+    spec: JSON!
+    status: JSON!
+}
+
+type ResourceListOutput {
+    items: [Resource!]!
+    itemsCount: Int!
+}
+
+type ResourceEvent {
+    type: SubscriptionEventType!
+    resource: Resource!
+}
+
 # Queries
 
 type Query {
@@ -1212,6 +1257,16 @@ type Query {
     functions(namespace: String!): [Function!]! @HasAccess(attributes: {apiGroup: "serverless.kyma-project.io", resource: "functions", verb: "list", apiVersion: "v1alpha1" namespaceArg: "namespace"})
 
     triggers(namespace: String!, subscriber: SubscriberInput): [Trigger!] @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+
+    genericGet(
+        schema: SchemaResourceInput!
+        name: String!
+        namespace: String
+    ): Resource @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+    genericList(
+        schema: SchemaResourceInput!
+        namespace: String
+    ): ResourceListOutput! @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 }
 
 # Mutations

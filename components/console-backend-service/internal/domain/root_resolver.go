@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/genericapi"
 	"math/rand"
 	"time"
 
@@ -41,6 +42,7 @@ type RootResolver struct {
 	authentication *authentication.PluggableResolver
 	serverless     *serverless.PluggableContainer
 	eventing       *eventing.PluggableContainer
+	genericApi 	   *genericapi.PluggableContainer
 }
 
 func GetRandomNumber() time.Duration {
@@ -107,6 +109,12 @@ func New(restConfig *rest.Config, appCfg application.Config, rafterCfg rafter.Co
 	}
 	makePluggable(eventingResolver)
 
+	genericApiResolver, err := genericapi.New(serviceFactory)
+	if err != nil {
+		return nil, errors.Wrap(err, "while initializing genericApi resolver")
+	}
+	makePluggable(genericApiResolver)
+
 	authenticationResolver, err := authentication.New(restConfig, informerResyncPeriod+GetRandomNumber())
 	if err != nil {
 		return nil, errors.Wrap(err, "while initializing authentication resolver")
@@ -123,6 +131,7 @@ func New(restConfig *rest.Config, appCfg application.Config, rafterCfg rafter.Co
 		ag:             agResolver,
 		serverless:     serverlessResolver,
 		eventing:       eventingResolver,
+		genericApi: 	genericApiResolver,
 		authentication: authenticationResolver,
 	}, nil
 }
@@ -658,6 +667,14 @@ func (r *queryResolver) Function(ctx context.Context, name string, namespace str
 
 func (r *queryResolver) Triggers(ctx context.Context, namespace string, subscriber *gqlschema.SubscriberInput) ([]gqlschema.Trigger, error) {
 	return r.eventing.TriggersQuery(ctx, namespace, subscriber)
+}
+
+func (r *queryResolver) GenericGet(ctx context.Context, schema gqlschema.SchemaResourceInput, name string, namespace *string) (*gqlschema.Resource, error) {
+	return r.genericApi.Get(ctx, schema, name, namespace)
+}
+
+func (r *queryResolver) GenericList(ctx context.Context, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error) {
+	return r.genericApi.List(ctx, schema, namespace)
 }
 
 // Subscriptions
