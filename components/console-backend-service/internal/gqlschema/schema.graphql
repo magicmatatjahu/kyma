@@ -1136,12 +1136,6 @@ type VersionInfo {
 
 # Generic
 
-input SchemaResourceInput {
-    version: String!
-    group: String!
-    resource: String!
-}
-
 # Remove old OwnerReferenceType type and change below type name
 type OwnerReferenceType {
     apiVersion: String!
@@ -1165,8 +1159,9 @@ type Resource {
     apiVersion: String!
     kind: String!
     metadata: ResourceMetadata!
-    spec: JSON!
-    status: JSON!
+    fields(fields: [ResourceFieldInput!]!): JSON!
+    subResources(resources: [SubResourceInput!]!): [SubResourceOutput!]!
+    rawContent: JSON!
 }
 
 type ResourceListOutput {
@@ -1174,9 +1169,32 @@ type ResourceListOutput {
     itemsCount: Int!
 }
 
+type SubResourceOutput {
+    apiVersion: String!
+    kind: String!
+    items: [Resource!]!
+    itemsCount: Int!
+}
+
 type ResourceEvent {
     type: SubscriptionEventType!
     resource: Resource!
+}
+
+input SchemaResourceInput {
+    version: String!
+    group: String!
+    resource: String!
+}
+
+input ResourceFieldInput {
+    key: String!
+    path: String!
+}
+
+input SubResourceInput {
+    schema: SchemaResourceInput!
+    namespace: String
 }
 
 # Queries

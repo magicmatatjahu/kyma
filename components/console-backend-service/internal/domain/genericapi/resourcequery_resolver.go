@@ -27,7 +27,7 @@ func (r *resourceQueryResolver) Get(ctx context.Context, schema gqlschema.Schema
 
 	key := name
 	if namespace != nil {
-		key = fmt.Sprintf("%s/%s", namespace, name)
+		key = fmt.Sprintf("%s/%s", *namespace, name)
 	}
 
 	item, exists, err := service.Informer.GetIndexer().GetByKey(key)
@@ -46,7 +46,6 @@ func (r *resourceQueryResolver) List(ctx context.Context, schema gqlschema.Schem
 
 	var items []interface{}
 	var err error
-
 	if namespace != nil {
 		items, err = service.Informer.GetIndexer().ByIndex("namespace", *namespace)
 	} else {
@@ -58,4 +57,12 @@ func (r *resourceQueryResolver) List(ctx context.Context, schema gqlschema.Schem
 	}
 
 	return r.converter.ToGQLs(items)
+}
+
+func (r *resourceQueryResolver) ResourceFields(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput) (gqlschema.JSON, error) {
+
+}
+
+func (r *resourceQueryResolver) ResourceSubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) (gqlschema.ResourceListOutput, error) {
+
 }

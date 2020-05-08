@@ -18,6 +18,7 @@ type resourcesServices map[string]*resourceService
 
 func newServices(serviceFactory *resource.ServiceFactory, schemas []schema.GroupVersionResource) resourcesServices {
 	services := make(map[string]*resourceService, 0)
+
 	for _, s := range schemas {
 		svc := &resourceService{
 			Service: serviceFactory.ForResource(schema.GroupVersionResource{
@@ -33,6 +34,7 @@ func newServices(serviceFactory *resource.ServiceFactory, schemas []schema.Group
 		key := prepareKey(s.Resource, s.Group, s.Version)
 		services[key] = svc
 	}
+
 	return services
 }
 
@@ -43,7 +45,7 @@ func (s resourcesServices) retrieveService(schema gqlschema.SchemaResourceInput)
 
 func prepareKey(resource, group, version string) string {
 	if group == "" {
-		return fmt.Sprintf("%s/%s", resource, version)
+		return fmt.Sprintf("%s.%s/%s", resource, group, version)
 	}
 	return fmt.Sprintf("%s.%s/%s", resource, version)
 }

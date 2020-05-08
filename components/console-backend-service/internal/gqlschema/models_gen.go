@@ -531,14 +531,6 @@ type RequiredPermission struct {
 	Resource string   `json:"resource"`
 }
 
-type Resource struct {
-	APIVersion string           `json:"apiVersion"`
-	Kind       string           `json:"kind"`
-	Metadata   ResourceMetadata `json:"metadata"`
-	Spec       JSON             `json:"spec"`
-	Status     JSON             `json:"status"`
-}
-
 type ResourceAttributes struct {
 	Verb            string  `json:"verb"`
 	APIGroup        *string `json:"apiGroup"`
@@ -554,6 +546,11 @@ type ResourceAttributes struct {
 type ResourceEvent struct {
 	Type     SubscriptionEventType `json:"type"`
 	Resource Resource              `json:"resource"`
+}
+
+type ResourceFieldInput struct {
+	Key  string `json:"key"`
+	Path string `json:"path"`
 }
 
 type ResourceListOutput struct {
@@ -775,6 +772,18 @@ type ServicePort struct {
 
 type ServiceStatus struct {
 	LoadBalancer LoadBalancerStatus `json:"loadBalancer"`
+}
+
+type SubResourceInput struct {
+	Schema    SchemaResourceInput `json:"schema"`
+	Namespace *string             `json:"namespace"`
+}
+
+type SubResourceOutput struct {
+	APIVersion string     `json:"apiVersion"`
+	Kind       string     `json:"kind"`
+	Items      []Resource `json:"items"`
+	ItemsCount int        `json:"itemsCount"`
 }
 
 type Subscriber struct {

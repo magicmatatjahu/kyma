@@ -19,15 +19,11 @@ func (c *resourceConverter) ToGQL(item interface{}) (*gqlschema.Resource, error)
 		return nil, err
 	}
 
-	spec, _, _ := unstructured.NestedMap(unstructuredResource.Object, []string{"spec"}...)
-	status, _, _ := unstructured.NestedMap(unstructuredResource.Object, []string{"status"}...)
-
 	return &gqlschema.Resource{
 		APIVersion: unstructuredResource.GetAPIVersion(),
 		Kind: unstructuredResource.GetKind(),
 		Metadata: c.convertMetadata(unstructuredResource),
-		Spec: spec,
-		Status: status,
+		RawContent: unstructuredResource.UnstructuredContent(),
 	}, nil
 }
 

@@ -59,7 +59,7 @@ func (r *PluggableContainer) Enable() error {
 
 func (r *PluggableContainer) Disable() error {
 	r.Pluggable.Disable(func(disabledErr error) {
-		r.Resolver = disabled.NewResolver(disabledErr)
+		//r.Resolver = disabled.NewResolver(disabledErr)
 	})
 
 	return nil
@@ -69,6 +69,9 @@ func (r *PluggableContainer) Disable() error {
 type Resolver interface {
 	Get(ctx context.Context, schema gqlschema.SchemaResourceInput, name string, namespace *string) (*gqlschema.Resource, error)
 	List(ctx context.Context, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error)
+
+	ResourceFields(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput) (gqlschema.JSON, error)
+	ResourceSubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) (gqlschema.ResourceListOutput, error)
 }
 
 type domainResolver struct {

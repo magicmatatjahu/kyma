@@ -135,3 +135,10 @@ models:
         resolver: true
       pods:
         resolver: true
+  Resource:
+    model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.Resource"
+    fields:
+      fields:
+        resolver: true
+      subResources:
+        resolver: true

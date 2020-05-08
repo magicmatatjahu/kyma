@@ -971,3 +971,15 @@ type assetGroupResolver struct {
 func (r *assetGroupResolver) Assets(ctx context.Context, obj *gqlschema.AssetGroup, types []string) ([]gqlschema.Asset, error) {
 	return r.rafter.Resolver.AssetGroupAssetsField(ctx, obj, types)
 }
+
+type resourceResolver struct {
+	genericApi *genericapi.PluggableContainer
+}
+
+func (r *resourceResolver) Fields(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput) (gqlschema.JSON, error) {
+	return r.genericApi.Resolver.ResourceFields(ctx, obj, fields)
+}
+
+func (r *resourceResolver) SubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) (gqlschema.SubResourceOutput, error) {
+	return r.genericApi.Resolver.ResourceSubResources(ctx, obj, resources)
+}
