@@ -1205,7 +1205,7 @@ type QueryResolver interface {
 }
 type ResourceResolver interface {
 	Fields(ctx context.Context, obj *Resource, fields []ResourceFieldInput) (JSON, error)
-	SubResources(ctx context.Context, obj *Resource, resources []SubResourceInput) (SubResourceOutput, error)
+	SubResources(ctx context.Context, obj *Resource, resources []SubResourceInput) ([]SubResourceOutput, error)
 }
 type ServiceBindingResolver interface {
 	Secret(ctx context.Context, obj *ServiceBinding) (*Secret, error)
@@ -28207,7 +28207,7 @@ func (ec *executionContext) _Resource_apiVersion(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ApiVersion, nil
+		return obj.APIVersion, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -28336,11 +28336,43 @@ func (ec *executionContext) _Resource_subResources(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(SubResourceOutput)
+	res := resTmp.([]SubResourceOutput)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	return ec._SubResourceOutput(ctx, field.Selections, &res)
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._SubResourceOutput(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
 }
 
 // nolint: vetshadow
@@ -40077,7 +40109,7 @@ type Resource {
     kind: String!
     metadata: ResourceMetadata!
     fields(fields: [ResourceFieldInput!]!): JSON!
-    subResources(resources: [SubResourceInput!]!): SubResourceOutput!
+    subResources(resources: [SubResourceInput!]!): [SubResourceOutput!]!
     rawContent: JSON!
 }
 

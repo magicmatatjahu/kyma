@@ -3,6 +3,8 @@ package genericapi
 import (
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"strings"
 
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 )
@@ -60,9 +62,25 @@ func (r *resourceQueryResolver) List(ctx context.Context, schema gqlschema.Schem
 }
 
 func (r *resourceQueryResolver) ResourceFields(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput) (gqlschema.JSON, error) {
+	gqlJson := gqlschema.JSON{}
 
+	for _, field := range fields {
+		pathField := strings.Split(field.Path, ".")
+
+		val, found, err := unstructured.NestedFieldCopy(obj.RawContent, pathField...)
+		if err != nil {
+			return nil, err
+		}
+		if !found {
+			continue
+		}
+
+		gqlJson[field.Key] = val
+	}
+
+	return gqlJson, nil
 }
 
-func (r *resourceQueryResolver) ResourceSubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) (gqlschema.ResourceListOutput, error) {
-
+func (r *resourceQueryResolver) ResourceSubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) ([]gqlschema.SubResourceOutput, error) {
+	return nil, nil
 }

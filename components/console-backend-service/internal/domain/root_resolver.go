@@ -213,6 +213,10 @@ func (r *RootResolver) Namespace() gqlschema.NamespaceResolver {
 	return &namespaceResolver{r.k8s}
 }
 
+func (r *RootResolver) Resource() gqlschema.ResourceResolver {
+	return &resourceResolver{r.genericApi}
+}
+
 func (r *RootResolver) Query() gqlschema.QueryResolver {
 	return &queryResolver{r}
 }
@@ -980,6 +984,6 @@ func (r *resourceResolver) Fields(ctx context.Context, obj *gqlschema.Resource, 
 	return r.genericApi.Resolver.ResourceFields(ctx, obj, fields)
 }
 
-func (r *resourceResolver) SubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) (gqlschema.SubResourceOutput, error) {
+func (r *resourceResolver) SubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) ([]gqlschema.SubResourceOutput, error) {
 	return r.genericApi.Resolver.ResourceSubResources(ctx, obj, resources)
 }

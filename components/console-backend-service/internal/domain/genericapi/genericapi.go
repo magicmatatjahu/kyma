@@ -5,7 +5,6 @@ import (
 	"github.com/kyma-project/kyma/components/function-controller/pkg/apis/serverless/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/domain/genericapi/disabled"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/resource"
@@ -71,7 +70,7 @@ type Resolver interface {
 	List(ctx context.Context, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error)
 
 	ResourceFields(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput) (gqlschema.JSON, error)
-	ResourceSubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) (gqlschema.ResourceListOutput, error)
+	ResourceSubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) ([]gqlschema.SubResourceOutput, error)
 }
 
 type domainResolver struct {
