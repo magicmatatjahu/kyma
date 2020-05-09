@@ -5,4 +5,5 @@ type Resource struct {
 	Kind      string `json:"kind"`
 	Metadata            ResourceMetadata   `json:"metadata"`
 	RawContent            JSON   `json:"rawContent"`
+	Parent *Resource `json:"parent"`
 }

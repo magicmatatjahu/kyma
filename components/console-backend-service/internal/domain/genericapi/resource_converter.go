@@ -7,13 +7,17 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-type resourceConverter struct {}
+type ResourceConverter struct {}
 
-func newResourceConverter() *resourceConverter {
-	return &resourceConverter{}
+func NewResourceConverter() *ResourceConverter {
+	return &ResourceConverter{}
 }
 
-func (c *resourceConverter) ToGQL(item interface{}) (*gqlschema.Resource, error) {
+func (c *ResourceConverter) ToGQL(item interface{}, parent *gqlschema.Resource) (*gqlschema.Resource, error) {
+	if item == nil {
+		return nil, nil
+	}
+
 	unstructuredResource, err := c.toUnstructured(item)
 	if unstructuredResource == nil || err != nil {
 		return nil, err
@@ -24,14 +28,15 @@ func (c *resourceConverter) ToGQL(item interface{}) (*gqlschema.Resource, error)
 		Kind: unstructuredResource.GetKind(),
 		Metadata: c.convertMetadata(unstructuredResource),
 		RawContent: unstructuredResource.UnstructuredContent(),
+		Parent: parent,
 	}, nil
 }
 
-func (c *resourceConverter) ToGQLs(items []interface{}) (gqlschema.ResourceListOutput, error) {
+func (c *ResourceConverter) ToGQLs(items []interface{}, parent *gqlschema.Resource) (gqlschema.ResourceListOutput, error) {
 	output := gqlschema.ResourceListOutput{}
 	resources := make([]gqlschema.Resource, 0)
 	for _, item := range items {
-		converted, err := c.ToGQL(item)
+		converted, err := c.ToGQL(item, parent)
 		if err != nil {
 			return gqlschema.ResourceListOutput{}, err
 		}
@@ -47,7 +52,7 @@ func (c *resourceConverter) ToGQLs(items []interface{}) (gqlschema.ResourceListO
 	return output, nil
 }
 
-func (c *resourceConverter) convertMetadata(unstructuredResource *unstructured.Unstructured) gqlschema.ResourceMetadata {
+func (c *ResourceConverter) convertMetadata(unstructuredResource *unstructured.Unstructured) gqlschema.ResourceMetadata {
 	ownerReferences := c.convertOwnerReferences(unstructuredResource)
 
 	return gqlschema.ResourceMetadata{
@@ -60,7 +65,7 @@ func (c *resourceConverter) convertMetadata(unstructuredResource *unstructured.U
 	}
 }
 
-func (c *resourceConverter) convertOwnerReferences(unstructuredResource *unstructured.Unstructured) []gqlschema.OwnerReferenceType {
+func (c *ResourceConverter) convertOwnerReferences(unstructuredResource *unstructured.Unstructured) []gqlschema.OwnerReferenceType {
 	gqlOwnerReferences := make([]gqlschema.OwnerReferenceType, 0)
 	ownerReferences := unstructuredResource.GetOwnerReferences()
 
@@ -79,7 +84,7 @@ func (c *resourceConverter) convertOwnerReferences(unstructuredResource *unstruc
 	return gqlOwnerReferences
 }
 
-func (c *resourceConverter) toUnstructured(item interface{}) (*unstructured.Unstructured, error) {
+func (c *ResourceConverter) toUnstructured(item interface{}) (*unstructured.Unstructured, error) {
 	if item == nil {
 		return nil, nil
 	}

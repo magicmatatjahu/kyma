@@ -138,7 +138,9 @@ models:
   Resource:
     model: "github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema.Resource"
     fields:
-      fields:
+      spec:
+        resolver: true
+      subResource:
         resolver: true
       subResources:
         resolver: true

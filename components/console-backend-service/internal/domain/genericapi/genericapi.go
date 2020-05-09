@@ -2,8 +2,6 @@ package genericapi
 
 import (
 	"context"
-	"github.com/kyma-project/kyma/components/function-controller/pkg/apis/serverless/v1alpha1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/module"
@@ -32,24 +30,9 @@ func New(serviceFactory *resource.ServiceFactory) (*PluggableContainer, error) {
 }
 
 func (r *PluggableContainer) Enable() error {
-	schemas := []schema.GroupVersionResource{
-		{
-			Version:  v1alpha1.GroupVersion.Version,
-			Group:    v1alpha1.GroupVersion.Group,
-			Resource: "functions",
-		},
-		{
-			Version:  "v1",
-			Group:    "",
-			Resource: "pods",
-		},
-	}
-	services := newServices(r.serviceFactory, schemas)
-	converter := newResourceConverter()
-
 	r.Pluggable.EnableAndSyncDynamicInformerFactory(r.serviceFactory.InformerFactory, func() {
 		r.Resolver = &domainResolver{
-			resourceQueryResolver: newResourceQueryResolver(services, converter),
+			ResourceResolver: NewResourceResolver(r.serviceFactory),
 		}
 	})
 
@@ -69,10 +52,11 @@ type Resolver interface {
 	Get(ctx context.Context, schema gqlschema.SchemaResourceInput, name string, namespace *string) (*gqlschema.Resource, error)
 	List(ctx context.Context, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error)
 
-	ResourceFields(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput) (gqlschema.JSON, error)
-	ResourceSubResources(ctx context.Context, obj *gqlschema.Resource, resources []gqlschema.SubResourceInput) ([]gqlschema.SubResourceOutput, error)
+	ResourceSpec(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput, rootField *string) (gqlschema.ResourceSpecOutput, error)
+	ResourceSubResource(ctx context.Context, parent *gqlschema.Resource, schema gqlschema.SchemaResourceInput, name string, namespace *string) (*gqlschema.Resource, error)
+	ResourceSubResources(ctx context.Context, parent *gqlschema.Resource, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error)
 }
 
 type domainResolver struct {
-	*resourceQueryResolver
+	*ResourceResolver
 }

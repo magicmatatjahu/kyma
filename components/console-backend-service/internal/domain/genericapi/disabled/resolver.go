@@ -33,3 +33,21 @@ func (_m *Resolver) List(ctx context.Context, schema gqlschema.SchemaResourceInp
 
 	return r0, r1
 }
+
+// ResourceSpec provides a failing mock function with given fields: ctx, obj, fields, rootField
+func (_m *Resolver) ResourceSpec(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput, rootField *string) (gqlschema.ResourceSpecOutput, error) {
+	var r0 gqlschema.ResourceSpecOutput
+	var r1 error
+	r1 = _m.err
+
+	return r0, r1
+}
+
+// ResourceSubResources provides a failing mock function with given fields: ctx, parent, schema, namespace
+func (_m *Resolver) ResourceSubResources(ctx context.Context, parent *gqlschema.Resource, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error) {
+	var r0 gqlschema.ResourceListOutput
+	var r1 error
+	r1 = _m.err
+
+	return r0, r1
+}

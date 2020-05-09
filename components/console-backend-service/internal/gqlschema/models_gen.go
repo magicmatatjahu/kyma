@@ -549,8 +549,8 @@ type ResourceEvent struct {
 }
 
 type ResourceFieldInput struct {
-	Key  string `json:"key"`
-	Path string `json:"path"`
+	Key  *string `json:"key"`
+	Path string  `json:"path"`
 }
 
 type ResourceListOutput struct {
@@ -598,6 +598,10 @@ type ResourceRule struct {
 	Verbs     []string `json:"verbs"`
 	APIGroups []string `json:"apiGroups"`
 	Resources []string `json:"resources"`
+}
+
+type ResourceSpecOutput struct {
+	Data JSON `json:"data"`
 }
 
 type ResourceType struct {
@@ -777,13 +781,6 @@ type ServiceStatus struct {
 type SubResourceInput struct {
 	Schema    SchemaResourceInput `json:"schema"`
 	Namespace *string             `json:"namespace"`
-}
-
-type SubResourceOutput struct {
-	APIVersion string     `json:"apiVersion"`
-	Kind       string     `json:"kind"`
-	Items      []Resource `json:"items"`
-	ItemsCount int        `json:"itemsCount"`
 }
 
 type Subscriber struct {

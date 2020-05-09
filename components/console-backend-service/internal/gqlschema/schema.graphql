@@ -1159,9 +1159,11 @@ type Resource {
     apiVersion: String!
     kind: String!
     metadata: ResourceMetadata!
-    fields(fields: [ResourceFieldInput!]!): JSON!
-    subResources(resources: [SubResourceInput!]!): [SubResourceOutput!]!
+    spec(fields: [ResourceFieldInput!]!, rootField: String = "spec"): ResourceSpecOutput!
+    subResource(schema: SchemaResourceInput!, name: String!, namespace: String): Resource
+    subResources(schema: SchemaResourceInput!, namespace: String): ResourceListOutput!
     rawContent: JSON!
+    parent: Resource
 }
 
 type ResourceListOutput {
@@ -1169,11 +1171,8 @@ type ResourceListOutput {
     itemsCount: Int!
 }
 
-type SubResourceOutput {
-    apiVersion: String!
-    kind: String!
-    items: [Resource!]!
-    itemsCount: Int!
+type ResourceSpecOutput {
+    data: JSON!
 }
 
 type ResourceEvent {
@@ -1188,7 +1187,7 @@ input SchemaResourceInput {
 }
 
 input ResourceFieldInput {
-    key: String!
+    key: String
     path: String!
 }
 
@@ -1276,15 +1275,8 @@ type Query {
 
     triggers(namespace: String!, subscriber: SubscriberInput): [Trigger!] @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 
-    genericGet(
-        schema: SchemaResourceInput!
-        name: String!
-        namespace: String
-    ): Resource @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
-    genericList(
-        schema: SchemaResourceInput!
-        namespace: String
-    ): ResourceListOutput! @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+    genericGet(schema: SchemaResourceInput!, name: String!, namespace: String): Resource @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+    genericList(schema: SchemaResourceInput!, namespace: String): ResourceListOutput! @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 }
 
 # Mutations
