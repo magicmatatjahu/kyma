@@ -2,18 +2,18 @@ package genericapi
 
 import (
 	"fmt"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/resource"
+	"github.com/kyma-project/kyma/components/console-backend-service/pkg/dynamic/dynamicinformer"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/dynamic"
 )
 
 type ResourcesServices map[string]*ResourceService
 
-func NewResourceServices(serviceFactory *resource.ServiceFactory, schemas []schema.GroupVersionResource) ResourcesServices {
+func NewResourceServices(dynamicClient dynamic.Interface, informerFactory dynamicinformer.DynamicSharedInformerFactory, schemas []schema.GroupVersionResource) ResourcesServices {
 	services := make(map[string]*ResourceService, 0)
 
 	for _, s := range schemas {
-		service := NewResourceService(serviceFactory, s)
+		service := NewResourceService(dynamicClient, informerFactory, s)
 		id := prepareResourceServiceID(s.Resource, s.Group, s.Version)
 		services[id] = service
 	}
@@ -21,9 +21,8 @@ func NewResourceServices(serviceFactory *resource.ServiceFactory, schemas []sche
 	return services
 }
 
-func (s ResourcesServices) Get(schema gqlschema.SchemaResourceInput) *ResourceService {
-	id := prepareResourceServiceID(schema.Resource, schema.Group, schema.Version)
-	return s[id]
+func (s ResourcesServices) Get(schema string) *ResourceService {
+	return s[schema]
 }
 
 func prepareResourceServiceID(resource, group, version string) string {

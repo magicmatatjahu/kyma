@@ -451,6 +451,15 @@ type LocalObjectReferenceInput struct {
 	Name string `json:"name"`
 }
 
+type ManagedField struct {
+	Manager    string                     `json:"manager"`
+	Operation  ManagedFieldsOperationType `json:"operation"`
+	APIVersion string                     `json:"apiVersion"`
+	Time       *time.Time                 `json:"time"`
+	FieldsType string                     `json:"fieldsType"`
+	FieldsV1   *string                    `json:"fieldsV1"`
+}
+
 type MicroFrontend struct {
 	Name            string           `json:"name"`
 	Version         string           `json:"version"`
@@ -553,18 +562,87 @@ type ResourceFieldInput struct {
 	Path string  `json:"path"`
 }
 
+type ResourceFilter struct {
+	Eq        *string         `json:"eq"`
+	Ne        *string         `json:"ne"`
+	Gt        *int            `json:"gt"`
+	Gte       *int            `json:"gte"`
+	Lt        *int            `json:"lt"`
+	Lte       *int            `json:"lte"`
+	In        []string        `json:"in"`
+	Nin       []string        `json:"nin"`
+	Glob      *string         `json:"glob"`
+	Exists    *bool           `json:"exists"`
+	Type      *string         `json:"type"`
+	Mod       *int            `json:"mod"`
+	Regex     *string         `json:"regex"`
+	All       []string        `json:"all"`
+	ElemMatch *ResourceFilter `json:"elemMatch"`
+	Size      *int            `json:"size"`
+}
+
+type ResourceFilters struct {
+	Value  string            `json:"value"`
+	Filter *ResourceFilter   `json:"filter"`
+	And    []ResourceFilters `json:"and"`
+	Not    []ResourceFilters `json:"not"`
+	Nor    []ResourceFilters `json:"nor"`
+	Or     []ResourceFilters `json:"or"`
+}
+
+type ResourceListEdges struct {
+	Prev *Resource `json:"prev"`
+	Node *Resource `json:"node"`
+	Next *Resource `json:"next"`
+}
+
+type ResourceListGroup struct {
+	Field      string              `json:"field"`
+	FieldValue string              `json:"fieldValue"`
+	Edges      []ResourceListEdges `json:"edges"`
+	Nodes      []Resource          `json:"nodes"`
+	TotalCount int                 `json:"totalCount"`
+}
+
+type ResourceListOptions struct {
+	InNamespaces  []string          `json:"inNamespaces"`
+	AllNamespaces *bool             `json:"allNamespaces"`
+	Filters       []ResourceFilters `json:"filters"`
+	Sort          []ResourceSort    `json:"sort"`
+}
+
 type ResourceListOutput struct {
-	Items      []Resource `json:"items"`
-	ItemsCount int        `json:"itemsCount"`
+	Edges      []ResourceListEdges `json:"edges"`
+	Nodes      []Resource          `json:"nodes"`
+	Group      *ResourceListGroup  `json:"group"`
+	TotalCount int                 `json:"totalCount"`
 }
 
 type ResourceMetadata struct {
-	Name            string               `json:"name"`
-	Namespace       string               `json:"namespace"`
-	GenerateName    string               `json:"generateName"`
-	Labels          Labels               `json:"labels"`
-	Annotations     Labels               `json:"annotations"`
-	OwnerReferences []OwnerReferenceType `json:"ownerReferences"`
+	Name                       string               `json:"name"`
+	Namespace                  string               `json:"namespace"`
+	Labels                     Labels               `json:"labels"`
+	Annotations                Labels               `json:"annotations"`
+	GenerateName               string               `json:"generateName"`
+	UID                        string               `json:"uid"`
+	OwnerReferences            []OwnerReferenceType `json:"ownerReferences"`
+	ResourceVersion            string               `json:"resourceVersion"`
+	Generation                 int                  `json:"generation"`
+	SelfLink                   string               `json:"selfLink"`
+	Continue                   string               `json:"continue"`
+	RemainingItemCount         *int                 `json:"remainingItemCount"`
+	CreationTimestamp          time.Time            `json:"creationTimestamp"`
+	DeletionTimestamp          *time.Time           `json:"deletionTimestamp"`
+	DeletionGracePeriodSeconds *int                 `json:"deletionGracePeriodSeconds"`
+	Finalizers                 []string             `json:"finalizers"`
+	ClusterName                string               `json:"clusterName"`
+	ManagedFields              []ManagedField       `json:"managedFields"`
+}
+
+type ResourcePager struct {
+	Limit int     `json:"limit"`
+	Skip  *int    `json:"skip"`
+	After *string `json:"after"`
 }
 
 type ResourceQuota struct {
@@ -600,8 +678,9 @@ type ResourceRule struct {
 	Resources []string `json:"resources"`
 }
 
-type ResourceSpecOutput struct {
-	Data JSON `json:"data"`
+type ResourceSort struct {
+	Field string    `json:"field"`
+	Order *SortType `json:"order"`
 }
 
 type ResourceType struct {
@@ -631,12 +710,6 @@ type RuleInput struct {
 	Methods          []string             `json:"methods"`
 	AccessStrategies []APIRuleConfigInput `json:"accessStrategies"`
 	Mutators         []APIRuleConfigInput `json:"mutators"`
-}
-
-type SchemaResourceInput struct {
-	Version  string `json:"version"`
-	Group    string `json:"group"`
-	Resource string `json:"resource"`
 }
 
 type Secret struct {
@@ -776,11 +849,6 @@ type ServicePort struct {
 
 type ServiceStatus struct {
 	LoadBalancer LoadBalancerStatus `json:"loadBalancer"`
-}
-
-type SubResourceInput struct {
-	Schema    SchemaResourceInput `json:"schema"`
-	Namespace *string             `json:"namespace"`
 }
 
 type Subscriber struct {
@@ -1207,6 +1275,42 @@ func (e LimitType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type ManagedFieldsOperationType string
+
+const (
+	ManagedFieldsOperationTypeApply  ManagedFieldsOperationType = "Apply"
+	ManagedFieldsOperationTypeUpdate ManagedFieldsOperationType = "Update"
+)
+
+func (e ManagedFieldsOperationType) IsValid() bool {
+	switch e {
+	case ManagedFieldsOperationTypeApply, ManagedFieldsOperationTypeUpdate:
+		return true
+	}
+	return false
+}
+
+func (e ManagedFieldsOperationType) String() string {
+	return string(e)
+}
+
+func (e *ManagedFieldsOperationType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ManagedFieldsOperationType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ManagedFieldsOperationType", str)
+	}
+	return nil
+}
+
+func (e ManagedFieldsOperationType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type PodStatusType string
 
 const (
@@ -1356,6 +1460,42 @@ func (e *ServiceProtocol) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ServiceProtocol) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SortType string
+
+const (
+	SortTypeAsc SortType = "ASC"
+	SortTypeDsc SortType = "DSC"
+)
+
+func (e SortType) IsValid() bool {
+	switch e {
+	case SortTypeAsc, SortTypeDsc:
+		return true
+	}
+	return false
+}
+
+func (e SortType) String() string {
+	return string(e)
+}
+
+func (e *SortType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SortType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SortType", str)
+	}
+	return nil
+}
+
+func (e SortType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

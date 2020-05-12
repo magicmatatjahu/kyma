@@ -62,7 +62,7 @@ func New(restConfig *rest.Config, appCfg application.Config, rafterCfg rafter.Co
 	}
 	makePluggable := module.MakePluggableFunc(uiContainer.BackendModuleInformer)
 
-	genericApiResolver, err := genericapi.New(serviceFactory)
+	genericApiResolver, err := genericapi.New(restConfig, informerResyncPeriod+GetRandomNumber())
 	if err != nil {
 		return nil, errors.Wrap(err, "while initializing genericApi resolver")
 	}
@@ -673,12 +673,12 @@ func (r *queryResolver) Triggers(ctx context.Context, namespace string, subscrib
 	return r.eventing.TriggersQuery(ctx, namespace, subscriber)
 }
 
-func (r *queryResolver) GenericGet(ctx context.Context, schema gqlschema.SchemaResourceInput, name string, namespace *string) (*gqlschema.Resource, error) {
-	return r.genericApi.Get(ctx, schema, name, namespace)
+func (r *queryResolver) GenericGet(ctx context.Context, typeArg string, name string, namespace *string) (*gqlschema.Resource, error) {
+	return r.genericApi.Get(ctx, typeArg, name, namespace)
 }
 
-func (r *queryResolver) GenericList(ctx context.Context, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error) {
-	return r.genericApi.List(ctx, schema, namespace)
+func (r *queryResolver) GenericList(ctx context.Context, typeArg string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
+	return r.genericApi.List(ctx, typeArg, namespace, options)
 }
 
 // Subscriptions
@@ -765,6 +765,10 @@ func (r *subscriptionResolver) TriggerEvent(ctx context.Context, namespace strin
 
 func (r *subscriptionResolver) FunctionEvent(ctx context.Context, namespace string, functionName *string) (<-chan gqlschema.FunctionEvent, error) {
 	return r.serverless.FunctionEventSubscription(ctx, namespace, functionName)
+}
+
+func (r *subscriptionResolver) GenericWatch(ctx context.Context, typeArg string, name, namespace *string) (<-chan gqlschema.ResourceEvent, error) {
+	return r.genericApi.Watch(ctx, typeArg, namespace, name)
 }
 
 // Service Instance
@@ -980,14 +984,14 @@ type resourceResolver struct {
 	genericApi *genericapi.PluggableContainer
 }
 
-func (r *resourceResolver) Spec(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput, rootField *string) (gqlschema.ResourceSpecOutput, error) {
+func (r *resourceResolver) Spec(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput, rootField *string) (gqlschema.JSON, error) {
 	return r.genericApi.Resolver.ResourceSpec(ctx, obj, fields, rootField)
 }
 
-func (r *resourceResolver) SubResource(ctx context.Context, obj *gqlschema.Resource, schema gqlschema.SchemaResourceInput, name string, namespace *string) (*gqlschema.Resource, error) {
+func (r *resourceResolver) SubResource(ctx context.Context, obj *gqlschema.Resource, schema string, name string, namespace *string) (*gqlschema.Resource, error) {
 	return r.genericApi.Resolver.ResourceSubResource(ctx, obj, schema, name, namespace)
 }
 
-func (r *resourceResolver) SubResources(ctx context.Context, obj *gqlschema.Resource, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error) {
-	return r.genericApi.Resolver.ResourceSubResources(ctx, obj, schema, namespace)
+func (r *resourceResolver) SubResources(ctx context.Context, obj *gqlschema.Resource, schema string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
+	return r.genericApi.Resolver.ResourceSubResources(ctx, obj, schema, namespace, options)
 }

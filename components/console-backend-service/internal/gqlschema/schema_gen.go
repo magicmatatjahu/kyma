@@ -508,6 +508,15 @@ type ComplexityRoot struct {
 		Name func(childComplexity int) int
 	}
 
+	ManagedField struct {
+		Manager    func(childComplexity int) int
+		Operation  func(childComplexity int) int
+		ApiVersion func(childComplexity int) int
+		Time       func(childComplexity int) int
+		FieldsType func(childComplexity int) int
+		FieldsV1   func(childComplexity int) int
+	}
+
 	MicroFrontend struct {
 		Name            func(childComplexity int) int
 		Version         func(childComplexity int) int
@@ -684,8 +693,8 @@ type ComplexityRoot struct {
 		Function                    func(childComplexity int, name string, namespace string) int
 		Functions                   func(childComplexity int, namespace string) int
 		Triggers                    func(childComplexity int, namespace string, subscriber *SubscriberInput) int
-		GenericGet                  func(childComplexity int, schema SchemaResourceInput, name string, namespace *string) int
-		GenericList                 func(childComplexity int, schema SchemaResourceInput, namespace *string) int
+		GenericGet                  func(childComplexity int, schema string, name string, namespace *string) int
+		GenericList                 func(childComplexity int, schema string, namespace *string, options *ResourceListOptions) int
 	}
 
 	ReplicaSet struct {
@@ -709,9 +718,9 @@ type ComplexityRoot struct {
 		Kind         func(childComplexity int) int
 		Metadata     func(childComplexity int) int
 		Spec         func(childComplexity int, fields []ResourceFieldInput, rootField *string) int
-		SubResource  func(childComplexity int, schema SchemaResourceInput, name string, namespace *string) int
-		SubResources func(childComplexity int, schema SchemaResourceInput, namespace *string) int
-		RawContent   func(childComplexity int) int
+		SubResource  func(childComplexity int, schema string, name string, namespace *string) int
+		SubResources func(childComplexity int, schema string, namespace *string, pager *ResourcePager, options *ResourceListOptions) int
+		Raw          func(childComplexity int) int
 		Parent       func(childComplexity int) int
 	}
 
@@ -720,18 +729,46 @@ type ComplexityRoot struct {
 		Resource func(childComplexity int) int
 	}
 
+	ResourceListEdges struct {
+		Prev func(childComplexity int) int
+		Node func(childComplexity int) int
+		Next func(childComplexity int) int
+	}
+
+	ResourceListGroup struct {
+		Field      func(childComplexity int) int
+		FieldValue func(childComplexity int) int
+		Edges      func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
 	ResourceListOutput struct {
-		Items      func(childComplexity int) int
-		ItemsCount func(childComplexity int) int
+		Edges      func(childComplexity int) int
+		Nodes      func(childComplexity int) int
+		Group      func(childComplexity int, field string) int
+		TotalCount func(childComplexity int) int
 	}
 
 	ResourceMetadata struct {
-		Name            func(childComplexity int) int
-		Namespace       func(childComplexity int) int
-		GenerateName    func(childComplexity int) int
-		Labels          func(childComplexity int) int
-		Annotations     func(childComplexity int) int
-		OwnerReferences func(childComplexity int) int
+		Name                       func(childComplexity int) int
+		Namespace                  func(childComplexity int) int
+		Labels                     func(childComplexity int) int
+		Annotations                func(childComplexity int) int
+		GenerateName               func(childComplexity int) int
+		Uid                        func(childComplexity int) int
+		OwnerReferences            func(childComplexity int) int
+		ResourceVersion            func(childComplexity int) int
+		Generation                 func(childComplexity int) int
+		SelfLink                   func(childComplexity int) int
+		Continue                   func(childComplexity int) int
+		RemainingItemCount         func(childComplexity int) int
+		CreationTimestamp          func(childComplexity int) int
+		DeletionTimestamp          func(childComplexity int) int
+		DeletionGracePeriodSeconds func(childComplexity int) int
+		Finalizers                 func(childComplexity int) int
+		ClusterName                func(childComplexity int) int
+		ManagedFields              func(childComplexity int) int
 	}
 
 	ResourceQuota struct {
@@ -755,10 +792,6 @@ type ComplexityRoot struct {
 		Verbs     func(childComplexity int) int
 		ApiGroups func(childComplexity int) int
 		Resources func(childComplexity int) int
-	}
-
-	ResourceSpecOutput struct {
-		Data func(childComplexity int) int
 	}
 
 	ResourceType struct {
@@ -998,6 +1031,7 @@ type ComplexityRoot struct {
 		NamespaceEvent                  func(childComplexity int, withSystemNamespaces *bool) int
 		FunctionEvent                   func(childComplexity int, namespace string, functionName *string) int
 		TriggerEvent                    func(childComplexity int, namespace string, subscriber *SubscriberInput) int
+		GenericWatch                    func(childComplexity int, schema string, name *string, namespace *string) int
 	}
 
 	Trigger struct {
@@ -1199,13 +1233,13 @@ type QueryResolver interface {
 	Function(ctx context.Context, name string, namespace string) (*Function, error)
 	Functions(ctx context.Context, namespace string) ([]Function, error)
 	Triggers(ctx context.Context, namespace string, subscriber *SubscriberInput) ([]Trigger, error)
-	GenericGet(ctx context.Context, schema SchemaResourceInput, name string, namespace *string) (*Resource, error)
-	GenericList(ctx context.Context, schema SchemaResourceInput, namespace *string) (ResourceListOutput, error)
+	GenericGet(ctx context.Context, schema string, name string, namespace *string) (*Resource, error)
+	GenericList(ctx context.Context, schema string, namespace *string, options *ResourceListOptions) (ResourceListOutput, error)
 }
 type ResourceResolver interface {
-	Spec(ctx context.Context, obj *Resource, fields []ResourceFieldInput, rootField *string) (ResourceSpecOutput, error)
-	SubResource(ctx context.Context, obj *Resource, schema SchemaResourceInput, name string, namespace *string) (*Resource, error)
-	SubResources(ctx context.Context, obj *Resource, schema SchemaResourceInput, namespace *string) (ResourceListOutput, error)
+	Spec(ctx context.Context, obj *Resource, fields []ResourceFieldInput, rootField *string) (JSON, error)
+	SubResource(ctx context.Context, obj *Resource, schema string, name string, namespace *string) (*Resource, error)
+	SubResources(ctx context.Context, obj *Resource, schema string, namespace *string, pager *ResourcePager, options *ResourceListOptions) (ResourceListOutput, error)
 }
 type ServiceBindingResolver interface {
 	Secret(ctx context.Context, obj *ServiceBinding) (*Secret, error)
@@ -1253,6 +1287,7 @@ type SubscriptionResolver interface {
 	NamespaceEvent(ctx context.Context, withSystemNamespaces *bool) (<-chan NamespaceEvent, error)
 	FunctionEvent(ctx context.Context, namespace string, functionName *string) (<-chan FunctionEvent, error)
 	TriggerEvent(ctx context.Context, namespace string, subscriber *SubscriberInput) (<-chan TriggerEvent, error)
+	GenericWatch(ctx context.Context, schema string, name *string, namespace *string) (<-chan ResourceEvent, error)
 }
 
 func field_Asset_files_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
@@ -4768,10 +4803,10 @@ func field_Query_triggers_args(rawArgs map[string]interface{}) (map[string]inter
 
 func field_Query_genericGet_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 SchemaResourceInput
+	var arg0 string
 	if tmp, ok := rawArgs["schema"]; ok {
 		var err error
-		arg0, err = UnmarshalSchemaResourceInput(tmp)
+		arg0, err = graphql.UnmarshalString(tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4806,10 +4841,10 @@ func field_Query_genericGet_args(rawArgs map[string]interface{}) (map[string]int
 
 func field_Query_genericList_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 SchemaResourceInput
+	var arg0 string
 	if tmp, ok := rawArgs["schema"]; ok {
 		var err error
-		arg0, err = UnmarshalSchemaResourceInput(tmp)
+		arg0, err = graphql.UnmarshalString(tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4829,6 +4864,20 @@ func field_Query_genericList_args(rawArgs map[string]interface{}) (map[string]in
 		}
 	}
 	args["namespace"] = arg1
+	var arg2 *ResourceListOptions
+	if tmp, ok := rawArgs["options"]; ok {
+		var err error
+		var ptr1 ResourceListOptions
+		if tmp != nil {
+			ptr1, err = UnmarshalResourceListOptions(tmp)
+			arg2 = &ptr1
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["options"] = arg2
 	return args, nil
 
 }
@@ -4890,10 +4939,10 @@ func field_Resource_spec_args(rawArgs map[string]interface{}) (map[string]interf
 
 func field_Resource_subResource_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 SchemaResourceInput
+	var arg0 string
 	if tmp, ok := rawArgs["schema"]; ok {
 		var err error
-		arg0, err = UnmarshalSchemaResourceInput(tmp)
+		arg0, err = graphql.UnmarshalString(tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4928,10 +4977,10 @@ func field_Resource_subResource_args(rawArgs map[string]interface{}) (map[string
 
 func field_Resource_subResources_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 SchemaResourceInput
+	var arg0 string
 	if tmp, ok := rawArgs["schema"]; ok {
 		var err error
-		arg0, err = UnmarshalSchemaResourceInput(tmp)
+		arg0, err = graphql.UnmarshalString(tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4951,6 +5000,49 @@ func field_Resource_subResources_args(rawArgs map[string]interface{}) (map[strin
 		}
 	}
 	args["namespace"] = arg1
+	var arg2 *ResourcePager
+	if tmp, ok := rawArgs["pager"]; ok {
+		var err error
+		var ptr1 ResourcePager
+		if tmp != nil {
+			ptr1, err = UnmarshalResourcePager(tmp)
+			arg2 = &ptr1
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pager"] = arg2
+	var arg3 *ResourceListOptions
+	if tmp, ok := rawArgs["options"]; ok {
+		var err error
+		var ptr1 ResourceListOptions
+		if tmp != nil {
+			ptr1, err = UnmarshalResourceListOptions(tmp)
+			arg3 = &ptr1
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["options"] = arg3
+	return args, nil
+
+}
+
+func field_ResourceListOutput_group_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["field"]; ok {
+		var err error
+		arg0, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["field"] = arg0
 	return args, nil
 
 }
@@ -5236,6 +5328,49 @@ func field_Subscription_triggerEvent_args(rawArgs map[string]interface{}) (map[s
 		}
 	}
 	args["subscriber"] = arg1
+	return args, nil
+
+}
+
+func field_Subscription_genericWatch_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["schema"]; ok {
+		var err error
+		arg0, err = graphql.UnmarshalString(tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["schema"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["name"]; ok {
+		var err error
+		var ptr1 string
+		if tmp != nil {
+			ptr1, err = graphql.UnmarshalString(tmp)
+			arg1 = &ptr1
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["name"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["namespace"]; ok {
+		var err error
+		var ptr1 string
+		if tmp != nil {
+			ptr1, err = graphql.UnmarshalString(tmp)
+			arg2 = &ptr1
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["namespace"] = arg2
 	return args, nil
 
 }
@@ -7050,6 +7185,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.LocalObjectReference.Name(childComplexity), true
 
+	case "ManagedField.manager":
+		if e.complexity.ManagedField.Manager == nil {
+			break
+		}
+
+		return e.complexity.ManagedField.Manager(childComplexity), true
+
+	case "ManagedField.operation":
+		if e.complexity.ManagedField.Operation == nil {
+			break
+		}
+
+		return e.complexity.ManagedField.Operation(childComplexity), true
+
+	case "ManagedField.apiVersion":
+		if e.complexity.ManagedField.ApiVersion == nil {
+			break
+		}
+
+		return e.complexity.ManagedField.ApiVersion(childComplexity), true
+
+	case "ManagedField.time":
+		if e.complexity.ManagedField.Time == nil {
+			break
+		}
+
+		return e.complexity.ManagedField.Time(childComplexity), true
+
+	case "ManagedField.fieldsType":
+		if e.complexity.ManagedField.FieldsType == nil {
+			break
+		}
+
+		return e.complexity.ManagedField.FieldsType(childComplexity), true
+
+	case "ManagedField.fieldsV1":
+		if e.complexity.ManagedField.FieldsV1 == nil {
+			break
+		}
+
+		return e.complexity.ManagedField.FieldsV1(childComplexity), true
+
 	case "MicroFrontend.name":
 		if e.complexity.MicroFrontend.Name == nil {
 			break
@@ -8621,7 +8798,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GenericGet(childComplexity, args["schema"].(SchemaResourceInput), args["name"].(string), args["namespace"].(*string)), true
+		return e.complexity.Query.GenericGet(childComplexity, args["schema"].(string), args["name"].(string), args["namespace"].(*string)), true
 
 	case "Query.genericList":
 		if e.complexity.Query.GenericList == nil {
@@ -8633,7 +8810,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GenericList(childComplexity, args["schema"].(SchemaResourceInput), args["namespace"].(*string)), true
+		return e.complexity.Query.GenericList(childComplexity, args["schema"].(string), args["namespace"].(*string), args["options"].(*ResourceListOptions)), true
 
 	case "ReplicaSet.name":
 		if e.complexity.ReplicaSet.Name == nil {
@@ -8748,7 +8925,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Resource.SubResource(childComplexity, args["schema"].(SchemaResourceInput), args["name"].(string), args["namespace"].(*string)), true
+		return e.complexity.Resource.SubResource(childComplexity, args["schema"].(string), args["name"].(string), args["namespace"].(*string)), true
 
 	case "Resource.subResources":
 		if e.complexity.Resource.SubResources == nil {
@@ -8760,14 +8937,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Resource.SubResources(childComplexity, args["schema"].(SchemaResourceInput), args["namespace"].(*string)), true
+		return e.complexity.Resource.SubResources(childComplexity, args["schema"].(string), args["namespace"].(*string), args["pager"].(*ResourcePager), args["options"].(*ResourceListOptions)), true
 
-	case "Resource.rawContent":
-		if e.complexity.Resource.RawContent == nil {
+	case "Resource.raw":
+		if e.complexity.Resource.Raw == nil {
 			break
 		}
 
-		return e.complexity.Resource.RawContent(childComplexity), true
+		return e.complexity.Resource.Raw(childComplexity), true
 
 	case "Resource.parent":
 		if e.complexity.Resource.Parent == nil {
@@ -8790,19 +8967,94 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ResourceEvent.Resource(childComplexity), true
 
-	case "ResourceListOutput.items":
-		if e.complexity.ResourceListOutput.Items == nil {
+	case "ResourceListEdges.prev":
+		if e.complexity.ResourceListEdges.Prev == nil {
 			break
 		}
 
-		return e.complexity.ResourceListOutput.Items(childComplexity), true
+		return e.complexity.ResourceListEdges.Prev(childComplexity), true
 
-	case "ResourceListOutput.itemsCount":
-		if e.complexity.ResourceListOutput.ItemsCount == nil {
+	case "ResourceListEdges.node":
+		if e.complexity.ResourceListEdges.Node == nil {
 			break
 		}
 
-		return e.complexity.ResourceListOutput.ItemsCount(childComplexity), true
+		return e.complexity.ResourceListEdges.Node(childComplexity), true
+
+	case "ResourceListEdges.next":
+		if e.complexity.ResourceListEdges.Next == nil {
+			break
+		}
+
+		return e.complexity.ResourceListEdges.Next(childComplexity), true
+
+	case "ResourceListGroup.field":
+		if e.complexity.ResourceListGroup.Field == nil {
+			break
+		}
+
+		return e.complexity.ResourceListGroup.Field(childComplexity), true
+
+	case "ResourceListGroup.fieldValue":
+		if e.complexity.ResourceListGroup.FieldValue == nil {
+			break
+		}
+
+		return e.complexity.ResourceListGroup.FieldValue(childComplexity), true
+
+	case "ResourceListGroup.edges":
+		if e.complexity.ResourceListGroup.Edges == nil {
+			break
+		}
+
+		return e.complexity.ResourceListGroup.Edges(childComplexity), true
+
+	case "ResourceListGroup.nodes":
+		if e.complexity.ResourceListGroup.Nodes == nil {
+			break
+		}
+
+		return e.complexity.ResourceListGroup.Nodes(childComplexity), true
+
+	case "ResourceListGroup.totalCount":
+		if e.complexity.ResourceListGroup.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.ResourceListGroup.TotalCount(childComplexity), true
+
+	case "ResourceListOutput.edges":
+		if e.complexity.ResourceListOutput.Edges == nil {
+			break
+		}
+
+		return e.complexity.ResourceListOutput.Edges(childComplexity), true
+
+	case "ResourceListOutput.nodes":
+		if e.complexity.ResourceListOutput.Nodes == nil {
+			break
+		}
+
+		return e.complexity.ResourceListOutput.Nodes(childComplexity), true
+
+	case "ResourceListOutput.group":
+		if e.complexity.ResourceListOutput.Group == nil {
+			break
+		}
+
+		args, err := field_ResourceListOutput_group_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ResourceListOutput.Group(childComplexity, args["field"].(string)), true
+
+	case "ResourceListOutput.totalCount":
+		if e.complexity.ResourceListOutput.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.ResourceListOutput.TotalCount(childComplexity), true
 
 	case "ResourceMetadata.name":
 		if e.complexity.ResourceMetadata.Name == nil {
@@ -8818,13 +9070,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ResourceMetadata.Namespace(childComplexity), true
 
-	case "ResourceMetadata.generateName":
-		if e.complexity.ResourceMetadata.GenerateName == nil {
-			break
-		}
-
-		return e.complexity.ResourceMetadata.GenerateName(childComplexity), true
-
 	case "ResourceMetadata.labels":
 		if e.complexity.ResourceMetadata.Labels == nil {
 			break
@@ -8839,12 +9084,103 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ResourceMetadata.Annotations(childComplexity), true
 
+	case "ResourceMetadata.generateName":
+		if e.complexity.ResourceMetadata.GenerateName == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.GenerateName(childComplexity), true
+
+	case "ResourceMetadata.uid":
+		if e.complexity.ResourceMetadata.Uid == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.Uid(childComplexity), true
+
 	case "ResourceMetadata.ownerReferences":
 		if e.complexity.ResourceMetadata.OwnerReferences == nil {
 			break
 		}
 
 		return e.complexity.ResourceMetadata.OwnerReferences(childComplexity), true
+
+	case "ResourceMetadata.resourceVersion":
+		if e.complexity.ResourceMetadata.ResourceVersion == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.ResourceVersion(childComplexity), true
+
+	case "ResourceMetadata.generation":
+		if e.complexity.ResourceMetadata.Generation == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.Generation(childComplexity), true
+
+	case "ResourceMetadata.selfLink":
+		if e.complexity.ResourceMetadata.SelfLink == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.SelfLink(childComplexity), true
+
+	case "ResourceMetadata.continue":
+		if e.complexity.ResourceMetadata.Continue == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.Continue(childComplexity), true
+
+	case "ResourceMetadata.remainingItemCount":
+		if e.complexity.ResourceMetadata.RemainingItemCount == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.RemainingItemCount(childComplexity), true
+
+	case "ResourceMetadata.creationTimestamp":
+		if e.complexity.ResourceMetadata.CreationTimestamp == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.CreationTimestamp(childComplexity), true
+
+	case "ResourceMetadata.deletionTimestamp":
+		if e.complexity.ResourceMetadata.DeletionTimestamp == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.DeletionTimestamp(childComplexity), true
+
+	case "ResourceMetadata.deletionGracePeriodSeconds":
+		if e.complexity.ResourceMetadata.DeletionGracePeriodSeconds == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.DeletionGracePeriodSeconds(childComplexity), true
+
+	case "ResourceMetadata.finalizers":
+		if e.complexity.ResourceMetadata.Finalizers == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.Finalizers(childComplexity), true
+
+	case "ResourceMetadata.clusterName":
+		if e.complexity.ResourceMetadata.ClusterName == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.ClusterName(childComplexity), true
+
+	case "ResourceMetadata.managedFields":
+		if e.complexity.ResourceMetadata.ManagedFields == nil {
+			break
+		}
+
+		return e.complexity.ResourceMetadata.ManagedFields(childComplexity), true
 
 	case "ResourceQuota.name":
 		if e.complexity.ResourceQuota.Name == nil {
@@ -8922,13 +9258,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ResourceRule.Resources(childComplexity), true
-
-	case "ResourceSpecOutput.data":
-		if e.complexity.ResourceSpecOutput.Data == nil {
-			break
-		}
-
-		return e.complexity.ResourceSpecOutput.Data(childComplexity), true
 
 	case "ResourceType.memory":
 		if e.complexity.ResourceType.Memory == nil {
@@ -10042,6 +10371,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Subscription.TriggerEvent(childComplexity, args["namespace"].(string), args["subscriber"].(*SubscriberInput)), true
+
+	case "Subscription.genericWatch":
+		if e.complexity.Subscription.GenericWatch == nil {
+			break
+		}
+
+		args, err := field_Subscription_genericWatch_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Subscription.GenericWatch(childComplexity, args["schema"].(string), args["name"].(*string), args["namespace"].(*string)), true
 
 	case "Trigger.name":
 		if e.complexity.Trigger.Name == nil {
@@ -20647,6 +20988,219 @@ func (ec *executionContext) _LocalObjectReference_name(ctx context.Context, fiel
 	return graphql.MarshalString(res)
 }
 
+var managedFieldImplementors = []string{"ManagedField"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _ManagedField(ctx context.Context, sel ast.SelectionSet, obj *ManagedField) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, managedFieldImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ManagedField")
+		case "manager":
+			out.Values[i] = ec._ManagedField_manager(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "operation":
+			out.Values[i] = ec._ManagedField_operation(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "apiVersion":
+			out.Values[i] = ec._ManagedField_apiVersion(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "time":
+			out.Values[i] = ec._ManagedField_time(ctx, field, obj)
+		case "fieldsType":
+			out.Values[i] = ec._ManagedField_fieldsType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "fieldsV1":
+			out.Values[i] = ec._ManagedField_fieldsV1(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ManagedField_manager(ctx context.Context, field graphql.CollectedField, obj *ManagedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ManagedField",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Manager, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ManagedField_operation(ctx context.Context, field graphql.CollectedField, obj *ManagedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ManagedField",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Operation, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ManagedFieldsOperationType)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return res
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ManagedField_apiVersion(ctx context.Context, field graphql.CollectedField, obj *ManagedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ManagedField",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.APIVersion, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ManagedField_time(ctx context.Context, field graphql.CollectedField, obj *ManagedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ManagedField",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Time, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+	return MarshalTimestamp(*res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ManagedField_fieldsType(ctx context.Context, field graphql.CollectedField, obj *ManagedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ManagedField",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldsType, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ManagedField_fieldsV1(ctx context.Context, field graphql.CollectedField, obj *ManagedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ManagedField",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldsV1, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalString(*res)
+}
+
 var microFrontendImplementors = []string{"MicroFrontend"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -27681,7 +28235,7 @@ func (ec *executionContext) _Query_genericGet(ctx context.Context, field graphql
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GenericGet(rctx, args["schema"].(SchemaResourceInput), args["name"].(string), args["namespace"].(*string))
+		return ec.resolvers.Query().GenericGet(rctx, args["schema"].(string), args["name"].(string), args["namespace"].(*string))
 	})
 	if resTmp == nil {
 		return graphql.Null
@@ -27716,7 +28270,7 @@ func (ec *executionContext) _Query_genericList(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GenericList(rctx, args["schema"].(SchemaResourceInput), args["namespace"].(*string))
+		return ec.resolvers.Query().GenericList(rctx, args["schema"].(string), args["namespace"].(*string), args["options"].(*ResourceListOptions))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -28237,8 +28791,8 @@ func (ec *executionContext) _Resource(ctx context.Context, sel ast.SelectionSet,
 				}
 				wg.Done()
 			}(i, field)
-		case "rawContent":
-			out.Values[i] = ec._Resource_rawContent(ctx, field, obj)
+		case "raw":
+			out.Values[i] = ec._Resource_raw(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -28364,11 +28918,10 @@ func (ec *executionContext) _Resource_spec(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(ResourceSpecOutput)
+	res := resTmp.(JSON)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	return ec._ResourceSpecOutput(ctx, field.Selections, &res)
+	return res
 }
 
 // nolint: vetshadow
@@ -28390,7 +28943,7 @@ func (ec *executionContext) _Resource_subResource(ctx context.Context, field gra
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Resource().SubResource(rctx, obj, args["schema"].(SchemaResourceInput), args["name"].(string), args["namespace"].(*string))
+		return ec.resolvers.Resource().SubResource(rctx, obj, args["schema"].(string), args["name"].(string), args["namespace"].(*string))
 	})
 	if resTmp == nil {
 		return graphql.Null
@@ -28425,7 +28978,7 @@ func (ec *executionContext) _Resource_subResources(ctx context.Context, field gr
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Resource().SubResources(rctx, obj, args["schema"].(SchemaResourceInput), args["namespace"].(*string))
+		return ec.resolvers.Resource().SubResources(rctx, obj, args["schema"].(string), args["namespace"].(*string), args["pager"].(*ResourcePager), args["options"].(*ResourceListOptions))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -28441,7 +28994,7 @@ func (ec *executionContext) _Resource_subResources(ctx context.Context, field gr
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Resource_rawContent(ctx context.Context, field graphql.CollectedField, obj *Resource) graphql.Marshaler {
+func (ec *executionContext) _Resource_raw(ctx context.Context, field graphql.CollectedField, obj *Resource) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -28453,7 +29006,7 @@ func (ec *executionContext) _Resource_rawContent(ctx context.Context, field grap
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.RawContent, nil
+		return obj.Raw, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -28586,11 +29139,11 @@ func (ec *executionContext) _ResourceEvent_resource(ctx context.Context, field g
 	return ec._Resource(ctx, field.Selections, &res)
 }
 
-var resourceListOutputImplementors = []string{"ResourceListOutput"}
+var resourceListEdgesImplementors = []string{"ResourceListEdges"}
 
 // nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _ResourceListOutput(ctx context.Context, sel ast.SelectionSet, obj *ResourceListOutput) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, resourceListOutputImplementors)
+func (ec *executionContext) _ResourceListEdges(ctx context.Context, sel ast.SelectionSet, obj *ResourceListEdges) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, resourceListEdgesImplementors)
 
 	out := graphql.NewOrderedMap(len(fields))
 	invalid := false
@@ -28599,14 +29152,147 @@ func (ec *executionContext) _ResourceListOutput(ctx context.Context, sel ast.Sel
 
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ResourceListOutput")
-		case "items":
-			out.Values[i] = ec._ResourceListOutput_items(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("ResourceListEdges")
+		case "prev":
+			out.Values[i] = ec._ResourceListEdges_prev(ctx, field, obj)
+		case "node":
+			out.Values[i] = ec._ResourceListEdges_node(ctx, field, obj)
+		case "next":
+			out.Values[i] = ec._ResourceListEdges_next(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListEdges_prev(ctx context.Context, field graphql.CollectedField, obj *ResourceListEdges) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListEdges",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Prev, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Resource)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._Resource(ctx, field.Selections, res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListEdges_node(ctx context.Context, field graphql.CollectedField, obj *ResourceListEdges) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListEdges",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Resource)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._Resource(ctx, field.Selections, res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListEdges_next(ctx context.Context, field graphql.CollectedField, obj *ResourceListEdges) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListEdges",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Next, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Resource)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._Resource(ctx, field.Selections, res)
+}
+
+var resourceListGroupImplementors = []string{"ResourceListGroup"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _ResourceListGroup(ctx context.Context, sel ast.SelectionSet, obj *ResourceListGroup) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, resourceListGroupImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ResourceListGroup")
+		case "field":
+			out.Values[i] = ec._ResourceListGroup_field(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "itemsCount":
-			out.Values[i] = ec._ResourceListOutput_itemsCount(ctx, field, obj)
+		case "fieldValue":
+			out.Values[i] = ec._ResourceListGroup_fieldValue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "edges":
+			out.Values[i] = ec._ResourceListGroup_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "nodes":
+			out.Values[i] = ec._ResourceListGroup_nodes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "totalCount":
+			out.Values[i] = ec._ResourceListGroup_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -28622,11 +29308,11 @@ func (ec *executionContext) _ResourceListOutput(ctx context.Context, sel ast.Sel
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _ResourceListOutput_items(ctx context.Context, field graphql.CollectedField, obj *ResourceListOutput) graphql.Marshaler {
+func (ec *executionContext) _ResourceListGroup_field(ctx context.Context, field graphql.CollectedField, obj *ResourceListGroup) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
-		Object: "ResourceListOutput",
+		Object: "ResourceListGroup",
 		Args:   nil,
 		Field:  field,
 	}
@@ -28634,7 +29320,121 @@ func (ec *executionContext) _ResourceListOutput_items(ctx context.Context, field
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
+		return obj.Field, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListGroup_fieldValue(ctx context.Context, field graphql.CollectedField, obj *ResourceListGroup) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListGroup",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FieldValue, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListGroup_edges(ctx context.Context, field graphql.CollectedField, obj *ResourceListGroup) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListGroup",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]ResourceListEdges)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._ResourceListEdges(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListGroup_nodes(ctx context.Context, field graphql.CollectedField, obj *ResourceListGroup) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListGroup",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -28682,7 +29482,76 @@ func (ec *executionContext) _ResourceListOutput_items(ctx context.Context, field
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _ResourceListOutput_itemsCount(ctx context.Context, field graphql.CollectedField, obj *ResourceListOutput) graphql.Marshaler {
+func (ec *executionContext) _ResourceListGroup_totalCount(ctx context.Context, field graphql.CollectedField, obj *ResourceListGroup) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListGroup",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+var resourceListOutputImplementors = []string{"ResourceListOutput"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _ResourceListOutput(ctx context.Context, sel ast.SelectionSet, obj *ResourceListOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, resourceListOutputImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ResourceListOutput")
+		case "edges":
+			out.Values[i] = ec._ResourceListOutput_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "nodes":
+			out.Values[i] = ec._ResourceListOutput_nodes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "group":
+			out.Values[i] = ec._ResourceListOutput_group(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._ResourceListOutput_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListOutput_edges(ctx context.Context, field graphql.CollectedField, obj *ResourceListOutput) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
 	rctx := &graphql.ResolverContext{
@@ -28694,7 +29563,162 @@ func (ec *executionContext) _ResourceListOutput_itemsCount(ctx context.Context, 
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ItemsCount, nil
+		return obj.Edges, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]ResourceListEdges)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._ResourceListEdges(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListOutput_nodes(ctx context.Context, field graphql.CollectedField, obj *ResourceListOutput) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListOutput",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]Resource)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._Resource(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListOutput_group(ctx context.Context, field graphql.CollectedField, obj *ResourceListOutput) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_ResourceListOutput_group_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListOutput",
+		Args:   args,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Group, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ResourceListGroup)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._ResourceListGroup(ctx, field.Selections, res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListOutput_totalCount(ctx context.Context, field graphql.CollectedField, obj *ResourceListOutput) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListOutput",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -28732,11 +29756,6 @@ func (ec *executionContext) _ResourceMetadata(ctx context.Context, sel ast.Selec
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "generateName":
-			out.Values[i] = ec._ResourceMetadata_generateName(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
 		case "labels":
 			out.Values[i] = ec._ResourceMetadata_labels(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -28747,8 +29766,64 @@ func (ec *executionContext) _ResourceMetadata(ctx context.Context, sel ast.Selec
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "generateName":
+			out.Values[i] = ec._ResourceMetadata_generateName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "uid":
+			out.Values[i] = ec._ResourceMetadata_uid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "ownerReferences":
 			out.Values[i] = ec._ResourceMetadata_ownerReferences(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "resourceVersion":
+			out.Values[i] = ec._ResourceMetadata_resourceVersion(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "generation":
+			out.Values[i] = ec._ResourceMetadata_generation(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "selfLink":
+			out.Values[i] = ec._ResourceMetadata_selfLink(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "continue":
+			out.Values[i] = ec._ResourceMetadata_continue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "remainingItemCount":
+			out.Values[i] = ec._ResourceMetadata_remainingItemCount(ctx, field, obj)
+		case "creationTimestamp":
+			out.Values[i] = ec._ResourceMetadata_creationTimestamp(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "deletionTimestamp":
+			out.Values[i] = ec._ResourceMetadata_deletionTimestamp(ctx, field, obj)
+		case "deletionGracePeriodSeconds":
+			out.Values[i] = ec._ResourceMetadata_deletionGracePeriodSeconds(ctx, field, obj)
+		case "finalizers":
+			out.Values[i] = ec._ResourceMetadata_finalizers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "clusterName":
+			out.Values[i] = ec._ResourceMetadata_clusterName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "managedFields":
+			out.Values[i] = ec._ResourceMetadata_managedFields(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -28818,33 +29893,6 @@ func (ec *executionContext) _ResourceMetadata_namespace(ctx context.Context, fie
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _ResourceMetadata_generateName(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "ResourceMetadata",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.GenerateName, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalString(res)
-}
-
-// nolint: vetshadow
 func (ec *executionContext) _ResourceMetadata_labels(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -28899,6 +29947,60 @@ func (ec *executionContext) _ResourceMetadata_annotations(ctx context.Context, f
 }
 
 // nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_generateName(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GenerateName, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_uid(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
 func (ec *executionContext) _ResourceMetadata_ownerReferences(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -28945,6 +30047,348 @@ func (ec *executionContext) _ResourceMetadata_ownerReferences(ctx context.Contex
 			arr1[idx1] = func() graphql.Marshaler {
 
 				return ec._OwnerReferenceType(ctx, field.Selections, &res[idx1])
+			}()
+		}
+		if isLen1 {
+			f(idx1)
+		} else {
+			go f(idx1)
+		}
+
+	}
+	wg.Wait()
+	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_resourceVersion(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ResourceVersion, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_generation(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Generation, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_selfLink(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SelfLink, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_continue(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Continue, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_remainingItemCount(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RemainingItemCount, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalInt(*res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_creationTimestamp(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreationTimestamp, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return MarshalTimestamp(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_deletionTimestamp(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletionTimestamp, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+	return MarshalTimestamp(*res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_deletionGracePeriodSeconds(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletionGracePeriodSeconds, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalInt(*res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_finalizers(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Finalizers, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+
+	for idx1 := range res {
+		arr1[idx1] = func() graphql.Marshaler {
+			return graphql.MarshalString(res[idx1])
+		}()
+	}
+
+	return arr1
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_clusterName(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClusterName, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceMetadata_managedFields(ctx context.Context, field graphql.CollectedField, obj *ResourceMetadata) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceMetadata",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ManagedFields, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]ManagedField)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	arr1 := make(graphql.Array, len(res))
+	var wg sync.WaitGroup
+
+	isLen1 := len(res) == 1
+	if !isLen1 {
+		wg.Add(len(res))
+	}
+
+	for idx1 := range res {
+		idx1 := idx1
+		rctx := &graphql.ResolverContext{
+			Index:  &idx1,
+			Result: &res[idx1],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(idx1 int) {
+			if !isLen1 {
+				defer wg.Done()
+			}
+			arr1[idx1] = func() graphql.Marshaler {
+
+				return ec._ManagedField(ctx, field.Selections, &res[idx1])
 			}()
 		}
 		if isLen1 {
@@ -29450,63 +30894,6 @@ func (ec *executionContext) _ResourceRule_resources(ctx context.Context, field g
 	}
 
 	return arr1
-}
-
-var resourceSpecOutputImplementors = []string{"ResourceSpecOutput"}
-
-// nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _ResourceSpecOutput(ctx context.Context, sel ast.SelectionSet, obj *ResourceSpecOutput) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, resourceSpecOutputImplementors)
-
-	out := graphql.NewOrderedMap(len(fields))
-	invalid := false
-	for i, field := range fields {
-		out.Keys[i] = field.Alias
-
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ResourceSpecOutput")
-		case "data":
-			out.Values[i] = ec._ResourceSpecOutput_data(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-
-	if invalid {
-		return graphql.Null
-	}
-	return out
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _ResourceSpecOutput_data(ctx context.Context, field graphql.CollectedField, obj *ResourceSpecOutput) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object: "ResourceSpecOutput",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Data, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(JSON)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return res
 }
 
 var resourceTypeImplementors = []string{"ResourceType"}
@@ -34723,6 +36110,8 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 		return ec._Subscription_functionEvent(ctx, fields[0])
 	case "triggerEvent":
 		return ec._Subscription_triggerEvent(ctx, fields[0])
+	case "genericWatch":
+		return ec._Subscription_genericWatch(ctx, fields[0])
 	default:
 		panic("unknown field " + strconv.Quote(fields[0].Name))
 	}
@@ -35282,6 +36671,37 @@ func (ec *executionContext) _Subscription_triggerEvent(ctx context.Context, fiel
 		var out graphql.OrderedMap
 		out.Add(field.Alias, func() graphql.Marshaler {
 			return ec._TriggerEvent(ctx, field.Selections, &res)
+		}())
+		return &out
+	}
+}
+
+func (ec *executionContext) _Subscription_genericWatch(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Subscription_genericWatch_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Field: field,
+	})
+	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
+	//          and Tracer stack
+	rctx := ctx
+	results, err := ec.resolvers.Subscription().GenericWatch(rctx, args["schema"].(string), args["name"].(*string), args["namespace"].(*string))
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-results
+		if !ok {
+			return nil
+		}
+		var out graphql.OrderedMap
+		out.Add(field.Alias, func() graphql.Marshaler {
+			return ec._ResourceEvent(ctx, field.Selections, &res)
 		}())
 		return &out
 	}
@@ -38390,6 +39810,423 @@ func UnmarshalResourceFieldInput(v interface{}) (ResourceFieldInput, error) {
 	return it, nil
 }
 
+func UnmarshalResourceFilter(v interface{}) (ResourceFilter, error) {
+	var it ResourceFilter
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "eq":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalString(v)
+				it.Eq = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "ne":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalString(v)
+				it.Ne = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "gt":
+			var err error
+			var ptr1 int
+			if v != nil {
+				ptr1, err = graphql.UnmarshalInt(v)
+				it.Gt = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "gte":
+			var err error
+			var ptr1 int
+			if v != nil {
+				ptr1, err = graphql.UnmarshalInt(v)
+				it.Gte = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "lt":
+			var err error
+			var ptr1 int
+			if v != nil {
+				ptr1, err = graphql.UnmarshalInt(v)
+				it.Lt = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "lte":
+			var err error
+			var ptr1 int
+			if v != nil {
+				ptr1, err = graphql.UnmarshalInt(v)
+				it.Lte = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "in":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.In = make([]string, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.In[idx1], err = graphql.UnmarshalString(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		case "nin":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.Nin = make([]string, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.Nin[idx1], err = graphql.UnmarshalString(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		case "glob":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalString(v)
+				it.Glob = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "exists":
+			var err error
+			var ptr1 bool
+			if v != nil {
+				ptr1, err = graphql.UnmarshalBoolean(v)
+				it.Exists = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "type":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalString(v)
+				it.Type = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "mod":
+			var err error
+			var ptr1 int
+			if v != nil {
+				ptr1, err = graphql.UnmarshalInt(v)
+				it.Mod = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "regex":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalString(v)
+				it.Regex = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "all":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.All = make([]string, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.All[idx1], err = graphql.UnmarshalString(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		case "elemMatch":
+			var err error
+			var ptr1 ResourceFilter
+			if v != nil {
+				ptr1, err = UnmarshalResourceFilter(v)
+				it.ElemMatch = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "size":
+			var err error
+			var ptr1 int
+			if v != nil {
+				ptr1, err = graphql.UnmarshalInt(v)
+				it.Size = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func UnmarshalResourceFilters(v interface{}) (ResourceFilters, error) {
+	var it ResourceFilters
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "value":
+			var err error
+			it.Value, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		case "filter":
+			var err error
+			var ptr1 ResourceFilter
+			if v != nil {
+				ptr1, err = UnmarshalResourceFilter(v)
+				it.Filter = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.And = make([]ResourceFilters, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.And[idx1], err = UnmarshalResourceFilters(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		case "not":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.Not = make([]ResourceFilters, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.Not[idx1], err = UnmarshalResourceFilters(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		case "nor":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.Nor = make([]ResourceFilters, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.Nor[idx1], err = UnmarshalResourceFilters(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.Or = make([]ResourceFilters, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.Or[idx1], err = UnmarshalResourceFilters(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func UnmarshalResourceListOptions(v interface{}) (ResourceListOptions, error) {
+	var it ResourceListOptions
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "inNamespaces":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.InNamespaces = make([]string, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.InNamespaces[idx1], err = graphql.UnmarshalString(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		case "allNamespaces":
+			var err error
+			var ptr1 bool
+			if v != nil {
+				ptr1, err = graphql.UnmarshalBoolean(v)
+				it.AllNamespaces = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "filters":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.Filters = make([]ResourceFilters, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.Filters[idx1], err = UnmarshalResourceFilters(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		case "sort":
+			var err error
+			var rawIf1 []interface{}
+			if v != nil {
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
+			}
+			it.Sort = make([]ResourceSort, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.Sort[idx1], err = UnmarshalResourceSort(rawIf1[idx1])
+			}
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func UnmarshalResourcePager(v interface{}) (ResourcePager, error) {
+	var it ResourcePager
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "limit":
+			var err error
+			it.Limit, err = graphql.UnmarshalInt(v)
+			if err != nil {
+				return it, err
+			}
+		case "skip":
+			var err error
+			var ptr1 int
+			if v != nil {
+				ptr1, err = graphql.UnmarshalInt(v)
+				it.Skip = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "after":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalString(v)
+				it.After = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func UnmarshalResourceQuotaInput(v interface{}) (ResourceQuotaInput, error) {
 	var it ResourceQuotaInput
 	var asMap = v.(map[string]interface{})
@@ -38429,6 +40266,39 @@ func UnmarshalResourceRefInput(v interface{}) (ResourceRefInput, error) {
 		case "namespace":
 			var err error
 			it.Namespace, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func UnmarshalResourceSort(v interface{}) (ResourceSort, error) {
+	var it ResourceSort
+	var asMap = v.(map[string]interface{})
+
+	if _, present := asMap["order"]; !present {
+		asMap["order"] = "ASC"
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "field":
+			var err error
+			it.Field, err = graphql.UnmarshalString(v)
+			if err != nil {
+				return it, err
+			}
+		case "order":
+			var err error
+			var ptr1 SortType
+			if v != nil {
+				err = (&ptr1).UnmarshalGQL(v)
+				it.Order = &ptr1
+			}
+
 			if err != nil {
 				return it, err
 			}
@@ -38532,36 +40402,6 @@ func UnmarshalRuleInput(v interface{}) (RuleInput, error) {
 			for idx1 := range rawIf1 {
 				it.Mutators[idx1], err = UnmarshalAPIRuleConfigInput(rawIf1[idx1])
 			}
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func UnmarshalSchemaResourceInput(v interface{}) (SchemaResourceInput, error) {
-	var it SchemaResourceInput
-	var asMap = v.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "version":
-			var err error
-			it.Version, err = graphql.UnmarshalString(v)
-			if err != nil {
-				return it, err
-			}
-		case "group":
-			var err error
-			it.Group, err = graphql.UnmarshalString(v)
-			if err != nil {
-				return it, err
-			}
-		case "resource":
-			var err error
-			it.Resource, err = graphql.UnmarshalString(v)
 			if err != nil {
 				return it, err
 			}
@@ -38685,35 +40525,6 @@ func UnmarshalServiceInstanceCreateInputResourceRef(v interface{}) (ServiceInsta
 		case "clusterWide":
 			var err error
 			it.ClusterWide, err = graphql.UnmarshalBoolean(v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func UnmarshalSubResourceInput(v interface{}) (SubResourceInput, error) {
-	var it SubResourceInput
-	var asMap = v.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "schema":
-			var err error
-			it.Schema, err = UnmarshalSchemaResourceInput(v)
-			if err != nil {
-				return it, err
-			}
-		case "namespace":
-			var err error
-			var ptr1 string
-			if v != nil {
-				ptr1, err = graphql.UnmarshalString(v)
-				it.Namespace = &ptr1
-			}
-
 			if err != nil {
 				return it, err
 			}
@@ -38928,6 +40739,8 @@ scalar Timestamp
 scalar Settings
 
 scalar ApplicationMappingService
+
+scalar Any
 
 # Directives
 
@@ -40065,33 +41878,75 @@ type OwnerReferenceType {
     blockOwnerDeletion: Boolean
 }
 
+enum ManagedFieldsOperationType {
+    Apply
+    Update
+}
+
+type ManagedField {
+    manager: String!
+    operation: ManagedFieldsOperationType!
+    apiVersion: String!
+    time: Timestamp
+    fieldsType: String!
+    fieldsV1: String
+}
+
 type ResourceMetadata {
     name: String!
     namespace: String!
-    generateName: String!
     labels: Labels!
     annotations: Labels!
+    generateName: String!
+    uid: String!
     ownerReferences: [OwnerReferenceType!]!
+    resourceVersion: String!
+    generation: Int!
+    selfLink: String!
+    continue: String!
+    remainingItemCount: Int
+    creationTimestamp: Timestamp!
+    deletionTimestamp: Timestamp
+    deletionGracePeriodSeconds: Int
+    finalizers: [String!]!
+    clusterName: String!
+    managedFields: [ManagedField!]!
 }
 
 type Resource {
     apiVersion: String!
     kind: String!
     metadata: ResourceMetadata!
-    spec(fields: [ResourceFieldInput!]!, rootField: String = "spec"): ResourceSpecOutput!
-    subResource(schema: SchemaResourceInput!, name: String!, namespace: String): Resource
-    subResources(schema: SchemaResourceInput!, namespace: String): ResourceListOutput!
-    rawContent: JSON!
+    spec(fields: [ResourceFieldInput!]!, rootField: String = "spec"): JSON!
+    subResource(schema: String!, name: String!, namespace: String): Resource
+    subResources(
+        schema: String!,
+        namespace: String,
+        pager: ResourcePager
+        options: ResourceListOptions): ResourceListOutput!
+    raw: JSON!
     parent: Resource
 }
 
 type ResourceListOutput {
-    items: [Resource!]!
-    itemsCount: Int!
+    edges: [ResourceListEdges!]!
+    nodes: [Resource!]!
+    group(field: String!): ResourceListGroup
+    totalCount: Int!
 }
 
-type ResourceSpecOutput {
-    data: JSON!
+type ResourceListEdges {
+    prev: Resource
+    node: Resource
+    next: Resource
+}
+
+type ResourceListGroup {
+    field: String!
+    fieldValue: Any!
+    edges: [ResourceListEdges!]!
+    nodes: [Resource!]!
+    totalCount: Int!
 }
 
 type ResourceEvent {
@@ -40099,20 +41954,71 @@ type ResourceEvent {
     resource: Resource!
 }
 
-input SchemaResourceInput {
-    version: String!
-    group: String!
-    resource: String!
+input ResourcePager {
+    limit: Int!
+    skip: Int
+    after: String
+}
+
+input ResourceListOptions {
+    inNamespaces: [String!]
+    allNamespaces: Boolean
+    filters: [ResourceFilters!]
+    sort: [ResourceSort!]
+}
+
+input ResourceFilters {
+    value: String!
+
+    # normal filters
+    filter: ResourceFilter
+
+    # logical filters
+    and: [ResourceFilters!]
+    not: [ResourceFilters!]
+    nor: [ResourceFilters!]
+    or: [ResourceFilters!]
+}
+
+enum SortType {
+    ASC
+    DSC
+}
+
+input ResourceSort {
+    field: String!
+    order: SortType = ASC
+}
+
+input ResourceFilter {
+    # comparison filters
+    eq: Any # equal
+    ne: Any # not equal
+    gt: Int # great than
+    gte: Int # great or equal than
+    lt: Int # less than
+    lte: Int # less or equal than
+    in: [Any!] # in array
+    nin: [Any!] # not in array
+    glob: String # global - for wildcard
+
+    # element filters
+    exists: Boolean # check if field exists
+    type: String # add GraphqLPrimitivesTypes :)
+
+    # evaluation filters
+    mod: Int # modulo
+    regex: String # regex
+
+    # array filters
+    all: [Any!] # if all elements in array match filters
+    elemMatch: ResourceFilter # if at least one element in array matches filters
+    size: Int # if array has appropriate length
 }
 
 input ResourceFieldInput {
     key: String
     path: String!
-}
-
-input SubResourceInput {
-    schema: SchemaResourceInput!
-    namespace: String
 }
 
 # Queries
@@ -40194,8 +42100,12 @@ type Query {
 
     triggers(namespace: String!, subscriber: SubscriberInput): [Trigger!] @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 
-    genericGet(schema: SchemaResourceInput!, name: String!, namespace: String): Resource @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
-    genericList(schema: SchemaResourceInput!, namespace: String): ResourceListOutput! @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+    genericGet(schema: String!, name: String!, namespace: String): Resource @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+    genericList(
+        schema: String!
+        namespace: String
+        options: ResourceListOptions
+    ): ResourceListOutput! @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 }
 
 # Mutations
@@ -40307,6 +42217,8 @@ type Subscription {
 
     functionEvent(namespace: String!, functionName: String): FunctionEvent! @HasAccess(attributes: {resource: "functions", verb: "watch", apiGroup: "serverless.kyma-project.io", apiVersion: "v1alpha1", namespaceArg: "namespace"})
     triggerEvent(namespace: String!, subscriber: SubscriberInput): TriggerEvent! @HasAccess(attributes: {resource: "triggers", verb: "watch", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+
+    genericWatch(schema: String!, name: String, namespace: String): ResourceEvent! @HasAccess(attributes: {resource: "triggers", verb: "watch", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 }
 
 # Schema

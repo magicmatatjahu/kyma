@@ -3,13 +3,9 @@ package genericapi
 import (
 	"context"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"log"
 	"strings"
 
 	"github.com/kyma-project/kyma/components/console-backend-service/internal/gqlschema"
-	"github.com/kyma-project/kyma/components/console-backend-service/internal/resource"
-	"github.com/kyma-project/kyma/components/function-controller/pkg/apis/serverless/v1alpha1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 type ResourceResolver struct {
@@ -17,34 +13,14 @@ type ResourceResolver struct {
 	converter *ResourceConverter
 }
 
-func NewResourceResolver(serviceFactory *resource.ServiceFactory) *ResourceResolver {
-	schemas := []schema.GroupVersionResource{
-		{
-			Version:  "v1beta1",
-			Group:    "servicecatalog.k8s.io",
-			Resource: "serviceinstances",
-		},
-		{
-			Version:  "v1beta1",
-			Group:    "servicecatalog.k8s.io",
-			Resource: "clusterserviceclasses",
-		},
-		{
-			Version:  v1alpha1.GroupVersion.Version,
-			Group:    v1alpha1.GroupVersion.Group,
-			Resource: "functions",
-		},
-	}
-	services := NewResourceServices(serviceFactory, schemas)
-	converter := NewResourceConverter()
-
+func NewResourceResolver(services ResourcesServices, converter *ResourceConverter) *ResourceResolver {
 	return &ResourceResolver{
 		services: services,
 		converter: converter,
 	}
 }
 
-func (r *ResourceResolver) Get(ctx context.Context, schema gqlschema.SchemaResourceInput, name string, namespace *string) (*gqlschema.Resource, error) {
+func (r *ResourceResolver) Get(ctx context.Context, schema string, name string, namespace *string) (*gqlschema.Resource, error) {
 	service := r.services.Get(schema)
 	if service == nil {
 		return nil, nil
@@ -58,13 +34,13 @@ func (r *ResourceResolver) Get(ctx context.Context, schema gqlschema.SchemaResou
 	return r.converter.ToGQL(item, nil)
 }
 
-func (r *ResourceResolver) List(ctx context.Context, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error) {
+func (r *ResourceResolver) List(ctx context.Context, schema string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
 	service := r.services.Get(schema)
 	if service == nil {
 		return gqlschema.ResourceListOutput{}, nil
 	}
 
-	items, err := service.List(namespace)
+	items, err := service.List(namespace, options)
 	if err != nil {
 		return gqlschema.ResourceListOutput{}, err
 	}
@@ -72,10 +48,34 @@ func (r *ResourceResolver) List(ctx context.Context, schema gqlschema.SchemaReso
 	return r.converter.ToGQLs(items, nil)
 }
 
-func (r *ResourceResolver) ResourceSpec(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput, rootField *string) (gqlschema.ResourceSpecOutput, error) {
-	gqlJson := gqlschema.ResourceSpecOutput{
-		Data: map[string]interface{}{},
+func (r *ResourceResolver) Watch(ctx context.Context, schema string, namespace, name *string) (<-chan gqlschema.ResourceEvent, error) {
+	service := r.services.Get(schema)
+	if service == nil {
+		return nil, nil
 	}
+
+	channel := make(chan gqlschema.ResourceEvent, 1)
+	filter := func(entity interface{}) bool {
+		if entity == nil {
+			return false
+		}
+		return true
+	}
+
+	listener := NewResourceListener(channel, filter, r.converter)
+	service.Subscribe(listener)
+	go func() {
+		defer close(channel)
+		defer service.Unsubscribe(listener)
+		<-ctx.Done()
+	}()
+
+	return channel, nil
+}
+
+
+func (r *ResourceResolver) ResourceSpec(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput, rootField *string) (gqlschema.JSON, error) {
+	gqlJSON := gqlschema.JSON{}
 
 	for _, field := range fields {
 		pathField := strings.Split(field.Path, ".")
@@ -83,9 +83,9 @@ func (r *ResourceResolver) ResourceSpec(ctx context.Context, obj *gqlschema.Reso
 			pathField = r.prependPath(pathField, *rootField)
 		}
 
-		val, found, err := unstructured.NestedFieldCopy(obj.RawContent, pathField...)
+		val, found, err := unstructured.NestedFieldCopy(obj.Raw, pathField...)
 		if err != nil {
-			return gqlJson, err
+			return nil, err
 		}
 		if !found {
 			continue
@@ -98,13 +98,13 @@ func (r *ResourceResolver) ResourceSpec(ctx context.Context, obj *gqlschema.Reso
 			key = pathField[len(pathField) - 1]
 		}
 
-		gqlJson.Data[key] = val
+		gqlJSON[key] = val
 	}
 
-	return gqlJson, nil
+	return gqlJSON, nil
 }
 
-func (r *ResourceResolver) ResourceSubResource(ctx context.Context, parent *gqlschema.Resource, schema gqlschema.SchemaResourceInput, name string, namespace *string) (*gqlschema.Resource, error) {
+func (r *ResourceResolver) ResourceSubResource(ctx context.Context, parent *gqlschema.Resource, schema string, name string, namespace *string) (*gqlschema.Resource, error) {
 	service := r.services.Get(schema)
 	if service == nil {
 		return nil, nil
@@ -125,7 +125,7 @@ func (r *ResourceResolver) ResourceSubResource(ctx context.Context, parent *gqls
 	return r.converter.ToGQL(item, nil)
 }
 
-func (r *ResourceResolver) ResourceSubResources(ctx context.Context, parent *gqlschema.Resource, schema gqlschema.SchemaResourceInput, namespace *string) (gqlschema.ResourceListOutput, error) {
+func (r *ResourceResolver) ResourceSubResources(ctx context.Context, parent *gqlschema.Resource, schema string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
 	service := r.services.Get(schema)
 	if service == nil {
 		return gqlschema.ResourceListOutput{}, nil
@@ -137,7 +137,7 @@ func (r *ResourceResolver) ResourceSubResources(ctx context.Context, parent *gql
 	}
 	parsedNamespace = r.parseArgValueForSubResource(parent, &parsedNamespace)
 
-	items, err := service.List(&parsedNamespace)
+	items, err := service.List(&parsedNamespace, options)
 	if err != nil {
 		return gqlschema.ResourceListOutput{}, err
 	}
@@ -166,9 +166,9 @@ func (r *ResourceResolver) parseArgValueForSubResource(parent *gqlschema.Resourc
 	for {
 		if strings.HasPrefix(deepPath, "$parent.") {
 			if deepParent == nil {
-				deepParent = parent
+				deepParent = &(*parent)
 			} else if deepParent.Parent != nil {
-				deepParent = deepParent.Parent
+				deepParent = &(*deepParent.Parent)
 			}
 
 			deepPath = strings.TrimPrefix(deepPath, "$parent.")
@@ -183,8 +183,7 @@ func (r *ResourceResolver) parseArgValueForSubResource(parent *gqlschema.Resourc
 	}
 
 	pathField := strings.Split(deepPath, ".")
-	log.Print(pathField)
-	val, found, err := unstructured.NestedString(deepParent.RawContent, pathField...)
+	val, found, err := unstructured.NestedString(deepParent.Raw, pathField...)
 	if err != nil || !found {
 		return deepPath
 	}

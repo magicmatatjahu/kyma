@@ -10,6 +10,8 @@ scalar Settings
 
 scalar ApplicationMappingService
 
+scalar Any
+
 # Directives
 
 directive @HasAccess(attributes: ResourceAttributes!) on FIELD_DEFINITION
@@ -1146,33 +1148,75 @@ type OwnerReferenceType {
     blockOwnerDeletion: Boolean
 }
 
+enum ManagedFieldsOperationType {
+    Apply
+    Update
+}
+
+type ManagedField {
+    manager: String!
+    operation: ManagedFieldsOperationType!
+    apiVersion: String!
+    time: Timestamp
+    fieldsType: String!
+    fieldsV1: String
+}
+
 type ResourceMetadata {
     name: String!
     namespace: String!
-    generateName: String!
     labels: Labels!
     annotations: Labels!
+    generateName: String!
+    uid: String!
     ownerReferences: [OwnerReferenceType!]!
+    resourceVersion: String!
+    generation: Int!
+    selfLink: String!
+    continue: String!
+    remainingItemCount: Int
+    creationTimestamp: Timestamp!
+    deletionTimestamp: Timestamp
+    deletionGracePeriodSeconds: Int
+    finalizers: [String!]!
+    clusterName: String!
+    managedFields: [ManagedField!]!
 }
 
 type Resource {
     apiVersion: String!
     kind: String!
     metadata: ResourceMetadata!
-    spec(fields: [ResourceFieldInput!]!, rootField: String = "spec"): ResourceSpecOutput!
-    subResource(schema: SchemaResourceInput!, name: String!, namespace: String): Resource
-    subResources(schema: SchemaResourceInput!, namespace: String): ResourceListOutput!
-    rawContent: JSON!
+    spec(fields: [ResourceFieldInput!]!, rootField: String = "spec"): JSON!
+    subResource(schema: String!, name: String!, namespace: String): Resource
+    subResources(
+        schema: String!,
+        namespace: String,
+        pager: ResourcePager
+        options: ResourceListOptions): ResourceListOutput!
+    raw: JSON!
     parent: Resource
 }
 
 type ResourceListOutput {
-    items: [Resource!]!
-    itemsCount: Int!
+    edges: [ResourceListEdges!]!
+    nodes: [Resource!]!
+    group(field: String!): ResourceListGroup
+    totalCount: Int!
 }
 
-type ResourceSpecOutput {
-    data: JSON!
+type ResourceListEdges {
+    prev: Resource
+    node: Resource
+    next: Resource
+}
+
+type ResourceListGroup {
+    field: String!
+    fieldValue: Any!
+    edges: [ResourceListEdges!]!
+    nodes: [Resource!]!
+    totalCount: Int!
 }
 
 type ResourceEvent {
@@ -1180,20 +1224,71 @@ type ResourceEvent {
     resource: Resource!
 }
 
-input SchemaResourceInput {
-    version: String!
-    group: String!
-    resource: String!
+input ResourcePager {
+    limit: Int!
+    skip: Int
+    after: String
+}
+
+input ResourceListOptions {
+    inNamespaces: [String!]
+    allNamespaces: Boolean
+    filters: [ResourceFilters!]
+    sort: [ResourceSort!]
+}
+
+input ResourceFilters {
+    value: String!
+
+    # normal filters
+    filter: ResourceFilter
+
+    # logical filters
+    and: [ResourceFilters!]
+    not: [ResourceFilters!]
+    nor: [ResourceFilters!]
+    or: [ResourceFilters!]
+}
+
+enum SortType {
+    ASC
+    DSC
+}
+
+input ResourceSort {
+    field: String!
+    order: SortType = ASC
+}
+
+input ResourceFilter {
+    # comparison filters
+    eq: Any # equal
+    ne: Any # not equal
+    gt: Int # great than
+    gte: Int # great or equal than
+    lt: Int # less than
+    lte: Int # less or equal than
+    in: [Any!] # in array
+    nin: [Any!] # not in array
+    glob: String # global - for wildcard
+
+    # element filters
+    exists: Boolean # check if field exists
+    type: String # add GraphqLPrimitivesTypes :)
+
+    # evaluation filters
+    mod: Int # modulo
+    regex: String # regex
+
+    # array filters
+    all: [Any!] # if all elements in array match filters
+    elemMatch: ResourceFilter # if at least one element in array matches filters
+    size: Int # if array has appropriate length
 }
 
 input ResourceFieldInput {
     key: String
     path: String!
-}
-
-input SubResourceInput {
-    schema: SchemaResourceInput!
-    namespace: String
 }
 
 # Queries
@@ -1275,8 +1370,12 @@ type Query {
 
     triggers(namespace: String!, subscriber: SubscriberInput): [Trigger!] @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 
-    genericGet(schema: SchemaResourceInput!, name: String!, namespace: String): Resource @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
-    genericList(schema: SchemaResourceInput!, namespace: String): ResourceListOutput! @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+    genericGet(schema: String!, name: String!, namespace: String): Resource @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+    genericList(
+        schema: String!
+        namespace: String
+        options: ResourceListOptions
+    ): ResourceListOutput! @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 }
 
 # Mutations
@@ -1388,6 +1487,8 @@ type Subscription {
 
     functionEvent(namespace: String!, functionName: String): FunctionEvent! @HasAccess(attributes: {resource: "functions", verb: "watch", apiGroup: "serverless.kyma-project.io", apiVersion: "v1alpha1", namespaceArg: "namespace"})
     triggerEvent(namespace: String!, subscriber: SubscriberInput): TriggerEvent! @HasAccess(attributes: {resource: "triggers", verb: "watch", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
+
+    genericWatch(schema: String!, name: String, namespace: String): ResourceEvent! @HasAccess(attributes: {resource: "triggers", verb: "watch", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 }
 
 # Schema
