@@ -1193,7 +1193,8 @@ type Resource {
         schema: String!,
         namespace: String,
         pager: ResourcePager
-        options: ResourceListOptions): ResourceListOutput!
+        options: ResourceListOptions
+    ): ResourceListOutput!
     raw: JSON!
     parent: Resource
 }
@@ -1202,6 +1203,8 @@ type ResourceListOutput {
     edges: [ResourceListEdges!]!
     nodes: [Resource!]!
     group(field: String!): ResourceListGroup
+    distinct(field: String!): ResourceListGroup
+    pageInfo: PageInfo!
     totalCount: Int!
 }
 
@@ -1209,6 +1212,7 @@ type ResourceListEdges {
     prev: Resource
     node: Resource
     next: Resource
+    cursor: String
 }
 
 type ResourceListGroup {
@@ -1225,15 +1229,27 @@ type ResourceEvent {
 }
 
 input ResourcePager {
-    limit: Int!
-    skip: Int
+    first: Int
+    last: Int
     after: String
+    before: String
+}
+
+type PageInfo {
+    startCursor: String!
+    endCursor: String!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+
+    pageCount: Int!
+    perPage: Int!
+    currentPage: Int!
 }
 
 input ResourceListOptions {
     inNamespaces: [String!]
     allNamespaces: Boolean
-    filters: [ResourceFilters!]
+    filter: [ResourceFilters!]
     sort: [ResourceSort!]
 }
 
@@ -1241,7 +1257,7 @@ input ResourceFilters {
     value: String!
 
     # normal filters
-    filter: ResourceFilter
+    filter: ResourceFilterArg
 
     # logical filters
     and: [ResourceFilters!]
@@ -1260,7 +1276,7 @@ input ResourceSort {
     order: SortType = ASC
 }
 
-input ResourceFilter {
+input ResourceFilterArg {
     # comparison filters
     eq: Any # equal
     ne: Any # not equal
@@ -1282,7 +1298,7 @@ input ResourceFilter {
 
     # array filters
     all: [Any!] # if all elements in array match filters
-    elemMatch: ResourceFilter # if at least one element in array matches filters
+    elemMatch: [ResourceFilters!] # if at least one element in array matches filters
     size: Int # if array has appropriate length
 }
 
@@ -1374,6 +1390,7 @@ type Query {
     genericList(
         schema: String!
         namespace: String
+        pager: ResourcePager
         options: ResourceListOptions
     ): ResourceListOutput! @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 }

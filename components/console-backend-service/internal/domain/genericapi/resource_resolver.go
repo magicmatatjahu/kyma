@@ -11,41 +11,27 @@ import (
 type ResourceResolver struct {
 	services ResourcesServices
 	converter *ResourceConverter
+	pager *ResourcePager
+	sort *ResourceSort
+	filter *ResourceFilter
 }
 
-func NewResourceResolver(services ResourcesServices, converter *ResourceConverter) *ResourceResolver {
+func NewResourceResolver(services ResourcesServices, converter *ResourceConverter, pager *ResourcePager, sort *ResourceSort, filter *ResourceFilter) *ResourceResolver {
 	return &ResourceResolver{
 		services: services,
 		converter: converter,
+		pager: pager,
+		sort: sort,
+		filter: filter,
 	}
 }
 
 func (r *ResourceResolver) Get(ctx context.Context, schema string, name string, namespace *string) (*gqlschema.Resource, error) {
-	service := r.services.Get(schema)
-	if service == nil {
-		return nil, nil
-	}
-
-	item, err := service.Get(namespace, name)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.converter.ToGQL(item, nil)
+	return r.get(ctx, schema, name, namespace)
 }
 
-func (r *ResourceResolver) List(ctx context.Context, schema string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
-	service := r.services.Get(schema)
-	if service == nil {
-		return gqlschema.ResourceListOutput{}, nil
-	}
-
-	items, err := service.List(namespace, options)
-	if err != nil {
-		return gqlschema.ResourceListOutput{}, err
-	}
-
-	return r.converter.ToGQLs(items, nil)
+func (r *ResourceResolver) List(ctx context.Context, schema string, namespace *string, pager *gqlschema.ResourcePager, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
+	return r.list(ctx, schema, namespace, pager, options)
 }
 
 func (r *ResourceResolver) Watch(ctx context.Context, schema string, namespace, name *string) (<-chan gqlschema.ResourceEvent, error) {
@@ -105,11 +91,6 @@ func (r *ResourceResolver) ResourceSpec(ctx context.Context, obj *gqlschema.Reso
 }
 
 func (r *ResourceResolver) ResourceSubResource(ctx context.Context, parent *gqlschema.Resource, schema string, name string, namespace *string) (*gqlschema.Resource, error) {
-	service := r.services.Get(schema)
-	if service == nil {
-		return nil, nil
-	}
-
 	parsedName := r.parseArgValueForSubResource(parent, &name)
 	parsedNamespace := ""
 	if namespace != nil {
@@ -117,32 +98,17 @@ func (r *ResourceResolver) ResourceSubResource(ctx context.Context, parent *gqls
 	}
 	parsedNamespace = r.parseArgValueForSubResource(parent, &parsedNamespace)
 
-	item, err := service.Get(&parsedNamespace, parsedName)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.converter.ToGQL(item, nil)
+	return r.get(ctx, schema, parsedName, &parsedNamespace)
 }
 
-func (r *ResourceResolver) ResourceSubResources(ctx context.Context, parent *gqlschema.Resource, schema string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
-	service := r.services.Get(schema)
-	if service == nil {
-		return gqlschema.ResourceListOutput{}, nil
-	}
-
+func (r *ResourceResolver) ResourceSubResources(ctx context.Context, parent *gqlschema.Resource, schema string, namespace *string, pager *gqlschema.ResourcePager, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
 	parsedNamespace := ""
 	if namespace != nil {
 		parsedNamespace = *namespace
 	}
 	parsedNamespace = r.parseArgValueForSubResource(parent, &parsedNamespace)
 
-	items, err := service.List(&parsedNamespace, options)
-	if err != nil {
-		return gqlschema.ResourceListOutput{}, err
-	}
-
-	return r.converter.ToGQLs(items, parent)
+	return r.list(ctx, schema, &parsedNamespace, pager, options)
 }
 
 func (r *ResourceResolver) prependPath(paths []string, path string) []string {
@@ -188,4 +154,88 @@ func (r *ResourceResolver) parseArgValueForSubResource(parent *gqlschema.Resourc
 		return deepPath
 	}
 	return val
+}
+
+func (r *ResourceResolver) get(ctx context.Context, schema string, name string, namespace *string) (*gqlschema.Resource, error) {
+	service := r.services.Get(schema)
+	if service == nil {
+		return nil, nil
+	}
+
+	item, err := service.Get(namespace, name)
+	if err != nil {
+		return nil, err
+	}
+
+	unstructuredItem, err := r.converter.ToUnstructured(item)
+	if err != nil {
+		return nil, err
+	}
+
+	gqlItem, err := r.converter.ToGQL(unstructuredItem, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return gqlItem, nil
+}
+
+func (r *ResourceResolver) list(ctx context.Context, schema string, namespace *string, pager *gqlschema.ResourcePager, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
+	service := r.services.Get(schema)
+	if service == nil {
+		return gqlschema.ResourceListOutput{}, nil
+	}
+
+	items, err := service.List(namespace, options)
+	if err != nil {
+		return gqlschema.ResourceListOutput{}, err
+	}
+
+	unstructuredItems, err := r.converter.ToUnstructuredList(items)
+	if err != nil {
+		return gqlschema.ResourceListOutput{}, err
+	}
+
+	filteredItems, err := r.withFiltering(unstructuredItems, options)
+	if err != nil {
+		return gqlschema.ResourceListOutput{}, err
+	}
+
+	sortedItems, err := r.withSorting(filteredItems, options)
+	if err != nil {
+		return gqlschema.ResourceListOutput{}, err
+	}
+
+	paginatedItems, err := r.withPagination(sortedItems, pager)
+	if err != nil {
+		return gqlschema.ResourceListOutput{}, err
+	}
+
+	gqlItems, err := r.converter.ToGQLs(paginatedItems, nil)
+	if err != nil {
+		return gqlschema.ResourceListOutput{}, err
+	}
+
+	return r.converter.ToListOutput(gqlItems, false), nil
+}
+
+func (r *ResourceResolver) withFiltering(items []unstructured.Unstructured, options *gqlschema.ResourceListOptions) ([]unstructured.Unstructured, error) {
+	if options != nil && options.Filter != nil && len(options.Filter) > 0 {
+		return r.filter.Filter(items, options.Filter)
+	}
+	return items, nil
+}
+
+func (r *ResourceResolver) withSorting(items []unstructured.Unstructured, options *gqlschema.ResourceListOptions) ([]unstructured.Unstructured, error) {
+	if options != nil && options.Sort != nil && len(options.Sort) > 0 {
+		return r.sort.Sort(items, options.Sort)
+	}
+	return r.sort.Sort(items, nil)
+}
+
+func (r *ResourceResolver) withPagination(items []unstructured.Unstructured, pager *gqlschema.ResourcePager) ([]unstructured.Unstructured, error) {
+	if pager != nil {
+		return r.pager.Page(items, *pager)
+	}
+	return items, nil
 }

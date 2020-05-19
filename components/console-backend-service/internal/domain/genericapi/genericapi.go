@@ -61,10 +61,13 @@ func (r *PluggableContainer) Enable() error {
 		},
 	}
 	services := NewResourceServices(r.dynamicClient, r.informerFactory, schemas)
-	converter := NewResourceConverter()
+	pager := NewResourcePager()
+	converter := NewResourceConverter(pager)
+	sort := NewResourceSort()
+	filter := NewResourceFilter()
 
 	r.Pluggable.EnableAndSyncDynamicInformerFactory(r.informerFactory, func() {
-		r.Resolver = NewResourceResolver(services, converter)
+		r.Resolver = NewResourceResolver(services, converter, pager, sort, filter)
 	})
 
 	return nil
@@ -81,11 +84,11 @@ func (r *PluggableContainer) Disable() error {
 //go:generate failery -name=Resolver -case=underscore -output disabled -outpkg disabled
 type Resolver interface {
 	Get(ctx context.Context, schema string, name string, namespace *string) (*gqlschema.Resource, error)
-	List(ctx context.Context, schema string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error)
+	List(ctx context.Context, schema string, namespace *string, pager *gqlschema.ResourcePager, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error)
 
 	ResourceSpec(ctx context.Context, obj *gqlschema.Resource, fields []gqlschema.ResourceFieldInput, rootField *string) (gqlschema.JSON, error)
 	ResourceSubResource(ctx context.Context, parent *gqlschema.Resource, schema string, name string, namespace *string) (*gqlschema.Resource, error)
-	ResourceSubResources(ctx context.Context, parent *gqlschema.Resource, schema string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error)
+	ResourceSubResources(ctx context.Context, parent *gqlschema.Resource, schema string, namespace *string, pager *gqlschema.ResourcePager, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error)
 
 	Watch(ctx context.Context, schema string, namespace, name *string) (<-chan gqlschema.ResourceEvent, error)
 }

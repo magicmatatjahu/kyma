@@ -677,8 +677,8 @@ func (r *queryResolver) GenericGet(ctx context.Context, typeArg string, name str
 	return r.genericApi.Get(ctx, typeArg, name, namespace)
 }
 
-func (r *queryResolver) GenericList(ctx context.Context, typeArg string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
-	return r.genericApi.List(ctx, typeArg, namespace, options)
+func (r *queryResolver) GenericList(ctx context.Context, typeArg string, namespace *string, pager *gqlschema.ResourcePager, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
+	return r.genericApi.List(ctx, typeArg, namespace, pager, options)
 }
 
 // Subscriptions
@@ -992,6 +992,6 @@ func (r *resourceResolver) SubResource(ctx context.Context, obj *gqlschema.Resou
 	return r.genericApi.Resolver.ResourceSubResource(ctx, obj, schema, name, namespace)
 }
 
-func (r *resourceResolver) SubResources(ctx context.Context, obj *gqlschema.Resource, schema string, namespace *string, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
-	return r.genericApi.Resolver.ResourceSubResources(ctx, obj, schema, namespace, options)
+func (r *resourceResolver) SubResources(ctx context.Context, obj *gqlschema.Resource, schema string, namespace *string, pager *gqlschema.ResourcePager, options *gqlschema.ResourceListOptions) (gqlschema.ResourceListOutput, error) {
+	return r.genericApi.Resolver.ResourceSubResources(ctx, obj, schema, namespace, pager, options)
 }

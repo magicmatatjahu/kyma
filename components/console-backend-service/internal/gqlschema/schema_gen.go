@@ -625,6 +625,16 @@ type ComplexityRoot struct {
 		BlockOwnerDeletion func(childComplexity int) int
 	}
 
+	PageInfo struct {
+		StartCursor     func(childComplexity int) int
+		EndCursor       func(childComplexity int) int
+		HasNextPage     func(childComplexity int) int
+		HasPreviousPage func(childComplexity int) int
+		PageCount       func(childComplexity int) int
+		PerPage         func(childComplexity int) int
+		CurrentPage     func(childComplexity int) int
+	}
+
 	Pod struct {
 		Name              func(childComplexity int) int
 		NodeName          func(childComplexity int) int
@@ -694,7 +704,7 @@ type ComplexityRoot struct {
 		Functions                   func(childComplexity int, namespace string) int
 		Triggers                    func(childComplexity int, namespace string, subscriber *SubscriberInput) int
 		GenericGet                  func(childComplexity int, schema string, name string, namespace *string) int
-		GenericList                 func(childComplexity int, schema string, namespace *string, options *ResourceListOptions) int
+		GenericList                 func(childComplexity int, schema string, namespace *string, pager *ResourcePager, options *ResourceListOptions) int
 	}
 
 	ReplicaSet struct {
@@ -730,9 +740,10 @@ type ComplexityRoot struct {
 	}
 
 	ResourceListEdges struct {
-		Prev func(childComplexity int) int
-		Node func(childComplexity int) int
-		Next func(childComplexity int) int
+		Prev   func(childComplexity int) int
+		Node   func(childComplexity int) int
+		Next   func(childComplexity int) int
+		Cursor func(childComplexity int) int
 	}
 
 	ResourceListGroup struct {
@@ -747,6 +758,7 @@ type ComplexityRoot struct {
 		Edges      func(childComplexity int) int
 		Nodes      func(childComplexity int) int
 		Group      func(childComplexity int, field string) int
+		PageInfo   func(childComplexity int) int
 		TotalCount func(childComplexity int) int
 	}
 
@@ -1234,7 +1246,7 @@ type QueryResolver interface {
 	Functions(ctx context.Context, namespace string) ([]Function, error)
 	Triggers(ctx context.Context, namespace string, subscriber *SubscriberInput) ([]Trigger, error)
 	GenericGet(ctx context.Context, schema string, name string, namespace *string) (*Resource, error)
-	GenericList(ctx context.Context, schema string, namespace *string, options *ResourceListOptions) (ResourceListOutput, error)
+	GenericList(ctx context.Context, schema string, namespace *string, pager *ResourcePager, options *ResourceListOptions) (ResourceListOutput, error)
 }
 type ResourceResolver interface {
 	Spec(ctx context.Context, obj *Resource, fields []ResourceFieldInput, rootField *string) (JSON, error)
@@ -4864,12 +4876,12 @@ func field_Query_genericList_args(rawArgs map[string]interface{}) (map[string]in
 		}
 	}
 	args["namespace"] = arg1
-	var arg2 *ResourceListOptions
-	if tmp, ok := rawArgs["options"]; ok {
+	var arg2 *ResourcePager
+	if tmp, ok := rawArgs["pager"]; ok {
 		var err error
-		var ptr1 ResourceListOptions
+		var ptr1 ResourcePager
 		if tmp != nil {
-			ptr1, err = UnmarshalResourceListOptions(tmp)
+			ptr1, err = UnmarshalResourcePager(tmp)
 			arg2 = &ptr1
 		}
 
@@ -4877,7 +4889,21 @@ func field_Query_genericList_args(rawArgs map[string]interface{}) (map[string]in
 			return nil, err
 		}
 	}
-	args["options"] = arg2
+	args["pager"] = arg2
+	var arg3 *ResourceListOptions
+	if tmp, ok := rawArgs["options"]; ok {
+		var err error
+		var ptr1 ResourceListOptions
+		if tmp != nil {
+			ptr1, err = UnmarshalResourceListOptions(tmp)
+			arg3 = &ptr1
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["options"] = arg3
 	return args, nil
 
 }
@@ -8126,6 +8152,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.OwnerReferenceType.BlockOwnerDeletion(childComplexity), true
 
+	case "PageInfo.startCursor":
+		if e.complexity.PageInfo.StartCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "PageInfo.endCursor":
+		if e.complexity.PageInfo.EndCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.EndCursor(childComplexity), true
+
+	case "PageInfo.hasNextPage":
+		if e.complexity.PageInfo.HasNextPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.HasNextPage(childComplexity), true
+
+	case "PageInfo.hasPreviousPage":
+		if e.complexity.PageInfo.HasPreviousPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.HasPreviousPage(childComplexity), true
+
+	case "PageInfo.pageCount":
+		if e.complexity.PageInfo.PageCount == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.PageCount(childComplexity), true
+
+	case "PageInfo.perPage":
+		if e.complexity.PageInfo.PerPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.PerPage(childComplexity), true
+
+	case "PageInfo.currentPage":
+		if e.complexity.PageInfo.CurrentPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.CurrentPage(childComplexity), true
+
 	case "Pod.name":
 		if e.complexity.Pod.Name == nil {
 			break
@@ -8810,7 +8885,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GenericList(childComplexity, args["schema"].(string), args["namespace"].(*string), args["options"].(*ResourceListOptions)), true
+		return e.complexity.Query.GenericList(childComplexity, args["schema"].(string), args["namespace"].(*string), args["pager"].(*ResourcePager), args["options"].(*ResourceListOptions)), true
 
 	case "ReplicaSet.name":
 		if e.complexity.ReplicaSet.Name == nil {
@@ -8988,6 +9063,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ResourceListEdges.Next(childComplexity), true
 
+	case "ResourceListEdges.cursor":
+		if e.complexity.ResourceListEdges.Cursor == nil {
+			break
+		}
+
+		return e.complexity.ResourceListEdges.Cursor(childComplexity), true
+
 	case "ResourceListGroup.field":
 		if e.complexity.ResourceListGroup.Field == nil {
 			break
@@ -9048,6 +9130,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ResourceListOutput.Group(childComplexity, args["field"].(string)), true
+
+	case "ResourceListOutput.pageInfo":
+		if e.complexity.ResourceListOutput.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.ResourceListOutput.PageInfo(childComplexity), true
 
 	case "ResourceListOutput.totalCount":
 		if e.complexity.ResourceListOutput.TotalCount == nil {
@@ -24679,6 +24768,255 @@ func (ec *executionContext) _OwnerReferenceType_blockOwnerDeletion(ctx context.C
 	return graphql.MarshalBoolean(*res)
 }
 
+var pageInfoImplementors = []string{"PageInfo"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet, obj *PageInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, pageInfoImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PageInfo")
+		case "startCursor":
+			out.Values[i] = ec._PageInfo_startCursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "endCursor":
+			out.Values[i] = ec._PageInfo_endCursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "hasNextPage":
+			out.Values[i] = ec._PageInfo_hasNextPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "hasPreviousPage":
+			out.Values[i] = ec._PageInfo_hasPreviousPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "pageCount":
+			out.Values[i] = ec._PageInfo_pageCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "perPage":
+			out.Values[i] = ec._PageInfo_perPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "currentPage":
+			out.Values[i] = ec._PageInfo_currentPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field graphql.CollectedField, obj *PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "PageInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartCursor, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "PageInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndCursor, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "PageInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasNextPage, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalBoolean(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _PageInfo_hasPreviousPage(ctx context.Context, field graphql.CollectedField, obj *PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "PageInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasPreviousPage, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalBoolean(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _PageInfo_pageCount(ctx context.Context, field graphql.CollectedField, obj *PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "PageInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageCount, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _PageInfo_perPage(ctx context.Context, field graphql.CollectedField, obj *PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "PageInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PerPage, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _PageInfo_currentPage(ctx context.Context, field graphql.CollectedField, obj *PageInfo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "PageInfo",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CurrentPage, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
 var podImplementors = []string{"Pod"}
 
 // nolint: gocyclo, errcheck, gas, goconst
@@ -28270,7 +28608,7 @@ func (ec *executionContext) _Query_genericList(ctx context.Context, field graphq
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GenericList(rctx, args["schema"].(string), args["namespace"].(*string), args["options"].(*ResourceListOptions))
+		return ec.resolvers.Query().GenericList(rctx, args["schema"].(string), args["namespace"].(*string), args["pager"].(*ResourcePager), args["options"].(*ResourceListOptions))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -29159,6 +29497,8 @@ func (ec *executionContext) _ResourceListEdges(ctx context.Context, sel ast.Sele
 			out.Values[i] = ec._ResourceListEdges_node(ctx, field, obj)
 		case "next":
 			out.Values[i] = ec._ResourceListEdges_next(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._ResourceListEdges_cursor(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -29255,6 +29595,34 @@ func (ec *executionContext) _ResourceListEdges_next(ctx context.Context, field g
 	}
 
 	return ec._Resource(ctx, field.Selections, res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListEdges_cursor(ctx context.Context, field graphql.CollectedField, obj *ResourceListEdges) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListEdges",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalString(*res)
 }
 
 var resourceListGroupImplementors = []string{"ResourceListGroup"}
@@ -29534,6 +29902,11 @@ func (ec *executionContext) _ResourceListOutput(ctx context.Context, sel ast.Sel
 			}
 		case "group":
 			out.Values[i] = ec._ResourceListOutput_group(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._ResourceListOutput_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "totalCount":
 			out.Values[i] = ec._ResourceListOutput_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -29703,6 +30076,34 @@ func (ec *executionContext) _ResourceListOutput_group(ctx context.Context, field
 	}
 
 	return ec._ResourceListGroup(ctx, field.Selections, res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _ResourceListOutput_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ResourceListOutput) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object: "ResourceListOutput",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(PageInfo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	return ec._PageInfo(ctx, field.Selections, &res)
 }
 
 // nolint: vetshadow
@@ -39810,8 +40211,8 @@ func UnmarshalResourceFieldInput(v interface{}) (ResourceFieldInput, error) {
 	return it, nil
 }
 
-func UnmarshalResourceFilter(v interface{}) (ResourceFilter, error) {
-	var it ResourceFilter
+func UnmarshalResourceFilterArg(v interface{}) (ResourceFilterArg, error) {
+	var it ResourceFilterArg
 	var asMap = v.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -39990,12 +40391,18 @@ func UnmarshalResourceFilter(v interface{}) (ResourceFilter, error) {
 			}
 		case "elemMatch":
 			var err error
-			var ptr1 ResourceFilter
+			var rawIf1 []interface{}
 			if v != nil {
-				ptr1, err = UnmarshalResourceFilter(v)
-				it.ElemMatch = &ptr1
+				if tmp1, ok := v.([]interface{}); ok {
+					rawIf1 = tmp1
+				} else {
+					rawIf1 = []interface{}{v}
+				}
 			}
-
+			it.ElemMatch = make([]ResourceFilters, len(rawIf1))
+			for idx1 := range rawIf1 {
+				it.ElemMatch[idx1], err = UnmarshalResourceFilters(rawIf1[idx1])
+			}
 			if err != nil {
 				return it, err
 			}
@@ -40030,9 +40437,9 @@ func UnmarshalResourceFilters(v interface{}) (ResourceFilters, error) {
 			}
 		case "filter":
 			var err error
-			var ptr1 ResourceFilter
+			var ptr1 ResourceFilterArg
 			if v != nil {
-				ptr1, err = UnmarshalResourceFilter(v)
+				ptr1, err = UnmarshalResourceFilterArg(v)
 				it.Filter = &ptr1
 			}
 
@@ -40147,7 +40554,7 @@ func UnmarshalResourceListOptions(v interface{}) (ResourceListOptions, error) {
 			if err != nil {
 				return it, err
 			}
-		case "filters":
+		case "filter":
 			var err error
 			var rawIf1 []interface{}
 			if v != nil {
@@ -40157,9 +40564,9 @@ func UnmarshalResourceListOptions(v interface{}) (ResourceListOptions, error) {
 					rawIf1 = []interface{}{v}
 				}
 			}
-			it.Filters = make([]ResourceFilters, len(rawIf1))
+			it.Filter = make([]ResourceFilters, len(rawIf1))
 			for idx1 := range rawIf1 {
-				it.Filters[idx1], err = UnmarshalResourceFilters(rawIf1[idx1])
+				it.Filter[idx1], err = UnmarshalResourceFilters(rawIf1[idx1])
 			}
 			if err != nil {
 				return it, err
@@ -40193,18 +40600,23 @@ func UnmarshalResourcePager(v interface{}) (ResourcePager, error) {
 
 	for k, v := range asMap {
 		switch k {
-		case "limit":
-			var err error
-			it.Limit, err = graphql.UnmarshalInt(v)
-			if err != nil {
-				return it, err
-			}
-		case "skip":
+		case "first":
 			var err error
 			var ptr1 int
 			if v != nil {
 				ptr1, err = graphql.UnmarshalInt(v)
-				it.Skip = &ptr1
+				it.First = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "last":
+			var err error
+			var ptr1 int
+			if v != nil {
+				ptr1, err = graphql.UnmarshalInt(v)
+				it.Last = &ptr1
 			}
 
 			if err != nil {
@@ -40216,6 +40628,17 @@ func UnmarshalResourcePager(v interface{}) (ResourcePager, error) {
 			if v != nil {
 				ptr1, err = graphql.UnmarshalString(v)
 				it.After = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "before":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalString(v)
+				it.Before = &ptr1
 			}
 
 			if err != nil {
@@ -41923,7 +42346,8 @@ type Resource {
         schema: String!,
         namespace: String,
         pager: ResourcePager
-        options: ResourceListOptions): ResourceListOutput!
+        options: ResourceListOptions
+    ): ResourceListOutput!
     raw: JSON!
     parent: Resource
 }
@@ -41932,6 +42356,7 @@ type ResourceListOutput {
     edges: [ResourceListEdges!]!
     nodes: [Resource!]!
     group(field: String!): ResourceListGroup
+    pageInfo: PageInfo!
     totalCount: Int!
 }
 
@@ -41939,6 +42364,7 @@ type ResourceListEdges {
     prev: Resource
     node: Resource
     next: Resource
+    cursor: String
 }
 
 type ResourceListGroup {
@@ -41955,15 +42381,27 @@ type ResourceEvent {
 }
 
 input ResourcePager {
-    limit: Int!
-    skip: Int
+    first: Int
+    last: Int
     after: String
+    before: String
+}
+
+type PageInfo {
+    startCursor: String!
+    endCursor: String!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+
+    pageCount: Int!
+    perPage: Int!
+    currentPage: Int!
 }
 
 input ResourceListOptions {
     inNamespaces: [String!]
     allNamespaces: Boolean
-    filters: [ResourceFilters!]
+    filter: [ResourceFilters!]
     sort: [ResourceSort!]
 }
 
@@ -41971,7 +42409,7 @@ input ResourceFilters {
     value: String!
 
     # normal filters
-    filter: ResourceFilter
+    filter: ResourceFilterArg
 
     # logical filters
     and: [ResourceFilters!]
@@ -41990,7 +42428,7 @@ input ResourceSort {
     order: SortType = ASC
 }
 
-input ResourceFilter {
+input ResourceFilterArg {
     # comparison filters
     eq: Any # equal
     ne: Any # not equal
@@ -42012,7 +42450,7 @@ input ResourceFilter {
 
     # array filters
     all: [Any!] # if all elements in array match filters
-    elemMatch: ResourceFilter # if at least one element in array matches filters
+    elemMatch: [ResourceFilters!] # if at least one element in array matches filters
     size: Int # if array has appropriate length
 }
 
@@ -42104,6 +42542,7 @@ type Query {
     genericList(
         schema: String!
         namespace: String
+        pager: ResourcePager
         options: ResourceListOptions
     ): ResourceListOutput! @HasAccess(attributes: {resource: "triggers", verb: "list", apiGroup: "eventing.knative.dev", apiVersion: "v1alpha1", namespaceArg: "namespace"})
 }

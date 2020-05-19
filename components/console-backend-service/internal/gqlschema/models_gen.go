@@ -507,6 +507,16 @@ type OwnerReferenceType struct {
 	BlockOwnerDeletion *bool  `json:"blockOwnerDeletion"`
 }
 
+type PageInfo struct {
+	StartCursor     string `json:"startCursor"`
+	EndCursor       string `json:"endCursor"`
+	HasNextPage     bool   `json:"hasNextPage"`
+	HasPreviousPage bool   `json:"hasPreviousPage"`
+	PageCount       int    `json:"pageCount"`
+	PerPage         int    `json:"perPage"`
+	CurrentPage     int    `json:"currentPage"`
+}
+
 type Pod struct {
 	Name              string           `json:"name"`
 	NodeName          string           `json:"nodeName"`
@@ -562,38 +572,39 @@ type ResourceFieldInput struct {
 	Path string  `json:"path"`
 }
 
-type ResourceFilter struct {
-	Eq        *string         `json:"eq"`
-	Ne        *string         `json:"ne"`
-	Gt        *int            `json:"gt"`
-	Gte       *int            `json:"gte"`
-	Lt        *int            `json:"lt"`
-	Lte       *int            `json:"lte"`
-	In        []string        `json:"in"`
-	Nin       []string        `json:"nin"`
-	Glob      *string         `json:"glob"`
-	Exists    *bool           `json:"exists"`
-	Type      *string         `json:"type"`
-	Mod       *int            `json:"mod"`
-	Regex     *string         `json:"regex"`
-	All       []string        `json:"all"`
-	ElemMatch *ResourceFilter `json:"elemMatch"`
-	Size      *int            `json:"size"`
+type ResourceFilterArg struct {
+	Eq        *string           `json:"eq"`
+	Ne        *string           `json:"ne"`
+	Gt        *int              `json:"gt"`
+	Gte       *int              `json:"gte"`
+	Lt        *int              `json:"lt"`
+	Lte       *int              `json:"lte"`
+	In        []string          `json:"in"`
+	Nin       []string          `json:"nin"`
+	Glob      *string           `json:"glob"`
+	Exists    *bool             `json:"exists"`
+	Type      *string           `json:"type"`
+	Mod       *int              `json:"mod"`
+	Regex     *string           `json:"regex"`
+	All       []string          `json:"all"`
+	ElemMatch []ResourceFilters `json:"elemMatch"`
+	Size      *int              `json:"size"`
 }
 
 type ResourceFilters struct {
-	Value  string            `json:"value"`
-	Filter *ResourceFilter   `json:"filter"`
-	And    []ResourceFilters `json:"and"`
-	Not    []ResourceFilters `json:"not"`
-	Nor    []ResourceFilters `json:"nor"`
-	Or     []ResourceFilters `json:"or"`
+	Value  string             `json:"value"`
+	Filter *ResourceFilterArg `json:"filter"`
+	And    []ResourceFilters  `json:"and"`
+	Not    []ResourceFilters  `json:"not"`
+	Nor    []ResourceFilters  `json:"nor"`
+	Or     []ResourceFilters  `json:"or"`
 }
 
 type ResourceListEdges struct {
-	Prev *Resource `json:"prev"`
-	Node *Resource `json:"node"`
-	Next *Resource `json:"next"`
+	Prev   *Resource `json:"prev"`
+	Node   *Resource `json:"node"`
+	Next   *Resource `json:"next"`
+	Cursor *string   `json:"cursor"`
 }
 
 type ResourceListGroup struct {
@@ -607,7 +618,7 @@ type ResourceListGroup struct {
 type ResourceListOptions struct {
 	InNamespaces  []string          `json:"inNamespaces"`
 	AllNamespaces *bool             `json:"allNamespaces"`
-	Filters       []ResourceFilters `json:"filters"`
+	Filter        []ResourceFilters `json:"filter"`
 	Sort          []ResourceSort    `json:"sort"`
 }
 
@@ -615,6 +626,7 @@ type ResourceListOutput struct {
 	Edges      []ResourceListEdges `json:"edges"`
 	Nodes      []Resource          `json:"nodes"`
 	Group      *ResourceListGroup  `json:"group"`
+	PageInfo   PageInfo            `json:"pageInfo"`
 	TotalCount int                 `json:"totalCount"`
 }
 
@@ -640,9 +652,10 @@ type ResourceMetadata struct {
 }
 
 type ResourcePager struct {
-	Limit int     `json:"limit"`
-	Skip  *int    `json:"skip"`
-	After *string `json:"after"`
+	First  *int    `json:"first"`
+	Last   *int    `json:"last"`
+	After  *string `json:"after"`
+	Before *string `json:"before"`
 }
 
 type ResourceQuota struct {

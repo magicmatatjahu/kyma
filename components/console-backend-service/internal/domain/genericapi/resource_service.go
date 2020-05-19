@@ -80,7 +80,7 @@ func (s *ResourceService) listInNamespace(namespace string) ([]interface{}, erro
 func (s *ResourceService) listInNamespaces(namespace []string) ([]interface{}, error) {
 	out := make([]interface{}, 0)
 	for _, namespace := range namespace {
-		items, err := s.informer.GetIndexer().ByIndex("namespace", namespace)
+		items, err := s.listInNamespace(namespace)
 		if err != nil {
 			return nil, err
 		}
