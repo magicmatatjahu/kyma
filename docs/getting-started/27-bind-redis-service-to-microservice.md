@@ -3,7 +3,9 @@ title: Bind a Redis ServiceInstance to a microservice
 type: Getting Started
 ---
 
-<div tabs name="bind-redis-to-microservic" group="bind-redis-to-microservice">
+## Bind a Redis ServiceInstance to the microservice
+
+<div tabs name="bind-redis-to-microservice" group="bind-redis-to-microservice">
   <details>
   <summary label="cli">
   CLI
@@ -184,7 +186,7 @@ type: Getting Started
    [{"orderCode":"762727210","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}]
    ```
 
-   As we can see, new instance of microservice has saved order in previous steps. In the `Expose a microservice` tutorial, we used the in-memory storage, so in every time when you deleted a microservice's Pod or changed a Deployment definition, the orders details were lost. Using binding to Redis instance, details are stored outside the `orders-service` microservice, so the data persistence will be preserved.
+   As we can see, new instance of microservice has saved order created in previous steps. In the `Expose a microservice` tutorial, we used the in-memory storage, so in every time when you deleted a microservice's Pod or changed a Deployment definition, the orders details were lost. Using binding to Redis instance, details are stored outside the `orders-service` microservice, so the data persistence will be preserved.
 
 // dopisać do czego mogą słuzyć bindingi
 // dac zajawke do nastepnego etapu tutka

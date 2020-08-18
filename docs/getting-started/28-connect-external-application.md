@@ -190,7 +190,7 @@ First create the Application CR and then retrieve token to connect the mock to a
 
 To connect events from mock to created Application, follow these steps:  
 
-1. Access the SAP Commerce Cloud Mock mock at `https://commerce-{NAMESPACE}.{CLUSTER_DOMAIN}.` or go to **API Rules** view (under **Configuration** section) and select the mock, you will the direct link to the mock application under **Host** column.
+1. Access the SAP Commerce Cloud Mock mock at `https://commerce-orders-service.{CLUSTER_DOMAIN}.` or go to **API Rules** view (under **Configuration** section) in `orders-service` Namespace and select the mock, you will the direct link to the mock application under **Host** column.
 
 2. Click **Connect**.
 
