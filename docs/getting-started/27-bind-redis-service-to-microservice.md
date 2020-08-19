@@ -11,7 +11,7 @@ type: Getting Started
   CLI
   </summary>
 
-1. Create a ServiceBinding CR that points to the newly created ServiceInstance in the **spec.instanceRef** field:
+1. Create a ServiceBinding CR that points to the created Redis instance in previous steps in the **spec.instanceRef** field:
 
    ```yaml
    cat <<EOF | kubectl apply -f -
@@ -57,7 +57,7 @@ type: Getting Started
 
    - The **spec.parameters.envPrefix.name** field is optional. It adds a prefix to all environment variables injected in a Secret to the microservice when creating a ServiceBinding. In our example, **envPrefix** is `REDIS_`, so all environmental variables will follow the `REDIS_{env}` naming pattern.
 
-     > **TIP:** It is considered good practice to use **envPrefix**. In some cases, a microservice/Function must use several instances of a given ServiceClass. Prefixes allow you to distinguish between instances and make sure that one Secret does not overwrite another one.
+     > **TIP:** It is considered good practice to use **envPrefix**. In some cases, a microservice must use several instances of a given ServiceClass. Prefixes allow you to distinguish between instances and make sure that one Secret does not overwrite another one.
 
 4. Check if the ServiceBindingUsage CR was created successfully. The last condition in the CR status should state `Ready True`:
 

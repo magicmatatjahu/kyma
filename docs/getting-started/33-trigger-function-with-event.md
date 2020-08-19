@@ -1,26 +1,30 @@
 ---
-title: Trigger a microservice with an event
+title: Trigger a Function with an event
 type: Getting Started
 ---
 
-This tutorial shows how to trigger a deployed in previous tutorial `orders-service` microservice with an `order.deliverysent.v1` event from an Application connected to Kyma.
+This tutorial shows how to trigger a Function with an event from an Application connected to Kyma.
+
+// opisac, ze mocka powinno sie miec juz podpietego.
+
+> **NOTE:** To learn more about events flow in Kyma, read the [eventing](/components/event-mesh) documentation.
 
 ## Create the Trigger
 
-<div tabs name="steps" group="trigger-microservice">
+<div tabs name="steps" group="trigger-function">
   <details>
   <summary label="cli">
   CLI
   </summary>
 
-1. Create a Trigger CR for `orders-service` microservice to subscribe application to an `order.deliverysent.v1` event from `commerce-mock` Application:
+1. Create a Trigger CR for `orders-function` Function to subscribe application to an `order.deliverysent.v1` event from `commerce-mock` Application:
 
    ```yaml
    cat <<EOF | kubectl apply -f  -
    apiVersion: eventing.knative.dev/v1alpha1
    kind: Trigger
    metadata:
-     name: orders-service-event
+     name: orders-function-event
      namespace: orders-service
    spec:
      broker: default
@@ -33,7 +37,7 @@ This tutorial shows how to trigger a deployed in previous tutorial `orders-servi
        ref:
          apiVersion: v1
          kind: Service
-         name: orders-service
+         name: orders-function
          namespace: orders-service
    EOF
    ```
@@ -45,7 +49,7 @@ This tutorial shows how to trigger a deployed in previous tutorial `orders-servi
 2. Check if the Trigger CR was created successfully and is ready. The CR `Ready` condition should state `True`:
 
    ```bash
-   kubectl get trigger orders-service-event -n orders-service -o=jsonpath="{.status.conditions[2].status}"
+   kubectl get trigger orders-function-event -n orders-service -o=jsonpath="{.status.conditions[2].status}"
    ```
 
   </details>
@@ -56,13 +60,13 @@ This tutorial shows how to trigger a deployed in previous tutorial `orders-servi
 
 1. If you aren't in the view of Namespace `orders-service` in the Kyma Console, select a `orders-service` Namespace from the drop-down list in the top navigation panel.
 
-2. Go to the **Services** view (under **Operation** section) in the left navigation panel and navigate to `orders-service` Service.
+1. Go to the **Functions** view (under **Development** section) in the left navigation panel and select `orders-function` Function. 
 
-3. Once in the Service details view, select **Add Event Trigger** in the **Event Triggers** section.
+3. Once in the Function details view, select **Configuration** tab, find the **Event Triggers** section and select **Add Event Trigger**. 
 
-4. Find `order.deliverysent` event with `v1` version from `commerce-mock` Application, check it and click **Add**.
+4. In opened modal box, find `order.deliverysent` event with `v1` version from `commerce-mock` Application, check it and click **Add**.
 
-   The message appears on the UI confirming that the Event Trigger was successfully created, and you will see it in the **Event Triggers** section of Service's details view.
+   The message appears on the UI confirming that the Event Trigger was successfully created, and you will see it in the **Event Triggers** section.
 
   </details>
 </div>
@@ -79,16 +83,16 @@ To send events from mock to Orders Service application, follow these steps:
 
    The message appears on the UI confirming that the event was successfully sent.
 
-4. For the last time call the microservice to check the storage:
+4. For the last time call the Function to check the storage:
 
    ```bash
-   curl -ik "https://$SERVICE_DOMAIN/orders"
+   curl -ik "https://$FUNCTION_DOMAIN"
    ```
 
-   > **NOTE**: To get the microservice domain, run:
+   > **NOTE**: To get the Function domain, run:
    >
    > ```bash
-   > export SERVICE_DOMAIN=$(kubectl get virtualservices -l apirule.gateway.kyma-project.io/v1alpha1=orders-service.orders-service -n orders-service -o=jsonpath='{.items[*].spec.hosts[0]}')
+   > export FUNCTION_DOMAIN=$(kubectl get virtualservices -l apirule.gateway.kyma-project.io/v1alpha1=orders-function.orders-service -n orders-service -o=jsonpath='{.items[*].spec.hosts[0]}')
    > ```
 
    You should see a response similar to the following:

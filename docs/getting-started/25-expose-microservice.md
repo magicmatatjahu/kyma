@@ -167,7 +167,7 @@ echo "$(minikube ip) orders-service.kyma.local" | sudo tee -a /etc/hosts
 5. Remove the [Pod](https://kubernetes.io/docs/concepts/workloads/pods/) created by `orders-service` Deployment, execute command and wait for successful deletion and starting the new one:
 
    ```bash
-   kubectl delete pod -n $NAMESPACE -l app=orders-service
+   kubectl delete pod -n orders-service -l app=orders-service
    ```
 
 6. Again call the microservice to check the storage:
