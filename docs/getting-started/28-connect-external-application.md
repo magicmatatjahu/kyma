@@ -7,6 +7,8 @@ type: Getting Started
 
 // po stworzeniu microserwisu, bindingu itp dopiero tworzymy mocka
 
+// podlinkowac tutek jak dodac eventy pod aplikacje z istniejacej apki
+
 After creating Namespace, let's integrate an external application to Kyma. In this set of guides, we will use a mock application called [SAP Commerce Cloud - Mock](https://github.com/SAP-samples/xf-addons/tree/master/addons/commerce-mock-0.1.0) that is to simulate a monolithic application. You will learn how you can connect it to Kyma, and expose its API and events. We will subscribe to one of its events (**order.deliverysent.v1**) in other tutorials and use it to trigger the logic of a sample service and Function.
 
 ## Deploy the XF Addons and provision the Commerce mock
