@@ -80,6 +80,8 @@ Create a [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/
              env:
                - name: APP_PORT
                  value: "8080"
+               - name: APP_REDIS_PREFIX
+                 value: "REDIS_"
    EOF
    ```
 
@@ -132,6 +134,8 @@ Create a [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/
              env:
                - name: APP_PORT
                  value: "8080"
+               - name: APP_REDIS_PREFIX
+                 value: "REDIS_"
    ```
 
 2. Go to the `orders-service` Namespace view in the Console UI and select the **Deploy new resource** button.
