@@ -140,11 +140,12 @@ echo "$(minikube ip) orders-function.kyma.local" | sudo tee -a /etc/hosts
 
    ```bash
    curl -ikX POST "https://$FUNCTION_DOMAIN" \
+     -H "Content-Type: application/json" \
      -H 'Cache-Control: no-cache' -d \
      '{
        "orderCode": "762727210",
        "consignmentCode": "76272725",
-       "consignmentStatus": PICKUP_COMPLETE
+       "consignmentStatus": "PICKUP_COMPLETE"
      }'
    ```
 
@@ -173,7 +174,7 @@ echo "$(minikube ip) orders-function.kyma.local" | sudo tee -a /etc/hosts
 5. Remove the [Pod](https://kubernetes.io/docs/concepts/workloads/pods/) created by `orders-function` Function, execute command and wait for successful deletion and starting the new one:
 
    ```bash
-   kubectl delete pod -n orders-service -l app=orders-function
+   kubectl delete pod -n orders-service -l "serverless.kyma-project.io/function-name=orders-function"
    ```
 
 6. Again call the Function to check the storage:

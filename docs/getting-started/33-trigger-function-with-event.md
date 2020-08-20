@@ -24,7 +24,7 @@ This tutorial shows how to trigger a Function with an event from an Application 
    apiVersion: eventing.knative.dev/v1alpha1
    kind: Trigger
    metadata:
-     name: orders-function-event
+     name: orders-function
      namespace: orders-service
    spec:
      broker: default
@@ -49,7 +49,7 @@ This tutorial shows how to trigger a Function with an event from an Application 
 2. Check if the Trigger CR was created successfully and is ready. The CR `Ready` condition should state `True`:
 
    ```bash
-   kubectl get trigger orders-function-event -n orders-service -o=jsonpath="{.status.conditions[2].status}"
+   kubectl get trigger orders-function -n orders-service -o=jsonpath="{.status.conditions[2].status}"
    ```
 
   </details>
@@ -79,7 +79,7 @@ To send events from mock to Orders Service application, follow these steps:
 
 2. Switch to **Remote APIs** tab, find **SAP Commerce Cloud - Events** and click it.
 
-3. In opened view search in dropdown list `order.deliverysent.v1` event. In pasted event change `orderCode` to `123456789` and select **Send Event**.
+3. In opened view search in dropdown list `order.deliverysent.v1` event. In pasted event change `orderCode` to `987654321` and select **Send Event**.
 
    The message appears on the UI confirming that the event was successfully sent.
 
@@ -105,7 +105,7 @@ To send events from mock to Orders Service application, follow these steps:
    vary: Origin
    x-envoy-upstream-service-time: 37
 
-   [{"orderCode":"762727210","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}, {"orderCode":"123456789","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}]
+   [{"orderCode":"762727234","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}, {"orderCode":"762727210","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}, {"orderCode":"123456789","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}, {"orderCode":"987654321","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}]
    ```
 
    The event from mock application was saved in Redis instance :)

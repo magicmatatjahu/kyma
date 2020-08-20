@@ -138,7 +138,7 @@ echo "$(minikube ip) orders-service.kyma.local" | sudo tee -a /etc/hosts
      '{
        "orderCode": "762727210",
        "consignmentCode": "76272725",
-       "consignmentStatus": PICKUP_COMPLETE
+       "consignmentStatus": "PICKUP_COMPLETE"
      }'
    ```
 

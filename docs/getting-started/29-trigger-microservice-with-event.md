@@ -15,12 +15,12 @@ This tutorial shows how to trigger a deployed in previous tutorial `orders-servi
 
 1. Create a Trigger CR for `orders-service` microservice to subscribe application to an `order.deliverysent.v1` event from `commerce-mock` Application:
 
-   ```yaml
+   ```bash
    cat <<EOF | kubectl apply -f  -
    apiVersion: eventing.knative.dev/v1alpha1
    kind: Trigger
    metadata:
-     name: orders-service-event
+     name: orders-service
      namespace: orders-service
    spec:
      broker: default
@@ -45,7 +45,7 @@ This tutorial shows how to trigger a deployed in previous tutorial `orders-servi
 2. Check if the Trigger CR was created successfully and is ready. The CR `Ready` condition should state `True`:
 
    ```bash
-   kubectl get trigger orders-service-event -n orders-service -o=jsonpath="{.status.conditions[2].status}"
+   kubectl get trigger orders-service -n orders-service -o=jsonpath="{.status.conditions[2].status}"
    ```
 
   </details>

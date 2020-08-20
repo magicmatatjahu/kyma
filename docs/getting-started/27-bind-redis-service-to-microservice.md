@@ -22,7 +22,7 @@ type: Getting Started
      namespace: orders-service
    spec:
      instanceRef:
-       name: redis-instance
+       name: redis-service
    EOF
    ```
 
@@ -143,7 +143,7 @@ type: Getting Started
      '{
        "orderCode": "762727210",
        "consignmentCode": "76272725",
-       "consignmentStatus": PICKUP_COMPLETE
+       "consignmentStatus": "PICKUP_COMPLETE"
      }'
    ```
 

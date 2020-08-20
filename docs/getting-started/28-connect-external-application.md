@@ -33,7 +33,6 @@ Follow these steps to deploy XF Addons and add the Commerce mock to your Namespa
      name: xf-mocks
      namespace: orders-service
    spec:
-     reprocessRequest: 0
      repositories:
      - url: github.com/sap/xf-addons//addons/index.yaml
    EOF
@@ -192,7 +191,7 @@ First create the Application CR and then retrieve token to connect the mock to a
 
 To connect events from mock to created Application, follow these steps:  
 
-1. Access the SAP Commerce Cloud Mock mock at `https://commerce-orders-service.{CLUSTER_DOMAIN}.` or go to **API Rules** view (under **Configuration** section) in `orders-service` Namespace and select the mock, you will the direct link to the mock application under **Host** column.
+1. Access the SAP Commerce Cloud Mock mock at `https://commerce-orders-service.{CLUSTER_DOMAIN}` or go to **API Rules** view (under **Configuration** section) in `orders-service` Namespace and select the mock, you will the direct link to the mock application under **Host** column.
 
 2. Click **Connect**.
 
@@ -224,7 +223,13 @@ To expose events in a Namespace, first create an ApplicationMapping CR in the cl
    EOF
    ```
 
-2. List available ServiceClass CRs in the `orders-service` Namespace and find one with the `EXTERNAL-NAME` prefix `sap-commerce-cloud-events-*`. Copy the full `EXTERNAL NAME` to environment variable like:
+2. List available ServiceClass CRs in the `orders-service` Namespace and find one with the `EXTERNAL-NAME` prefix `sap-commerce-cloud-events-*`. 
+
+   ```bash
+   kubectl get serviceclasses -n orders-service
+   ```
+
+   Copy the full `EXTERNAL NAME` to environment variable like:
 
    ```bash
    export EVENTS_EXTERNAL_NAME="sap-commerce-cloud-events-58d21"

@@ -24,7 +24,7 @@ This tutorial shows how you can bind a sample instance of the Redis service to a
      namespace: orders-service
    spec:
      instanceRef:
-       name: redis-instance
+       name: redis-service
    EOF
    ```
 
@@ -47,7 +47,7 @@ This tutorial shows how you can bind a sample instance of the Redis service to a
      serviceBindingRef:
        name: orders-function
      usedBy:
-       kind: function
+       kind: serverless-function
        name: orders-function
      parameters:
        envPrefix:
@@ -55,7 +55,7 @@ This tutorial shows how you can bind a sample instance of the Redis service to a
    EOF
    ```
 
-   - The **spec.serviceBindingRef** and **spec.usedBy** fields are required. **spec.serviceBindingRef** points to the ServiceBinding you have just created and **spec.usedBy** points to the `orders-function` Function. More specifically, **spec.usedBy** refers to the name of the Function and the cluster-specific [UsageKind CR](/components/service-catalog/#custom-resource-usage-kind) (`kind: function`) that defines how Secrets should be injected to `orders-function` Function when creating a ServiceBinding.
+   - The **spec.serviceBindingRef** and **spec.usedBy** fields are required. **spec.serviceBindingRef** points to the ServiceBinding you have just created and **spec.usedBy** points to the `orders-function` Function. More specifically, **spec.usedBy** refers to the name of the Function and the cluster-specific [UsageKind CR](/components/service-catalog/#custom-resource-usage-kind) (`kind: serverless-function`) that defines how Secrets should be injected to `orders-function` Function when creating a ServiceBinding.
 
    - The **spec.parameters.envPrefix.name** field is optional. It adds a prefix to all environment variables injected in a Secret to the Function when creating a ServiceBinding. In our example, **envPrefix** is `REDIS_`, so all environmental variables will follow the `REDIS_{env}` naming pattern.
 
@@ -132,18 +132,21 @@ This tutorial shows how you can bind a sample instance of the Redis service to a
    vary: Origin
    x-envoy-upstream-service-time: 37
 
-   []
+   [{"orderCode":"762727210","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}, {"orderCode":"123456789","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}]
    ```
+
+   > **NOTE**: The orders are created in previous tutorials. // w tutorialach odnośnie microserwisu
 
 3. Send a `POST` request to the microservice with a sample order details:
 
    ```bash
    curl -ikX POST "https://$FUNCTION_DOMAIN" \
+     -H "Content-Type: application/json" \
      -H 'Cache-Control: no-cache' -d \
      '{
-       "orderCode": "762727210",
+       "orderCode": "762727234",
        "consignmentCode": "76272725",
-       "consignmentStatus": PICKUP_COMPLETE
+       "consignmentStatus": "PICKUP_COMPLETE"
      }'
    ```
 
@@ -158,13 +161,13 @@ This tutorial shows how you can bind a sample instance of the Redis service to a
    vary: Origin
    x-envoy-upstream-service-time: 6
 
-   [{"orderCode":"762727210","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}]
+   [{"orderCode":"762727234","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}, {"orderCode":"762727210","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}, {"orderCode":"123456789","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}]
    ```
 
 5. Like in the previous tutorial (when we exposed Function) remove the Pod created by `orders-function` Function, execute command and wait for successful deletion and starting the new one:
 
    ```bash
-   kubectl delete pod -n orders-service -l app=orders-function
+   kubectl delete pod -n orders-service -l "serverless.kyma-project.io/function-name=orders-function"
    ```
 
 6. Again call the Function to check the storage:
@@ -183,7 +186,7 @@ This tutorial shows how you can bind a sample instance of the Redis service to a
    vary: Origin
    x-envoy-upstream-service-time: 37
 
-   [{"orderCode":"762727210","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}]
+   [{"orderCode":"762727234","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}, {"orderCode":"762727210","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}, {"orderCode":"123456789","consignmentCode":"76272725","consignmentStatus":"PICKUP_COMPLETE"}]
    ```
 
-   As we can see, new instance of Function has saved order created in previous steps. In the `Expose a Function` tutorial, we used the in-memory storage, so in every time when you deleted a Function's Pod or changed a Function definition, the orders details were lost. Using binding to Redis instance, details are stored outside the `orders-function` Function, so the data persistence will be preserved.
+   As we can see, new instance of Function has saved order created in previous steps. In the `Expose a Function` tutorial, we used the in-memory storage, so in every time when you deleted a Function's Pod or changed a Function definition, the orders details were lost. Using binding to Redis instance, details are stored outside the `orders-function` Function, so the data persistence will be preserved. Also Redis can be shared between Function and microservice.

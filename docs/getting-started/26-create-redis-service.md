@@ -27,7 +27,6 @@ Follows these steps:
      name: redis-addon
      namespace: orders-service
    spec:
-     reprocessRequest: 0
      repositories:
      - url: https://github.com/kyma-project/addons/releases/download/0.12.0/index-testing.yaml
    EOF

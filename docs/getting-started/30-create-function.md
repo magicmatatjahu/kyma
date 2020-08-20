@@ -19,7 +19,8 @@ Follows these steps:
 
 1. Create a Function CR that specifies the Function's logic:
 
-   ```yaml
+   ```bash
+   cat <<EOF | kubectl apply -f  -
    apiVersion: serverless.kyma-project.io/v1alpha1
    kind: Function
    metadata:
@@ -54,7 +55,6 @@ Follows these steps:
       const { promisify } = require("util");
 
       let storage = undefined;
-      const ordersPrefix = "orders";
       const errors = {
         codeRequired: new Error("orderCode is required"),
         alreadyExists: new Error("object already exists"),
@@ -121,7 +121,7 @@ Follows these steps:
         async getAll() {
           let values = [];
 
-          const keys = await this.asyncKeys(`${ordersPrefix}:*`);
+          const keys = await this.asyncKeys("*");
           for (const key of keys) {
             const value = await this.asyncGet(key);
             values.push(JSON.parse(value));
@@ -134,11 +134,11 @@ Follows these steps:
           if (!order.orderCode) {
             throw errors.codeRequired;
           }
-          const value = await this.asyncGet(`${ordersPrefix}:${order.orderCode}`);
+          const value = await this.asyncGet(order.orderCode);
           if (value) {
             throw errors.alreadyExists;
           }
-          await this.asyncSet(`${ordersPrefix}:${order.orderCode}`, JSON.stringify(order));
+          await this.asyncSet(order.orderCode, JSON.stringify(order));
         }
       }
 
@@ -147,7 +147,6 @@ Follows these steps:
 
         getAll() {
           return Array.from(this.storage)
-            .filter(([orderCode, _]) => orderCode.startsWith(`${ordersPrefix}:`))
             .map(([_, order]) => order)
         }
 
@@ -155,10 +154,10 @@ Follows these steps:
           if (!order.orderCode) {
             throw errors.codeRequired;
           }
-          if (this.storage.get(`${ordersPrefix}:${order.orderCode}`)) {
+          if (this.storage.get(order.orderCode)) {
             throw errors.alreadyExists;
           }
-          return this.storage.set(`${ordersPrefix}:${order.orderCode}`, order);
+          return this.storage.set(order.orderCode, order);
         }
       }
 
@@ -171,9 +170,9 @@ Follows these steps:
         if (!redisPrefix) {
           redisPrefix = "REDIS_";
         }
-        const port = readEnv(`${redisPrefix}PORT`);
-        const host = readEnv(`${redisPrefix}HOST`);
-        const password = readEnv(`${redisPrefix}REDIS_PASSWORD`);
+        const port = readEnv(redisPrefix + "PORT");
+        const host = readEnv(redisPrefix + "HOST");
+        const password = readEnv(redisPrefix + "REDIS_PASSWORD");
 
         if (host && port && password) {
           return new RedisStorage({ host, port, password });
@@ -225,7 +224,6 @@ Follows these steps:
     const { promisify } = require("util");
 
     let storage = undefined;
-    const ordersPrefix = "orders";
     const errors = {
       codeRequired: new Error("orderCode is required"),
       alreadyExists: new Error("object already exists"),
@@ -292,7 +290,7 @@ Follows these steps:
       async getAll() {
         let values = [];
 
-        const keys = await this.asyncKeys(`${ordersPrefix}:*`);
+        const keys = await this.asyncKeys("*");
         for (const key of keys) {
           const value = await this.asyncGet(key);
           values.push(JSON.parse(value));
@@ -305,11 +303,11 @@ Follows these steps:
         if (!order.orderCode) {
           throw errors.codeRequired;
         }
-        const value = await this.asyncGet(`${ordersPrefix}:${order.orderCode}`);
+        const value = await this.asyncGet(order.orderCode);
         if (value) {
           throw errors.alreadyExists;
         }
-        await this.asyncSet(`${ordersPrefix}:${order.orderCode}`, JSON.stringify(order));
+        await this.asyncSet(order.orderCode, JSON.stringify(order));
       }
     }
 
@@ -318,7 +316,6 @@ Follows these steps:
 
       getAll() {
         return Array.from(this.storage)
-          .filter(([orderCode, _]) => orderCode.startsWith(`${ordersPrefix}:`))
           .map(([_, order]) => order)
       }
 
@@ -326,10 +323,10 @@ Follows these steps:
         if (!order.orderCode) {
           throw errors.codeRequired;
         }
-        if (this.storage.get(`${ordersPrefix}:${order.orderCode}`)) {
+        if (this.storage.get(order.orderCode)) {
           throw errors.alreadyExists;
         }
-        return this.storage.set(`${ordersPrefix}:${order.orderCode}`, order);
+        return this.storage.set(order.orderCode, order);
       }
     }
 
@@ -342,9 +339,9 @@ Follows these steps:
       if (!redisPrefix) {
         redisPrefix = "REDIS_";
       }
-      const port = readEnv(`${redisPrefix}PORT`);
-      const host = readEnv(`${redisPrefix}HOST`);
-      const password = readEnv(`${redisPrefix}REDIS_PASSWORD`);
+      const port = readEnv(redisPrefix + "PORT");
+      const host = readEnv(redisPrefix + "HOST");
+      const password = readEnv(redisPrefix + "REDIS_PASSWORD");
 
       if (host && port && password) {
         return new RedisStorage({ host, port, password });
