@@ -18,6 +18,13 @@ func TestSetDefaults(t *testing.T) {
 	zero := int32(0)
 	one := int32(1)
 	two := int32(2)
+	functionResources := `
+{
+"s":{"requestCpu": "25m","requestMemory": "32Mi","limitsCpu": "50m","limitsMemory": "64Mi"},
+"m":{"requestCpu": "50m","requestMemory": "64Mi","limitsCpu": "100m","limitsMemory": "128Mi"},
+"l":{"limitsCpu": "200m","limitsMemory": "256Mi"}
+}
+`
 	buildResources := `
 {
 "slow":{"requestCpu": "350m","requestMemory": "350Mi","limitsCpu": "700m","limitsMemory": "700Mi"},
@@ -324,9 +331,12 @@ func TestSetDefaults(t *testing.T) {
 			config := &DefaultingConfig{}
 			err := envconfig.Init(config)
 			g.Expect(err).To(gomega.BeNil())
-			presets, err := ParseResourcePresets(buildResources)
-			config.BuildJob.Presets = presets
+			functionPresets, err := ParseResourcePresets(functionResources)
 			g.Expect(err).To(gomega.BeNil())
+			config.Function.Presets = functionPresets
+			buildPresets, err := ParseResourcePresets(buildResources)
+			g.Expect(err).To(gomega.BeNil())
+			config.BuildJob.Presets = buildPresets
 			ctx := context.WithValue(context.Background(), DefaultingConfigKey, *config)
 
 			// when
@@ -345,19 +355,16 @@ func TestSetDefaults(t *testing.T) {
 			givenFunc: Function{
 				ObjectMeta: v1.ObjectMeta{
 					Labels: map[string]string{
-						BuildResourcesPresetLabel: "slow",
+						FunctionResourcesPresetLabel: "s",
+						BuildResourcesPresetLabel:    "slow",
 					},
 				},
 				Spec: FunctionSpec{
 					Runtime: Nodejs12,
 					Resources: corev1.ResourceRequirements{
-						Limits: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("100m"),
-							corev1.ResourceMemory: resource.MustParse("128Mi"),
-						},
 						Requests: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("50m"),
-							corev1.ResourceMemory: resource.MustParse("64Mi"),
+							corev1.ResourceCPU:    resource.MustParse("15m"),
+							corev1.ResourceMemory: resource.MustParse("15Mi"),
 						},
 					},
 					BuildResources: corev1.ResourceRequirements{
@@ -372,18 +379,19 @@ func TestSetDefaults(t *testing.T) {
 			},
 			expectedFunc: Function{ObjectMeta: v1.ObjectMeta{
 				Labels: map[string]string{
-					BuildResourcesPresetLabel: "slow",
+					FunctionResourcesPresetLabel: "s",
+					BuildResourcesPresetLabel:    "slow",
 				},
 			}, Spec: FunctionSpec{
 				Runtime: Nodejs12,
 				Resources: corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("100m"),
-						corev1.ResourceMemory: resource.MustParse("128Mi"),
-					},
-					Requests: corev1.ResourceList{
 						corev1.ResourceCPU:    resource.MustParse("50m"),
 						corev1.ResourceMemory: resource.MustParse("64Mi"),
+					},
+					Requests: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("15m"),
+						corev1.ResourceMemory: resource.MustParse("15Mi"),
 					},
 				},
 				BuildResources: corev1.ResourceRequirements{
@@ -405,35 +413,27 @@ func TestSetDefaults(t *testing.T) {
 			givenFunc: Function{
 				ObjectMeta: v1.ObjectMeta{
 					Labels: map[string]string{
-						BuildResourcesPresetLabel: "fast",
+						FunctionResourcesPresetLabel: "l",
+						BuildResourcesPresetLabel:    "fast",
 					},
 				},
 				Spec: FunctionSpec{
-					Runtime: Nodejs12,
-					Resources: corev1.ResourceRequirements{
-						Limits: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("100m"),
-							corev1.ResourceMemory: resource.MustParse("128Mi"),
-						},
-						Requests: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("50m"),
-							corev1.ResourceMemory: resource.MustParse("64Mi"),
-						},
-					},
+					Runtime:     Nodejs12,
 					MinReplicas: &two,
 					MaxReplicas: &two,
 				},
 			},
 			expectedFunc: Function{ObjectMeta: v1.ObjectMeta{
 				Labels: map[string]string{
-					BuildResourcesPresetLabel: "fast",
+					FunctionResourcesPresetLabel: "l",
+					BuildResourcesPresetLabel:    "fast",
 				},
 			}, Spec: FunctionSpec{
 				Runtime: Nodejs12,
 				Resources: corev1.ResourceRequirements{
 					Limits: corev1.ResourceList{
-						corev1.ResourceCPU:    resource.MustParse("100m"),
-						corev1.ResourceMemory: resource.MustParse("128Mi"),
+						corev1.ResourceCPU:    resource.MustParse("200m"),
+						corev1.ResourceMemory: resource.MustParse("256Mi"),
 					},
 					Requests: corev1.ResourceList{
 						corev1.ResourceCPU:    resource.MustParse("50m"),
@@ -462,9 +462,12 @@ func TestSetDefaults(t *testing.T) {
 			config := &DefaultingConfig{}
 			err := envconfig.Init(config)
 			g.Expect(err).To(gomega.BeNil())
-			presets, err := ParseResourcePresets(buildResources)
-			config.BuildJob.Presets = presets
+			functionPresets, err := ParseResourcePresets(functionResources)
 			g.Expect(err).To(gomega.BeNil())
+			config.Function.Presets = functionPresets
+			buildPresets, err := ParseResourcePresets(buildResources)
+			g.Expect(err).To(gomega.BeNil())
+			config.BuildJob.Presets = buildPresets
 			ctx := context.WithValue(context.Background(), DefaultingConfigKey, *config)
 
 			// when

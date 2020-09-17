@@ -22,16 +22,16 @@ type MinFunctionRequestValues struct {
 	MinRequestMemory string `envconfig:"default=16Mi"`
 }
 
-type MinBuildRequestValues struct {
+type MinBuildJobRequestValues struct {
 	MinRequestCpu    string `envconfig:"default=200m"`
 	MinRequestMemory string `envconfig:"default=200Mi"`
 }
 
 type ValidationConfig struct {
-	FunctionResources MinFunctionRequestValues
-	BuildResources    MinBuildRequestValues
-	MinReplicasValue  int32    `envconfig:"default=1"`
-	ReservedEnvs      []string `envconfig:"default={}"`
+	Function         MinFunctionRequestValues
+	BuildJob         MinBuildJobRequestValues
+	MinReplicasValue int32    `envconfig:"default=1"`
+	ReservedEnvs     []string `envconfig:"default={}"`
 }
 
 func (fn *Function) performBasicValidation(ctx context.Context) *apis.FieldError {
@@ -106,15 +106,15 @@ func (spec *FunctionSpec) validateEnv(ctx context.Context) (apisError *apis.Fiel
 }
 
 func (spec *FunctionSpec) validateFunctionResources(ctx context.Context) (apisError *apis.FieldError) {
-	minMemory := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).FunctionResources.MinRequestMemory)
-	minCpu := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).FunctionResources.MinRequestCpu)
+	minMemory := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).Function.MinRequestMemory)
+	minCpu := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).Function.MinRequestCpu)
 
 	return validateResources(spec.Resources, minMemory, minCpu).ViaField("spec.resources")
 }
 
 func (spec *FunctionSpec) validateBuildResources(ctx context.Context) (apisError *apis.FieldError) {
-	minMemory := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).BuildResources.MinRequestMemory)
-	minCpu := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).BuildResources.MinRequestCpu)
+	minMemory := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).BuildJob.MinRequestMemory)
+	minCpu := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).BuildJob.MinRequestCpu)
 
 	return validateResources(spec.BuildResources, minMemory, minCpu).ViaField("spec.buildResources")
 }

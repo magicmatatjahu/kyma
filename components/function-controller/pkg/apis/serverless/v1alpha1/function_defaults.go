@@ -22,10 +22,9 @@ type ResourcesPreset struct {
 }
 
 type FunctionDefaulting struct {
-	RequestCpu    string `envconfig:"default=50m"`
-	RequestMemory string `envconfig:"default=64Mi"`
-	LimitsCpu     string `envconfig:"default=100m"`
-	LimitsMemory  string `envconfig:"default=128Mi"`
+	DefaultPreset string                     `envconfig:"default=m"`
+	Presets       map[string]ResourcesPreset `envconfig:"-"`
+	PresetsMap    string                     `envconfig:"default={}"`
 }
 
 type BuildJobDefaulting struct {
@@ -46,7 +45,7 @@ func (fn *Function) SetDefaults(ctx context.Context) {
 	config := ctx.Value(DefaultingConfigKey).(DefaultingConfig)
 
 	fn.Spec.defaultReplicas(ctx)
-	fn.Spec.defaultFunctionResources(ctx)
+	fn.Spec.defaultFunctionResources(ctx, fn)
 	fn.Spec.defaultBuildResources(ctx, fn)
 	fn.Spec.defaultRuntime(config)
 }
@@ -116,11 +115,12 @@ func defaultResources(res corev1.ResourceRequirements, requestMemory, requestCpu
 	return *copiedRes
 }
 
-func (spec *FunctionSpec) defaultFunctionResources(ctx context.Context) {
+func (spec *FunctionSpec) defaultFunctionResources(ctx context.Context, fn *Function) {
 	resources := spec.Resources
 	defaultingConfig := ctx.Value(DefaultingConfigKey).(DefaultingConfig).Function
+	resourcesPreset := mergeResourcesPreset(fn, FunctionResourcesPresetLabel, defaultingConfig.Presets, defaultingConfig.DefaultPreset)
 
-	spec.Resources = defaultResources(resources, defaultingConfig.RequestMemory, defaultingConfig.RequestCpu, defaultingConfig.LimitsMemory, defaultingConfig.LimitsCpu)
+	spec.Resources = defaultResources(resources, resourcesPreset.RequestMemory, resourcesPreset.RequestCpu, resourcesPreset.LimitsMemory, resourcesPreset.LimitsCpu)
 }
 
 func (spec *FunctionSpec) defaultBuildResources(ctx context.Context, fn *Function) {

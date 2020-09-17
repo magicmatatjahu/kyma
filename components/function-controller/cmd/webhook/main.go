@@ -117,11 +117,17 @@ func readDefaultingConfig() *serverlessv1alhpa1.DefaultingConfig {
 		panic(errors.Wrap(err, "while reading env defaulting variables"))
 	}
 
-	presets, err := serverlessv1alhpa1.ParseResourcePresets(defaultingCfg.BuildJob.PresetsMap)
+	functionPresets, err := serverlessv1alhpa1.ParseResourcePresets(defaultingCfg.Function.PresetsMap)
 	if err != nil {
-		panic(errors.Wrap(err, "while reading env defaulting variables"))
+		panic(errors.Wrap(err, "while parsing function resources presets"))
 	}
-	defaultingCfg.BuildJob.Presets = presets
+	defaultingCfg.Function.Presets = functionPresets
+
+	buildPresets, err := serverlessv1alhpa1.ParseResourcePresets(defaultingCfg.BuildJob.PresetsMap)
+	if err != nil {
+		panic(errors.Wrap(err, "while parsing build resources presets"))
+	}
+	defaultingCfg.BuildJob.Presets = buildPresets
 
 	return defaultingCfg
 }

@@ -22,7 +22,8 @@ const (
 )
 
 const (
-	BuildResourcesPresetLabel = "serverless.kyma-project.io/build-resources-preset"
+	FunctionResourcesPresetLabel = "serverless.kyma-project.io/function-resources-preset"
+	BuildResourcesPresetLabel    = "serverless.kyma-project.io/build-resources-preset"
 )
 
 // FunctionSpec defines the desired state of Function
