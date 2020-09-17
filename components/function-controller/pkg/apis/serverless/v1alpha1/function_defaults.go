@@ -44,10 +44,28 @@ type DefaultingConfig struct {
 func (fn *Function) SetDefaults(ctx context.Context) {
 	config := ctx.Value(DefaultingConfigKey).(DefaultingConfig)
 
+	fn.defaultLabels(ctx)
 	fn.Spec.defaultReplicas(ctx)
 	fn.Spec.defaultFunctionResources(ctx, fn)
 	fn.Spec.defaultBuildResources(ctx, fn)
 	fn.Spec.defaultRuntime(config)
+}
+
+func (fn *Function) defaultLabels(ctx context.Context) {
+	defaultingConfig := ctx.Value(DefaultingConfigKey).(DefaultingConfig)
+	labels := fn.GetLabels()
+
+	functionResourcesLabel := labels[FunctionResourcesPresetLabel]
+	if functionResourcesLabel == "" {
+		labels[FunctionResourcesPresetLabel] = defaultingConfig.Function.DefaultPreset
+		fn.SetLabels(labels)
+	}
+
+	buildResourcesLabel := labels[BuildResourcesPresetLabel]
+	if buildResourcesLabel == "" {
+		labels[BuildResourcesPresetLabel] = defaultingConfig.BuildJob.DefaultPreset
+		fn.SetLabels(labels)
+	}
 }
 
 func (spec *FunctionSpec) defaultReplicas(ctx context.Context) {
