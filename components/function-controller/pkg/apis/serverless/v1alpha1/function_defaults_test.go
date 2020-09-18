@@ -18,6 +18,13 @@ func TestSetDefaults(t *testing.T) {
 	zero := int32(0)
 	one := int32(1)
 	two := int32(2)
+	functionReplicas := `
+{
+"s":{"min": 1,"max": 1},
+"m":{"min": 1,"max": 2},
+"l":{"min": 2}
+}
+`
 	functionResources := `
 {
 "s":{"requestCpu": "25m","requestMemory": "32Mi","limitsCpu": "50m","limitsMemory": "64Mi"},
@@ -331,12 +338,19 @@ func TestSetDefaults(t *testing.T) {
 			config := &DefaultingConfig{}
 			err := envconfig.Init(config)
 			g.Expect(err).To(gomega.BeNil())
-			functionPresets, err := ParseResourcePresets(functionResources)
+
+			functionReplicasPresets, err := ParseReplicasPresets(functionReplicas)
 			g.Expect(err).To(gomega.BeNil())
-			config.Function.Presets = functionPresets
-			buildPresets, err := ParseResourcePresets(buildResources)
+			config.Function.Replicas.Presets = functionReplicasPresets
+
+			functionResourcesPresets, err := ParseResourcePresets(functionResources)
 			g.Expect(err).To(gomega.BeNil())
-			config.BuildJob.Presets = buildPresets
+			config.Function.Resources.Presets = functionResourcesPresets
+
+			buildResourcesPresets, err := ParseResourcePresets(buildResources)
+			g.Expect(err).To(gomega.BeNil())
+			config.BuildJob.Resources.Presets = buildResourcesPresets
+
 			ctx := context.WithValue(context.Background(), DefaultingConfigKey, *config)
 
 			// when
@@ -355,6 +369,7 @@ func TestSetDefaults(t *testing.T) {
 			givenFunc: Function{
 				ObjectMeta: v1.ObjectMeta{
 					Labels: map[string]string{
+						ReplicasPresetLabel:          "l",
 						FunctionResourcesPresetLabel: "s",
 						BuildResourcesPresetLabel:    "slow",
 					},
@@ -374,11 +389,11 @@ func TestSetDefaults(t *testing.T) {
 						},
 					},
 					MinReplicas: &two,
-					MaxReplicas: &two,
 				},
 			},
 			expectedFunc: Function{ObjectMeta: v1.ObjectMeta{
 				Labels: map[string]string{
+					ReplicasPresetLabel:          "l",
 					FunctionResourcesPresetLabel: "s",
 					BuildResourcesPresetLabel:    "slow",
 				},
@@ -413,18 +428,18 @@ func TestSetDefaults(t *testing.T) {
 			givenFunc: Function{
 				ObjectMeta: v1.ObjectMeta{
 					Labels: map[string]string{
+						ReplicasPresetLabel:          "l",
 						FunctionResourcesPresetLabel: "l",
 						BuildResourcesPresetLabel:    "fast",
 					},
 				},
 				Spec: FunctionSpec{
-					Runtime:     Nodejs12,
-					MinReplicas: &two,
-					MaxReplicas: &two,
+					Runtime: Nodejs12,
 				},
 			},
 			expectedFunc: Function{ObjectMeta: v1.ObjectMeta{
 				Labels: map[string]string{
+					ReplicasPresetLabel:          "l",
 					FunctionResourcesPresetLabel: "l",
 					BuildResourcesPresetLabel:    "fast",
 				},
@@ -462,12 +477,19 @@ func TestSetDefaults(t *testing.T) {
 			config := &DefaultingConfig{}
 			err := envconfig.Init(config)
 			g.Expect(err).To(gomega.BeNil())
-			functionPresets, err := ParseResourcePresets(functionResources)
+
+			functionReplicasPresets, err := ParseReplicasPresets(functionReplicas)
 			g.Expect(err).To(gomega.BeNil())
-			config.Function.Presets = functionPresets
-			buildPresets, err := ParseResourcePresets(buildResources)
+			config.Function.Replicas.Presets = functionReplicasPresets
+
+			functionResourcesPresets, err := ParseResourcePresets(functionResources)
 			g.Expect(err).To(gomega.BeNil())
-			config.BuildJob.Presets = buildPresets
+			config.Function.Resources.Presets = functionResourcesPresets
+
+			buildResourcesPresets, err := ParseResourcePresets(buildResources)
+			g.Expect(err).To(gomega.BeNil())
+			config.BuildJob.Resources.Presets = buildResourcesPresets
+
 			ctx := context.WithValue(context.Background(), DefaultingConfigKey, *config)
 
 			// when

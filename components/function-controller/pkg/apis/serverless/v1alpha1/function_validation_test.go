@@ -21,7 +21,7 @@ func TestFunctionSpec_validateResources(t *testing.T) {
 	g := gomega.NewWithT(t)
 	err := os.Setenv("RESERVED_ENVS", "K_CONFIGURATION")
 	g.Expect(err).ShouldNot(gomega.HaveOccurred())
-	err = os.Setenv("MIN_REPLICAS_VALUE", "1")
+	err = os.Setenv("FUNCTION_REPLICAS_MIN_VALUE", "1")
 	g.Expect(err).ShouldNot(gomega.HaveOccurred())
 
 	for testName, testData := range map[string]struct {

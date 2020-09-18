@@ -17,21 +17,33 @@ import (
 
 const ValidationConfigKey = "validation-config"
 
-type MinFunctionRequestValues struct {
+type MinFunctionReplicasValues struct {
+	MinValue int32 `envconfig:"default=1"`
+}
+
+type MinFunctionResourcesValues struct {
 	MinRequestCpu    string `envconfig:"default=10m"`
 	MinRequestMemory string `envconfig:"default=16Mi"`
 }
 
-type MinBuildJobRequestValues struct {
+type MinBuildJobResourcesValues struct {
 	MinRequestCpu    string `envconfig:"default=200m"`
 	MinRequestMemory string `envconfig:"default=200Mi"`
 }
 
+type MinFunctionValues struct {
+	Replicas  MinFunctionReplicasValues
+	Resources MinFunctionResourcesValues
+}
+
+type MinBuildJobValues struct {
+	Resources MinBuildJobResourcesValues
+}
+
 type ValidationConfig struct {
-	Function         MinFunctionRequestValues
-	BuildJob         MinBuildJobRequestValues
-	MinReplicasValue int32    `envconfig:"default=1"`
-	ReservedEnvs     []string `envconfig:"default={}"`
+	ReservedEnvs []string `envconfig:"default={}"`
+	Function     MinFunctionValues
+	BuildJob     MinBuildJobValues
 }
 
 func (fn *Function) performBasicValidation(ctx context.Context) *apis.FieldError {
@@ -106,15 +118,15 @@ func (spec *FunctionSpec) validateEnv(ctx context.Context) (apisError *apis.Fiel
 }
 
 func (spec *FunctionSpec) validateFunctionResources(ctx context.Context) (apisError *apis.FieldError) {
-	minMemory := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).Function.MinRequestMemory)
-	minCpu := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).Function.MinRequestCpu)
+	minMemory := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).Function.Resources.MinRequestMemory)
+	minCpu := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).Function.Resources.MinRequestCpu)
 
 	return validateResources(spec.Resources, minMemory, minCpu).ViaField("spec.resources")
 }
 
 func (spec *FunctionSpec) validateBuildResources(ctx context.Context) (apisError *apis.FieldError) {
-	minMemory := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).BuildJob.MinRequestMemory)
-	minCpu := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).BuildJob.MinRequestCpu)
+	minMemory := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).BuildJob.Resources.MinRequestMemory)
+	minCpu := resource.MustParse(ctx.Value(ValidationConfigKey).(ValidationConfig).BuildJob.Resources.MinRequestCpu)
 
 	return validateResources(spec.BuildResources, minMemory, minCpu).ViaField("spec.buildResources")
 }
@@ -160,7 +172,7 @@ func validateResources(resources corev1.ResourceRequirements, minMemory, minCpu 
 }
 
 func (spec *FunctionSpec) validateReplicas(ctx context.Context) (apisError *apis.FieldError) {
-	minValue := ctx.Value(ValidationConfigKey).(ValidationConfig).MinReplicasValue
+	minValue := ctx.Value(ValidationConfigKey).(ValidationConfig).Function.Replicas.MinValue
 	maxReplicas := spec.MaxReplicas
 	minReplicas := spec.MinReplicas
 

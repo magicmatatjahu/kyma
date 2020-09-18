@@ -14,6 +14,11 @@ var _ resourcesemantics.GenericCRD = (*Function)(nil)
 
 const DefaultingConfigKey = "defaulting-config"
 
+type ReplicasPreset struct {
+	Min int32 `json:"min,omitempty"`
+	Max int32 `json:"max,omitempty"`
+}
+
 type ResourcesPreset struct {
 	RequestCpu    string `json:"requestCpu,omitempty"`
 	RequestMemory string `json:"requestMemory,omitempty"`
@@ -21,38 +26,54 @@ type ResourcesPreset struct {
 	LimitsMemory  string `json:"limitsMemory,omitempty"`
 }
 
-type FunctionDefaulting struct {
+type FunctionReplicasDefaulting struct {
+	DefaultPreset string                    `envconfig:"default=s"`
+	Presets       map[string]ReplicasPreset `envconfig:"-"`
+	PresetsMap    string                    `envconfig:"default={}"`
+}
+
+type FunctionResourcesDefaulting struct {
 	DefaultPreset string                     `envconfig:"default=m"`
 	Presets       map[string]ResourcesPreset `envconfig:"-"`
 	PresetsMap    string                     `envconfig:"default={}"`
 }
 
-type BuildJobDefaulting struct {
+type BuildJobResourcesDefaulting struct {
 	DefaultPreset string                     `envconfig:"default=normal"`
 	Presets       map[string]ResourcesPreset `envconfig:"-"`
 	PresetsMap    string                     `envconfig:"default={}"`
 }
 
+type FunctionDefaulting struct {
+	Replicas  FunctionReplicasDefaulting
+	Resources FunctionResourcesDefaulting
+}
+
+type BuildJobDefaulting struct {
+	Resources BuildJobResourcesDefaulting
+}
+
 type DefaultingConfig struct {
-	Function    FunctionDefaulting
-	BuildJob    BuildJobDefaulting
-	MinReplicas int32   `envconfig:"default=1"`
-	MaxReplicas int32   `envconfig:"default=1"`
-	Runtime     Runtime `envconfig:"default=nodejs12"`
+	Function FunctionDefaulting
+	BuildJob BuildJobDefaulting
+	Runtime  Runtime `envconfig:"default=nodejs12"`
 }
 
 func (fn *Function) SetDefaults(ctx context.Context) {
 	config := ctx.Value(DefaultingConfigKey).(DefaultingConfig)
 
-	fn.Spec.defaultReplicas(ctx)
+	fn.Spec.defaultReplicas(ctx, fn)
 	fn.Spec.defaultFunctionResources(ctx, fn)
 	fn.Spec.defaultBuildResources(ctx, fn)
 	fn.Spec.defaultRuntime(config)
 }
 
-func (spec *FunctionSpec) defaultReplicas(ctx context.Context) {
+func (spec *FunctionSpec) defaultReplicas(ctx context.Context, fn *Function) {
+	defaultingConfig := ctx.Value(DefaultingConfigKey).(DefaultingConfig).Function.Replicas
+	replicasPreset := mergeReplicasPreset(fn, defaultingConfig.Presets, defaultingConfig.DefaultPreset)
+
 	if spec.MinReplicas == nil {
-		newMin := ctx.Value(DefaultingConfigKey).(DefaultingConfig).MinReplicas
+		newMin := replicasPreset.Min
 		if spec.MaxReplicas != nil && *spec.MaxReplicas < newMin {
 			newMin = *spec.MaxReplicas
 		}
@@ -60,12 +81,34 @@ func (spec *FunctionSpec) defaultReplicas(ctx context.Context) {
 		spec.MinReplicas = &newMin
 	}
 	if spec.MaxReplicas == nil {
-		newMax := ctx.Value(DefaultingConfigKey).(DefaultingConfig).MaxReplicas
+		newMax := replicasPreset.Max
 		if *spec.MinReplicas > newMax {
 			newMax = *spec.MinReplicas
 		}
 
 		spec.MaxReplicas = &newMax
+	}
+}
+
+func (spec *FunctionSpec) defaultFunctionResources(ctx context.Context, fn *Function) {
+	resources := spec.Resources
+	defaultingConfig := ctx.Value(DefaultingConfigKey).(DefaultingConfig).Function.Resources
+	resourcesPreset := mergeResourcesPreset(fn, FunctionResourcesPresetLabel, defaultingConfig.Presets, defaultingConfig.DefaultPreset)
+
+	spec.Resources = defaultResources(resources, resourcesPreset.RequestMemory, resourcesPreset.RequestCpu, resourcesPreset.LimitsMemory, resourcesPreset.LimitsCpu)
+}
+
+func (spec *FunctionSpec) defaultBuildResources(ctx context.Context, fn *Function) {
+	resources := spec.BuildResources
+	defaultingConfig := ctx.Value(DefaultingConfigKey).(DefaultingConfig).BuildJob.Resources
+	resourcesPreset := mergeResourcesPreset(fn, BuildResourcesPresetLabel, defaultingConfig.Presets, defaultingConfig.DefaultPreset)
+
+	spec.BuildResources = defaultResources(resources, resourcesPreset.RequestMemory, resourcesPreset.RequestCpu, resourcesPreset.LimitsMemory, resourcesPreset.LimitsCpu)
+}
+
+func (spec *FunctionSpec) defaultRuntime(config DefaultingConfig) {
+	if spec.Runtime == "" {
+		spec.Runtime = config.Runtime
 	}
 }
 
@@ -115,26 +158,28 @@ func defaultResources(res corev1.ResourceRequirements, requestMemory, requestCpu
 	return *copiedRes
 }
 
-func (spec *FunctionSpec) defaultFunctionResources(ctx context.Context, fn *Function) {
-	resources := spec.Resources
-	defaultingConfig := ctx.Value(DefaultingConfigKey).(DefaultingConfig).Function
-	resourcesPreset := mergeResourcesPreset(fn, FunctionResourcesPresetLabel, defaultingConfig.Presets, defaultingConfig.DefaultPreset)
+func mergeReplicasPreset(fn *Function, presets map[string]ReplicasPreset, defaultPreset string) ReplicasPreset {
+	replicas := ReplicasPreset{}
 
-	spec.Resources = defaultResources(resources, resourcesPreset.RequestMemory, resourcesPreset.RequestCpu, resourcesPreset.LimitsMemory, resourcesPreset.LimitsCpu)
-}
-
-func (spec *FunctionSpec) defaultBuildResources(ctx context.Context, fn *Function) {
-	resources := spec.BuildResources
-	defaultingConfig := ctx.Value(DefaultingConfigKey).(DefaultingConfig).BuildJob
-	resourcesPreset := mergeResourcesPreset(fn, BuildResourcesPresetLabel, defaultingConfig.Presets, defaultingConfig.DefaultPreset)
-
-	spec.BuildResources = defaultResources(resources, resourcesPreset.RequestMemory, resourcesPreset.RequestCpu, resourcesPreset.LimitsMemory, resourcesPreset.LimitsCpu)
-}
-
-func (spec *FunctionSpec) defaultRuntime(config DefaultingConfig) {
-	if spec.Runtime == "" {
-		spec.Runtime = config.Runtime
+	preset := fn.GetLabels()[ReplicasPresetLabel]
+	if preset == "" {
+		return presets[defaultPreset]
 	}
+
+	replicasPreset := presets[preset]
+	replicasDefaultPreset := presets[defaultPreset]
+
+	replicas.Min = replicasPreset.Min
+	if replicas.Min == 0 {
+		replicas.Min = replicasDefaultPreset.Min
+	}
+
+	replicas.Max = replicasPreset.Max
+	if replicas.Max == 0 {
+		replicas.Max = replicasDefaultPreset.Max
+	}
+
+	return replicas
 }
 
 func mergeResourcesPreset(fn *Function, presetLabel string, presets map[string]ResourcesPreset, defaultPreset string) ResourcesPreset {
@@ -169,6 +214,14 @@ func mergeResourcesPreset(fn *Function, presetLabel string, presets map[string]R
 	}
 
 	return resources
+}
+
+func ParseReplicasPresets(presetsMap string) (map[string]ReplicasPreset, error) {
+	var presets map[string]ReplicasPreset
+	if err := json.Unmarshal([]byte(presetsMap), &presets); err != nil {
+		return presets, errors.Wrap(err, "while parsing resources presets")
+	}
+	return presets, nil
 }
 
 func ParseResourcePresets(presetsMap string) (map[string]ResourcesPreset, error) {
