@@ -1,0 +1,114 @@
+---
+# Source: serverless/charts/docker-registry/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serverless-docker-registry
+  labels:
+    app: docker-registry
+    chart: docker-registry-1.9.1
+    release: RELEASE-NAME
+    heritage: Helm
+spec:
+  selector:
+    matchLabels:
+      app: docker-registry
+      release: RELEASE-NAME
+  replicas: 1
+#
+#   strategy:
+#     type: Recreate
+#
+  strategy:
+    type: Recreate
+    rollingUpdate: null
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: docker-registry
+        release: RELEASE-NAME
+      annotations:
+        rollme: "DOZz6"
+        sidecar.istio.io/inject: "false"
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      initContainers:
+        - name: generate-htpasswd
+          image: "eu.gcr.io/kyma-project/incubator/develop/registry:2.7.1-a67baaa0"
+          volumeMounts:
+            - name: registry-credentials
+              mountPath: /regcred
+              readOnly: true
+            - mountPath: /data
+              name: htpasswd-data
+          command:
+            - sh
+            - -c
+            - |
+              htpasswd -Bbn $(cat /regcred/username.txt) $(cat /regcred/password.txt) > ./data/htpasswd
+              echo "Generated htpasswd file for docker-registry..."
+      containers:
+        - name: docker-registry
+          image: "eu.gcr.io/kyma-project/incubator/develop/registry:2.7.1-a67baaa0"
+          imagePullPolicy: IfNotPresent
+          command:
+          - /bin/registry
+          - serve
+          - /etc/docker/registry/config.yml
+          ports:
+            - containerPort: 5000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+          resources:
+            limits:
+              cpu: 400m
+              memory: 800Mi
+            requests:
+              cpu: 100m
+              memory: 300Mi
+          env:
+            - name: REGISTRY_AUTH
+              value: "htpasswd"
+            - name: REGISTRY_AUTH_HTPASSWD_REALM
+              value: "Registry Realm"
+            - name: REGISTRY_AUTH_HTPASSWD_PATH
+              value: "/data/htpasswd"
+            - name: REGISTRY_HTTP_SECRET
+            # https://docs.docker.com/registry/configuration/#http, there's no problem that it is plainly seen 
+            # using kubectl describe
+              value: "TklVWmw3SGo5U1p4T2RmUg=="
+            - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
+              value: "/var/lib/registry"
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/registry/
+            - name: "serverless-docker-registry-config"
+              mountPath: "/etc/docker/registry"
+            - mountPath: /data
+              name: htpasswd-data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: serverless-docker-registry
+        - name: serverless-docker-registry-config
+          configMap:
+            name: serverless-docker-registry-config
+        - name: registry-credentials
+          secret:
+            items:
+            - key: username
+              path: username.txt
+            - key: password
+              path: password.txt
+            secretName: serverless-registry-credentials
+        - emptyDir: {}
+          name: htpasswd-data

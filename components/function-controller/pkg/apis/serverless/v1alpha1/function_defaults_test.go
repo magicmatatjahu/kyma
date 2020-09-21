@@ -27,16 +27,16 @@ func TestSetDefaults(t *testing.T) {
 `
 	functionResources := `
 {
-"s":{"requestCpu": "25m","requestMemory": "32Mi","limitsCpu": "50m","limitsMemory": "64Mi"},
-"m":{"requestCpu": "50m","requestMemory": "64Mi","limitsCpu": "100m","limitsMemory": "128Mi"},
-"l":{"limitsCpu": "200m","limitsMemory": "256Mi"}
+"s":{"requestCpu": "25m","requestMemory": "32Mi","limitCpu": "50m","limitMemory": "64Mi"},
+"m":{"requestCpu": "50m","requestMemory": "64Mi","limitCpu": "100m","limitMemory": "128Mi"},
+"l":{"limitCpu": "200m","limitMemory": "256Mi"}
 }
 `
 	buildResources := `
 {
-"slow":{"requestCpu": "350m","requestMemory": "350Mi","limitsCpu": "700m","limitsMemory": "700Mi"},
-"normal":{"requestCpu": "700m","requestMemory": "700Mi","limitsCpu": "1100m","limitsMemory": "1100Mi"},
-"fast":{"limitsCpu": "1800m","limitsMemory": "1800Mi"}
+"slow":{"requestCpu": "350m","requestMemory": "350Mi","limitCpu": "700m","limitMemory": "700Mi"},
+"normal":{"requestCpu": "700m","requestMemory": "700Mi","limitCpu": "1100m","limitMemory": "1100Mi"},
+"fast":{"limitCpu": "1800m","limitMemory": "1800Mi"}
 }
 `
 

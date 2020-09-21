@@ -22,8 +22,8 @@ type ReplicasPreset struct {
 type ResourcesPreset struct {
 	RequestCpu    string `json:"requestCpu,omitempty"`
 	RequestMemory string `json:"requestMemory,omitempty"`
-	LimitsCpu     string `json:"limitsCpu,omitempty"`
-	LimitsMemory  string `json:"limitsMemory,omitempty"`
+	LimitCpu      string `json:"limitCpu,omitempty"`
+	LimitMemory   string `json:"limitMemory,omitempty"`
 }
 
 type FunctionReplicasDefaulting struct {
@@ -95,7 +95,7 @@ func (spec *FunctionSpec) defaultFunctionResources(ctx context.Context, fn *Func
 	defaultingConfig := ctx.Value(DefaultingConfigKey).(DefaultingConfig).Function.Resources
 	resourcesPreset := mergeResourcesPreset(fn, FunctionResourcesPresetLabel, defaultingConfig.Presets, defaultingConfig.DefaultPreset)
 
-	spec.Resources = defaultResources(resources, resourcesPreset.RequestMemory, resourcesPreset.RequestCpu, resourcesPreset.LimitsMemory, resourcesPreset.LimitsCpu)
+	spec.Resources = defaultResources(resources, resourcesPreset.RequestMemory, resourcesPreset.RequestCpu, resourcesPreset.LimitMemory, resourcesPreset.LimitCpu)
 }
 
 func (spec *FunctionSpec) defaultBuildResources(ctx context.Context, fn *Function) {
@@ -103,7 +103,7 @@ func (spec *FunctionSpec) defaultBuildResources(ctx context.Context, fn *Functio
 	defaultingConfig := ctx.Value(DefaultingConfigKey).(DefaultingConfig).BuildJob.Resources
 	resourcesPreset := mergeResourcesPreset(fn, BuildResourcesPresetLabel, defaultingConfig.Presets, defaultingConfig.DefaultPreset)
 
-	spec.BuildResources = defaultResources(resources, resourcesPreset.RequestMemory, resourcesPreset.RequestCpu, resourcesPreset.LimitsMemory, resourcesPreset.LimitsCpu)
+	spec.BuildResources = defaultResources(resources, resourcesPreset.RequestMemory, resourcesPreset.RequestCpu, resourcesPreset.LimitMemory, resourcesPreset.LimitCpu)
 }
 
 func (spec *FunctionSpec) defaultRuntime(config DefaultingConfig) {
@@ -112,7 +112,7 @@ func (spec *FunctionSpec) defaultRuntime(config DefaultingConfig) {
 	}
 }
 
-func defaultResources(res corev1.ResourceRequirements, requestMemory, requestCpu, limitsMemory, limitsCpu string) corev1.ResourceRequirements {
+func defaultResources(res corev1.ResourceRequirements, requestMemory, requestCpu, limitMemory, limitCpu string) corev1.ResourceRequirements {
 	copiedRes := res.DeepCopy()
 
 	if copiedRes.Requests == nil {
@@ -139,7 +139,7 @@ func defaultResources(res corev1.ResourceRequirements, requestMemory, requestCpu
 		copiedRes.Limits = corev1.ResourceList{}
 	}
 	if copiedRes.Limits.Memory().IsZero() {
-		newResource := resource.MustParse(limitsMemory)
+		newResource := resource.MustParse(limitMemory)
 		if copiedRes.Requests.Memory().Cmp(newResource) == 1 {
 			newResource = *copiedRes.Requests.Memory()
 		}
@@ -147,7 +147,7 @@ func defaultResources(res corev1.ResourceRequirements, requestMemory, requestCpu
 		copiedRes.Limits[corev1.ResourceMemory] = newResource
 	}
 	if copiedRes.Limits.Cpu().IsZero() {
-		newResource := resource.MustParse(limitsCpu)
+		newResource := resource.MustParse(limitCpu)
 		if copiedRes.Requests.Cpu().Cmp(newResource) == 1 {
 			newResource = *copiedRes.Requests.Cpu()
 		}
@@ -203,14 +203,14 @@ func mergeResourcesPreset(fn *Function, presetLabel string, presets map[string]R
 		resources.RequestMemory = resourcesDefaultPreset.RequestMemory
 	}
 
-	resources.LimitsCpu = resourcesPreset.LimitsCpu
-	if resources.LimitsCpu == "" {
-		resources.LimitsCpu = resourcesDefaultPreset.LimitsCpu
+	resources.LimitCpu = resourcesPreset.LimitCpu
+	if resources.LimitCpu == "" {
+		resources.LimitCpu = resourcesDefaultPreset.LimitCpu
 	}
 
-	resources.LimitsMemory = resourcesPreset.LimitsMemory
-	if resources.LimitsMemory == "" {
-		resources.LimitsMemory = resourcesDefaultPreset.LimitsMemory
+	resources.LimitMemory = resourcesPreset.LimitMemory
+	if resources.LimitMemory == "" {
+		resources.LimitMemory = resourcesDefaultPreset.LimitMemory
 	}
 
 	return resources

@@ -1,0 +1,26 @@
+---
+# Source: serverless/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: serverless-controller-manager
+  namespace: default
+  labels:
+    app: 'serverless'
+    app.kubernetes.io/instance: 'RELEASE-NAME'
+    app.kubernetes.io/managed-by: 'Helm'
+    app.kubernetes.io/name: 'serverless'
+    app.kubernetes.io/version: 'f4e7f64c'
+    helm.sh/chart: 'serverless-1.0.0'
+    version: 'f4e7f64c'
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-metrics
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: serverless
+    app.kubernetes.io/name: serverless
+    app.kubernetes.io/instance: "RELEASE-NAME"

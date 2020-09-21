@@ -1,0 +1,21 @@
+---
+# Source: serverless/charts/docker-registry/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: serverless-docker-registry
+  labels:
+    app: docker-registry
+    chart: docker-registry-1.9.1
+    release: RELEASE-NAME
+    heritage: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      protocol: TCP
+      name: http-registry
+      targetPort: 5000
+  selector:
+    app: docker-registry
+    release: RELEASE-NAME

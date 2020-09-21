@@ -10,23 +10,21 @@ data:
   WEBHOOK_SECRET_NAME: {{ include "tplValue" ( dict "value" .Values.container.envs.webhookSecretName.value "context" . ) | quote }}
   WEBHOOK_PORT: {{ include "tplValue" ( dict "value" .Values.container.envs.webhookPort.value "context" . ) | quote }}
 
-  WEBHOOK_VALIDATION_MIN_REPLICAS_VALUE: {{ include "tplValue" ( dict "value" .Values.container.envs.minReplicasValue.value "context" . ) | quote }}
-
   WEBHOOK_VALIDATION_RESERVED_ENVS: {{ include "tplValue" ( dict "value" .Values.container.envs.reservedEnvs.value "context" . ) | quote }}
 
-  WEBHOOK_DEFAULTING_MINREPLICAS: {{ include "tplValue" ( dict "value" .Values.container.envs.minReplicas.value "context" . ) | quote }}
-  WEBHOOK_DEFAULTING_MAXREPLICAS: {{ include "tplValue" ( dict "value" .Values.container.envs.maxReplicas.value "context" . ) | quote }}
+  WEBHOOK_VALIDATION_FUNCTION_REPLICAS_MIN_VALUE: {{ include "tplValue" ( dict "value" .Values.container.envs.function.replicas.minValue "context" . ) | quote }}
+  WEBHOOK_DEFAULTING_FUNCTION_REPLICAS_DEFAULT_PRESET: {{ .Values.container.envs.function.replicas.defaultPreset | quote }}
+  WEBHOOK_DEFAULTING_FUNCTION_REPLICAS_PRESETS_MAP: |-
+{{ include "tplValue" ( dict "value" .Values.container.envs.function.replicas.presets "context" . ) | nindent 4 }}
 
-  WEBHOOK_VALIDATION_FUNCTION_MIN_REQUEST_CPU: {{ include "tplValue" ( dict "value" .Values.container.envs.function.minRequestCpu "context" . ) | quote }}
-  WEBHOOK_VALIDATION_FUNCTION_MIN_REQUEST_MEMORY: {{ include "tplValue" ( dict "value" .Values.container.envs.function.minRequestMemory "context" . ) | quote }}
+  WEBHOOK_VALIDATION_FUNCTION_RESOURCES_MIN_REQUEST_CPU: {{ include "tplValue" ( dict "value" .Values.container.envs.function.resources.minRequestCpu "context" . ) | quote }}
+  WEBHOOK_VALIDATION_FUNCTION_RESOURCES_MIN_REQUEST_MEMORY: {{ include "tplValue" ( dict "value" .Values.container.envs.function.resources.minRequestMemory "context" . ) | quote }}
+  WEBHOOK_DEFAULTING_FUNCTION_RESOURCES_DEFAULT_PRESET: {{ .Values.container.envs.function.resources.defaultPreset | quote }}
+  WEBHOOK_DEFAULTING_FUNCTION_RESOURCES_PRESETS_MAP: |-
+{{ include "tplValue" ( dict "value" .Values.container.envs.function.resources.presets "context" . ) | nindent 4 }}
 
-  WEBHOOK_DEFAULTING_FUNCTION_DEFAULT_PRESET: {{ .Values.container.envs.function.defaultPreset | quote }}
-  WEBHOOK_DEFAULTING_FUNCTION_PRESETS_MAP: |-
-{{ include "tplValue" ( dict "value" .Values.container.envs.function.presets "context" . ) | nindent 4 }}
-
-  WEBHOOK_VALIDATION_BUILD_JOB_MIN_REQUEST_CPU: {{ include "tplValue" ( dict "value" .Values.container.envs.buildJob.minRequestCpu "context" . ) | quote }}
-  WEBHOOK_VALIDATION_BUILD_JOB_MIN_REQUEST_MEMORY: {{ include "tplValue" ( dict "value" .Values.container.envs.buildJob.minRequestMemory "context" . ) | quote }}
-
-  WEBHOOK_DEFAULTING_BUILD_JOB_DEFAULT_PRESET: {{ .Values.container.envs.buildJob.defaultPreset | quote }}
-  WEBHOOK_DEFAULTING_BUILD_JOB_PRESETS_MAP: |-
-{{ include "tplValue" ( dict "value" .Values.container.envs.buildJob.presets "context" . ) | nindent 4 }}
+  WEBHOOK_VALIDATION_BUILD_JOB_RESOURCES_MIN_REQUEST_CPU: {{ include "tplValue" ( dict "value" .Values.container.envs.buildJob.resources.minRequestCpu "context" . ) | quote }}
+  WEBHOOK_VALIDATION_BUILD_JOB_RESOURCES_MIN_REQUEST_MEMORY: {{ include "tplValue" ( dict "value" .Values.container.envs.buildJob.resources.minRequestMemory "context" . ) | quote }}
+  WEBHOOK_DEFAULTING_BUILD_JOB_RESOURCES_DEFAULT_PRESET: {{ .Values.container.envs.buildJob.resources.defaultPreset | quote }}
+  WEBHOOK_DEFAULTING_BUILD_JOB_RESOURCES_PRESETS_MAP: |-
+{{ include "tplValue" ( dict "value" .Values.container.envs.buildJob.resources.presets "context" . ) | nindent 4 }}

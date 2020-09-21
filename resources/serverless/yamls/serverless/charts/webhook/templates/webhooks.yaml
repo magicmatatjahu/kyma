@@ -1,0 +1,44 @@
+---
+# Source: serverless/charts/webhook/templates/webhooks.yaml
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: defaulting.webhook.serverless.kyma-project.io
+  labels:
+    app: 'serverless-webhook'
+    app.kubernetes.io/instance: 'RELEASE-NAME'
+    app.kubernetes.io/managed-by: 'Helm'
+    app.kubernetes.io/name: 'serverless-webhook'
+    role: webhook
+webhooks:
+  - admissionReviewVersions:
+      - v1beta1
+    clientConfig:
+      service:
+        name: serverless-webhook
+        namespace: default
+    failurePolicy: Fail
+    sideEffects: None
+    name: defaulting.webhook.serverless.kyma-project.io
+---
+# Source: serverless/charts/webhook/templates/webhooks.yaml
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: validation.webhook.serverless.kyma-project.io
+  labels:
+    app: 'serverless-webhook'
+    app.kubernetes.io/instance: 'RELEASE-NAME'
+    app.kubernetes.io/managed-by: 'Helm'
+    app.kubernetes.io/name: 'serverless-webhook'
+    role: webhook
+webhooks:
+  - admissionReviewVersions:
+      - v1beta1
+    clientConfig:
+      service:
+        name: serverless-webhook
+        namespace: default
+    failurePolicy: Fail
+    sideEffects: None
+    name: validation.webhook.serverless.kyma-project.io

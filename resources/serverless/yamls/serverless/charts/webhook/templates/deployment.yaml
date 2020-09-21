@@ -1,0 +1,71 @@
+---
+# Source: serverless/charts/webhook/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serverless-webhook-svc
+  namespace: default
+  labels:
+    app: 'serverless-webhook'
+    app.kubernetes.io/instance: 'RELEASE-NAME'
+    app.kubernetes.io/managed-by: 'Helm'
+    app.kubernetes.io/name: 'serverless-webhook'
+    role: webhook
+spec:
+  selector:
+    matchLabels:
+      app: serverless-webhook
+      app.kubernetes.io/name: serverless-webhook
+      app.kubernetes.io/instance: "RELEASE-NAME"
+      role: webhook
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: 'serverless-webhook'
+        app.kubernetes.io/instance: 'RELEASE-NAME'
+        app.kubernetes.io/managed-by: 'Helm'
+        app.kubernetes.io/name: 'serverless-webhook'
+        role: webhook
+    spec:
+      serviceAccountName: serverless-webhook
+      containers:
+        - name: webhook
+          image: "eu.gcr.io/kyma-project/function-webhook:b04bc441"
+          imagePullPolicy: "IfNotPresent"
+          resources:
+            requests:
+              cpu: 30m
+              memory: 50Mi
+            limits:
+              cpu: 300m
+              memory: 300Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+          ports:
+            - name: http-metrics
+              containerPort: 9090
+            - name: http-profiling
+              containerPort: 8008
+            - name: https-webhook
+              containerPort: 8443
+          envFrom:
+            - configMapRef:
+                name: serverless-webhook-envs
+          env:
+            # Because of the serverless webhook is based on the knative webhook we have to set the following configuration envs:
+            # SYSTEM_NAMESPACE, METRICS_DOMAIN, CONFIG_OBSERVABILITY_NAME
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: METRICS_DOMAIN
+              
+              value: kyma-project.io/serverless
+            - name: CONFIG_OBSERVABILITY_NAME
+              
+              value: 'serverless-webhook-config-observability'

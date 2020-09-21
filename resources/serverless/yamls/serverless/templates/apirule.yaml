@@ -1,0 +1,26 @@
+---
+# Source: serverless/templates/apirule.yaml
+apiVersion: gateway.kyma-project.io/v1alpha1
+kind: APIRule
+metadata:
+  name: serverless-docker-registry
+  namespace: kyma-system
+  labels:
+    app: 'serverless'
+    app.kubernetes.io/instance: 'RELEASE-NAME'
+    app.kubernetes.io/managed-by: 'Helm'
+    app.kubernetes.io/name: 'serverless'
+    app.kubernetes.io/version: 'f4e7f64c'
+    helm.sh/chart: 'serverless-1.0.0'
+    version: 'f4e7f64c'
+spec:
+  gateway: kyma-gateway.kyma-system.svc.cluster.local
+  service:
+    name: serverless-docker-registry
+    port: 5000
+    host: registry. # docker-registry.{DOMAIN}
+  rules:
+    - path: /.*
+      methods: ["GET"]
+      accessStrategies:
+        - handler: noop
