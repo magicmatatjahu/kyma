@@ -20,16 +20,16 @@ func TestSetDefaults(t *testing.T) {
 	two := int32(2)
 	functionReplicas := `
 {
-"s":{"min": 1,"max": 1},
-"m":{"min": 1,"max": 2},
-"l":{"min": 2}
+"S":{"min": 1,"max": 1},
+"M":{"min": 1,"max": 2},
+"L":{"min": 2}
 }
 `
 	functionResources := `
 {
-"s":{"requestCpu": "25m","requestMemory": "32Mi","limitCpu": "50m","limitMemory": "64Mi"},
-"m":{"requestCpu": "50m","requestMemory": "64Mi","limitCpu": "100m","limitMemory": "128Mi"},
-"l":{"limitCpu": "200m","limitMemory": "256Mi"}
+"S":{"requestCpu": "25m","requestMemory": "32Mi","limitCpu": "50m","limitMemory": "64Mi"},
+"M":{"requestCpu": "50m","requestMemory": "64Mi","limitCpu": "100m","limitMemory": "128Mi"},
+"L":{"limitCpu": "200m","limitMemory": "256Mi"}
 }
 `
 	buildResources := `
@@ -369,8 +369,8 @@ func TestSetDefaults(t *testing.T) {
 			givenFunc: Function{
 				ObjectMeta: v1.ObjectMeta{
 					Labels: map[string]string{
-						ReplicasPresetLabel:          "l",
-						FunctionResourcesPresetLabel: "s",
+						ReplicasPresetLabel:          "L",
+						FunctionResourcesPresetLabel: "S",
 						BuildResourcesPresetLabel:    "slow",
 					},
 				},
@@ -393,8 +393,8 @@ func TestSetDefaults(t *testing.T) {
 			},
 			expectedFunc: Function{ObjectMeta: v1.ObjectMeta{
 				Labels: map[string]string{
-					ReplicasPresetLabel:          "l",
-					FunctionResourcesPresetLabel: "s",
+					ReplicasPresetLabel:          "L",
+					FunctionResourcesPresetLabel: "S",
 					BuildResourcesPresetLabel:    "slow",
 				},
 			}, Spec: FunctionSpec{
@@ -428,8 +428,8 @@ func TestSetDefaults(t *testing.T) {
 			givenFunc: Function{
 				ObjectMeta: v1.ObjectMeta{
 					Labels: map[string]string{
-						ReplicasPresetLabel:          "l",
-						FunctionResourcesPresetLabel: "l",
+						ReplicasPresetLabel:          "L",
+						FunctionResourcesPresetLabel: "L",
 						BuildResourcesPresetLabel:    "fast",
 					},
 				},
@@ -439,8 +439,8 @@ func TestSetDefaults(t *testing.T) {
 			},
 			expectedFunc: Function{ObjectMeta: v1.ObjectMeta{
 				Labels: map[string]string{
-					ReplicasPresetLabel:          "l",
-					FunctionResourcesPresetLabel: "l",
+					ReplicasPresetLabel:          "L",
+					FunctionResourcesPresetLabel: "L",
 					BuildResourcesPresetLabel:    "fast",
 				},
 			}, Spec: FunctionSpec{

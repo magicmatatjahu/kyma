@@ -27,13 +27,13 @@ type ResourcesPreset struct {
 }
 
 type FunctionReplicasDefaulting struct {
-	DefaultPreset string                    `envconfig:"default=s"`
+	DefaultPreset string                    `envconfig:"default=S"`
 	Presets       map[string]ReplicasPreset `envconfig:"-"`
 	PresetsMap    string                    `envconfig:"default={}"`
 }
 
 type FunctionResourcesDefaulting struct {
-	DefaultPreset string                     `envconfig:"default=m"`
+	DefaultPreset string                     `envconfig:"default=M"`
 	Presets       map[string]ResourcesPreset `envconfig:"-"`
 	PresetsMap    string                     `envconfig:"default={}"`
 }
